@@ -12,6 +12,7 @@
 	<select name="action">
 		<option value="loginUser">User - LoginUser</option>
 		<option value="logoutUser">user - LogoutUser</option>
+		<option value="getShopForUsers">user - getShopForUsers</option>		
 		<option value="getCurrentUserWishlist">wishlist - getCurrentUserWishlist</option>
 		<option value="getShoppingForList">wishlist - getShoppingForList</option>
 		<option value="getCurrentCount">wishlist - getCurrentCount</option>
@@ -19,6 +20,8 @@
 		<option value="manageItem">wishlist - manageItem</option>
 		<option value="manageItemSource">wishlist - manageItemSource</option>
 		<option value="manageItemImage">wishlist - manageItemImage</option>
+		<option value="getItemDetails">wishlist - getItemDetails</option>
+		
 	</select><br><br>
 <input type='submit' name="submit" value="submit"/>	
 </td>

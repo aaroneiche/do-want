@@ -1,0 +1,48 @@
+body{
+	font-family:Arial;
+
+}
+
+#mainContainer{
+	width:800px;
+	margin-left:auto;
+	margin-right:auto;
+	height:100%;
+	margin-bottom: 150px;
+}
+
+#pageContainer{
+	height:100%;
+}
+
+#tabSet{
+	list-style-type:none;
+	position:relative;
+	margin-left:auto;
+	margin-right:auto;	
+}
+
+.zebraRow{
+	background-color: #E7E7FF;
+}
+
+.tab{
+	background-color: lightgreen;
+	margin-left:5px;
+	padding:3px;
+	display:inline;
+	border: black 1px solid;
+}
+
+.tabSelected{
+	border-bottom:none;
+	background-color:white;
+}
+
+.section{
+	display:none;
+}
+
+#pageContainer{
+	border:solid black 1px;
+}

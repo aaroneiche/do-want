@@ -1,3 +1,7 @@
+debug = {}; /* This object is here to bring whatever you want out into the global space to look at.
+	There are probably more elegant ways to do it, but meh.
+*/
+
 function login(){
 
 	userVal = jQuery("#username").val();
@@ -98,7 +102,13 @@ function getUserWishlist(forUserId){
 				{"Quantity":"quantity"},			
 				{"Tools":"tools"}
 			]; 
-			displayWishlist(wishlistData);			
+			
+			displayWishlist(wishlistData);
+			
+			//create trigger foreach item row to display detail info
+			// we do this here because we don't want to provide this detail function for the currentUserWishlist
+			$(".item_description").click(function(clickEvent){showMoreInfo(clickEvent);});
+			
 		}			
 	},"json");	
 }
@@ -130,7 +140,7 @@ Function: displayWishlist
 		Object @list - the javascript object item list: contains information to build rows.
 		String @targetTable - where to put this list. 
 */
-debug = {};
+
 function displayWishlist(displayData){
 	debug = displayData;
 	//The table we're plugging this into.
@@ -153,7 +163,10 @@ function displayWishlist(displayData){
 
 	//Loop through each item on the user list and add it to a row, which is then added to the table.
 	$(displayData.list).each(function(i,e){
-		row = $(document.createElement("tr"));
+		row = $(document.createElement("tr"))
+			.attr("data-itemId",e.itemid)
+			.attr("id","item_"+e.itemid+"_row");
+			
 		if(i % 2 != 0){
 			row.addClass("zebraRow");
 		}
@@ -161,6 +174,8 @@ function displayWishlist(displayData){
 		//Values that need to be processed before the cell is built should be done here:
 		e.ranking = renderRanking(e.ranking);
 		e.tools = renderItemTools(e,displayData.toolset);
+	
+		e.description = $(document.createElement("span")).append(e.description);
 	
 		/*
 		This loops through our table structure and puts the data in the right order. Allows users
@@ -171,7 +186,10 @@ function displayWishlist(displayData){
 		for(key in displayData.columns){
 		    for(colName in displayData.columns[key]){
 				row.append(
-					$(document.createElement("td")).append(e[displayData.columns[key][colName]])
+					$(document.createElement("td"))
+						.append(e[displayData.columns[key][colName]])
+						.attr("id","item_"+e.itemid+"_"+displayData.columns[key][colName])
+						.addClass("item_"+displayData.columns[key][colName])
 				);
 		    } 
 		}
@@ -180,9 +198,64 @@ function displayWishlist(displayData){
 	});	
 }
 
+
+function showMoreInfo(eventObject){
+	currentRow = eventObject.target.parentNode.parentNode;
+	itemid = currentRow.getAttribute("data-itemid");	
+	
+	rowCellCount = $("#"+currentRow.id+" td").length;
+	detailCell = $(document.createElement("td")).attr("id","item_"+itemid+"_detail_cell").attr("colspan",rowCellCount);
+
+	detailsBox = makeItemDetailsBox(itemid);
+	detailCell.append(detailsBox);
+
+	detailRow = $(document.createElement("tr")).attr("id","item_"+itemid+"_detail").append(detailCell);	
+	$(detailRow).insertAfter($(currentRow));
+}
+
+
+function makeItemDetailsBox(itemId){
+	
+	container = $(document.createElement("table"));
+	rowA = $(document.createElement("tr"));
+	rowB = $(document.createElement("tr"));
+	
+	sources = $(document.createElement("td")).html("sources");
+	images = $(document.createElement("td")).attr("rowspan",2).html("this is images");
+	comments =$(document.createElement("td")).html("this is comments"); 
+	
+	//get the data here.
+	
+	data = {
+		interact:'wishlist',
+		action:'getItemDetails',
+		args:{'itemId':itemId}
+	}
+	
+	$.post('ajaxCalls.php',data,function(response){	
+		
+		response.sources.each(function(i,e){
+			
+		});
+		
+				
+	},"json");
+	
+	rowA.append(sources).append(images);
+	rowB.append(comments);
+	
+	container.append(rowA).append(rowB);
+	
+	
+	
+	
+	return container;
+}
+
+
 /*
 Function: renderRanking
-	Currently takes an integer and turns it into a series of asterisks. In the future this can render an 
+	Currently takes an integer and turns it into a series of asterisks. In the future this should render an 
 	image.
 	
 	int @rankValue - The ranking of an item as a number.
@@ -205,7 +278,7 @@ Function renderItemTools
 */
 function renderItemTools(itemObject, toolInfo){
 	
-	toolBox = $(document.createElement("div")).attr("data-itemId",itemObject.itemid);
+	toolBox = $(document.createElement("div"));
 	
 	switch(toolInfo){
 		
@@ -215,19 +288,21 @@ function renderItemTools(itemObject, toolInfo){
 			itemEdit = $(document.createElement("img")).attr("src","images/write_obj.gif");
 			itemDelete = $(document.createElement("img")).attr("src","images/cross.png");		
 
+			//data-itemId is stored on the row element: tool->div->td->tr
+
 			itemReceive.click(function(){
 				alert("Marked Received: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemEdit.click(function(){
 				alert("Edit: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemDelete.click(function(){
 				alert("Delete: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			toolBox.append(itemReceive);
@@ -246,17 +321,17 @@ function renderItemTools(itemObject, toolInfo){
 
 			itemReserve.click(function(){
 				alert("Reserve: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemCopy.click(function(){
 				alert("Copy: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemReturn.click(function(){
 				alert("Return: "+
-				this.parentNode.getAttribute("data-itemId"));
+				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemBuy.click(function(){
@@ -286,8 +361,51 @@ function displayError(errorObject){
 	alert("Uh-Oh: "+errorObject.title+" Message:"+errorObject.message);
 }
 
+/*
+	Function showSection
+		Displays the related section on the page when a tab has been clicked. The click binding is done in the index document
+		
+		object @eventOb - The event object generated by the click. Passed by the anonymous function in the click bind.
+*/
+
+function showSection(eventOb){
+	$(".section").hide();
+	$(".tab").removeClass("tabSelected");
+		
+		
+	$("#"+eventOb.target.getAttribute("data-openSection")).show()
+	$(eventOb.target).addClass("tabSelected");			
+}
 
 
+/*
+Function buildShopForSet
+	Builds a set of html option elements and places them in the shop for select element on the "Other's lists" tab.
 
+*/
 
+function buildShopForSet(){
+	data = {
+		interact:'user',
+		action:'getShopForUsers'
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		userSelect = $("#listOfUsers");
+
+		$(response).each(function(i,e){
+			userOption = $(document.createElement("option"))
+				.html(e.fullname).attr("value",e.userid);
+				
+				
+			userSelect.append(userOption);
+		});
+		
+		
+		$("#listOfUsers").change(function(e){
+				getUserWishlist(this.value);
+			});
+		
+	},"json");
+}
 

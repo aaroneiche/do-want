@@ -37,14 +37,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 ?>
 	<script>
 		jQuery(document).ready(function(){
-			//things to do once the page is loaded.
+			$(".tab").click(function(e){showSection(e)});
+			getCurrentUserList();
+			buildShopForSet();
 			
-			//getUserItems(); //Get items for current User
-			//getShoppingForList(); // Get Shopping list for current User.
-		
-			//jQuery("#cancelItemInput").click(function(){clearItemForm()});
-			//setup();
-		
+			$("#myListTab").trigger("click");
 		});
 	</script>
 
@@ -52,30 +49,47 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 <div id="curtain">&nbsp;</div>
 
-<div id="userWishlistBlock">
-<h3>User Wishlist</h3>
-	<table id="userWishlist">
-		<!-- <tr class="headerRow"><th>Description</th><th>Ranking</th><th>Price</th><th>Category</th><th>Tools</th></tr>
-		-->
-	</table>
+
+<div id="mainContainer">
+	<ul id="tabSet">
+		<!-- Contains Navigation Tabs-->
+		<li class="tab" data-openSection="myList" id="myListTab">My Wishlist</li>
+		<li class="tab" data-openSection="otherLists">Other People's Lists</li>
+		<li class="tab" data-openSection="shoppingList">My Shopping List</li>
+		<li class="tab lastTab" data-openSection="manage">Manage</li>
+	</ul>
+	<div id="pageContainer">
+		<div id="myList" class="section">
+			<div id="userWishlistBlock">
+				<button id=""><img src="images/add.png" style="clear:both;"/>Add An Item</button>
+			<h3>User Wishlist</h3>
+				<table id="userWishlist">
+
+				</table>
+			</div>
+		
+		</div>
+		<div id="otherLists" class="section">
+			<h3>List of users to shop for</h3>
+		
+			<div id="otherUserWishlistBlock">
+				<h3>Other user Wishlist</h3>
+				<select id="listOfUsers">
+					<option selected> -- </option
+				</select>
+				<table id="otherUserWishlist">
+					
+				</table>
+			</div>			
+		</div>
+		<div id="shoppingList" class="section">
+			
+		</div>
+		<div id="manage" class="section">
+			
+		</div>
+	</div>
 </div>
-
-
-<!-- ShoppingForSet is the list of people who this user may shop for -->
-<div id="shoppingForSetBlock">
-<h3>List of users to shop for</h3>
-
-</div>
-
-<div id="otherUserWishlistBlock">
-<h3>Other user Wishlist</h3>
-	<table id="otherUserWishlist">
-		<!--
-			<tr class="headerRow"><th>Description</th><th>Ranking</th><th>Price</th><th>Category</th><th>Tools</th></tr>
-		-->
-	</table>
-</div>
-
 
 
 	

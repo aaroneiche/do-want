@@ -378,7 +378,7 @@ class wishlist extends db{
 	}
 	
 	/*
-		method manageItemImage
+		Method: manageItemImage
 		int @itemid: The item this image will be associated with 
 		string @filename: The name of the file that was uploaded.
 		str @itemImageAction: The desired action: add or delete.
@@ -417,6 +417,31 @@ class wishlist extends db{
 		
 		$result = $this->dbQuery($query);
 		return $result;		
+	}
+	
+	
+	/*
+		Method: getItemDetails
+		Fetches the item details for a particlar item and returns them in a associative array.
+		int @itemid: The item to request details about.
+	*/
+	function getItemDetails($args){
+		$imagesQuery = "select * from itemimages where itemid = '{$args['itemid']}'";
+		$imagesResult = $this->dbQuery($imagesQuery);
+		$imagesData = $this->dbAssoc($imagesResult);
+//		print $query;
+		
+		$sourcesQuery = "select * from itemsources where itemid = {$args['itemid']}";
+		$sourcesResult = $this->dbQuery($sourcesQuery);
+		$sourcesData = $this->dbAssoc($sourcesResult);
+		
+		$allocQuery = "select allocs.*, users.fullname from allocs, users where itemid = '{$args['itemid']}' and users.userid = allocs.userid and allocs.userid != {$_SESSION['userid']}";
+		$allocResult = $this->dbQuery($allocQuery);
+		$allocData = $this->dbAssoc($allocResult);
+		
+		
+		return array('images'=>$imagesData,'sources'=>$sourcesData,'allocs'=>$allocData);
+		
 	}
 	
 	

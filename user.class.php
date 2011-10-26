@@ -33,6 +33,13 @@ class user extends db{
 		return true;		
 	}
 
+	function getShopForUsers(){
+		$query = "select fullname,userid from users, shoppers where shoppers.mayShopFor = users.userid and shoppers.shopper = {$_SESSION['userid']}";
+
+		$result = $this->dbQuery($query);
+		return $this->dbAssoc($result);
+	}
+
 /*
 TODO:
 addUser
