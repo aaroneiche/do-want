@@ -53,18 +53,25 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 <div id="mainContainer">
 	<ul id="tabSet">
 		<!-- Contains Navigation Tabs-->
-		<li class="tab" data-openSection="myList" id="myListTab">My Wishlist</li>
-		<li class="tab" data-openSection="otherLists">Other People's Lists</li>
-		<li class="tab" data-openSection="shoppingList">My Shopping List</li>
-		<li class="tab lastTab" data-openSection="manage">Manage</li>
+		<li class="tab" data-openSection="myList" id="myListTab">
+				My Wishlist
+		</li>
+		<li class="tab" data-openSection="otherLists">
+				Other People's Lists
+		</li>
+		<li class="tab" data-openSection="shoppingList">
+				My Shopping List
+		</li>
+		<li class="tab lastTab" data-openSection="manage">
+				Manage
+		</li>
 	</ul>
 	<div id="pageContainer">
 		<div id="myList" class="section">
 			<div id="userWishlistBlock">
-				<button id=""><img src="images/add.png" style="clear:both;"/>Add An Item</button>
+				<button id="addItems"><img src="images/add.png" style="clear:both;"/><span id="addAnItemButtonText">Add An Item</span></button>
 			<h3>User Wishlist</h3>
 				<table id="userWishlist">
-
 				</table>
 			</div>
 		
@@ -75,10 +82,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div id="otherUserWishlistBlock">
 				<h3>Other user Wishlist</h3>
 				<select id="listOfUsers">
-					<option selected> -- </option
+					<option selected> -- </option>
 				</select>
 				<table id="otherUserWishlist">
-					
 				</table>
 			</div>			
 		</div>

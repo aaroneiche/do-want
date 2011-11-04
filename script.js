@@ -57,12 +57,13 @@ function getCurrentUserList(){
 		wishlistData.list = response;		
 		wishlistData.targetTable = "userWishlist";
 		wishlistData.columns = [
-			{"Description":"description"},
-			{"Ranking":"ranking"},
+			{"Description":"displayDescription"},
+			{"Ranking":"displayRanking"},
 			{"Price":"price"},
 			{"Category":"category"},
-			{"Tools":"tools"}
+			{"Tools":"displayToolbox"}
 		];
+
 
 		displayWishlist(wishlistData);
 				
@@ -95,12 +96,12 @@ function getUserWishlist(forUserId){
 			wishlistData.list = response;		
 			wishlistData.targetTable = "otherUserWishlist";
 			wishlistData.columns = [
-				{"Description":"description"},
-				{"Ranking":"ranking"},
+				{"Description":"displayDescription"},
+				{"Ranking":"displayRanking"},
 				{"Price":"price"},
 				{"Category":"category"},
 				{"Quantity":"quantity"},			
-				{"Tools":"tools"}
+				{"Tools":"displayToolbox"}
 			]; 
 			
 			displayWishlist(wishlistData);
@@ -129,7 +130,7 @@ function sortByPriceAsc(){
 }
 
 /*
-Function: displayWishlist
+	Method: displayWishlist
 	
 	Builds and displays current User's wishlist. Requrires JSON userlist object.
 	If the user listed in object is the current user, we can display edit buttons.
@@ -170,13 +171,11 @@ function displayWishlist(displayData){
 		if(i % 2 != 0){
 			row.addClass("zebraRow");
 		}
+				
+		//Generates any needed display versions of properties. Builds display-specific items depending on toolset value.
+		e.toolset = displayData.toolset;
+		e = generateDisplayElements(e);
 		
-		//Values that need to be processed before the cell is built should be done here:
-		e.ranking = renderRanking(e.ranking);
-		e.tools = renderItemTools(e,displayData.toolset);
-	
-		e.description = $(document.createElement("span")).append(e.description);
-	
 		/*
 		This loops through our table structure and puts the data in the right order. Allows users
 		to change the column order, or add/remove columns if they care to without resorting to the
@@ -197,6 +196,39 @@ function displayWishlist(displayData){
 		table.append(row);
 	});	
 }
+
+/*
+	Method: generdateDisplayElements
+	This method takes a data object returned from the database and generates appriate display data. 
+	Returns the object
+
+	object @itemObject - The item returned from the database.
+	
+*/
+function generateDisplayElements(itemObject){
+
+	switch(itemObject.toolset){
+		case "shop":
+			itemObject.displayToolbox = renderItemTools(itemObject,"shop");
+			
+			expandButton = jQuery(document.createElement('button')).addClass("expandItemButton");
+			
+			itemObject.displayDescription = $(document.createElement("span"))
+				.append(itemObject.description);
+			
+		break;
+		case "edit":
+		
+			itemObject.displayToolbox = renderItemTools(itemObject,"edit");
+			itemObject.displayDescription = $(document.createElement("span")).append(itemObject.description);
+		break;
+	}
+	
+	itemObject.displayRanking = renderRanking(itemObject.ranking);
+
+	return itemObject
+}
+
 
 
 function showMoreInfo(eventObject){
@@ -372,8 +404,7 @@ function showSection(eventOb){
 	$(".section").hide();
 	$(".tab").removeClass("tabSelected");
 		
-		
-	$("#"+eventOb.target.getAttribute("data-openSection")).show()
+	$("#"+eventOb.target.getAttribute("data-openSection")).show();
 	$(eventOb.target).addClass("tabSelected");			
 }
 

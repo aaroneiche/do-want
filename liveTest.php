@@ -1,3 +1,44 @@
+<?php
+session_start();
+
+$wishlist = file_get_contents("wishlist.class.php");
+$user = file_get_contents("user.class.php");
+
+$wlMethodNames = array();
+preg_match_all("`/\*\s+?Method:(.+?)$(.+?)\*/`ms",$wishlist,$wlMethodNames);
+
+$uMethodNames = array();
+preg_match_all("`/\*\s+?Method:(.+?)$(.+?)\*/`ms",$user,$uMethodNames);
+
+$options = "";
+
+$methodList = array_merge($wlMethodNames[1],$uMethodNames[1]);
+$commentsList = array_merge($wlMethodNames[2],$uMethodNames[2]);
+	
+$jsonArray = array();
+
+foreach($methodList as $key=> $method){
+	$jsonArray[trim($method)] = $commentsList[$key];
+}
+
+
+foreach($methodList as $method){
+	$options .="<option value=\"".trim($method)."\">$method</option>";
+}
+
+?>
+<script>
+	methodsNotes =
+	<?php 
+		print json_encode($jsonArray);
+	?>;
+	
+	function displayNotes(methodName){
+		element = document.getElementById("methodStuff").innerHTML = methodsNotes[methodName];
+	}
+	
+	
+</script>
 
 <table>
 <tr><td valign="top">
@@ -9,7 +50,11 @@
 	</select>
 	<br><br>
 	<label for="action">Action</label>
-	<select name="action">
+	<select name="action" onchange="displayNotes(this.value);">
+		<?php 
+			print $options;
+		?>
+<!--
 		<option value="loginUser">User - LoginUser</option>
 		<option value="logoutUser">user - LogoutUser</option>
 		<option value="getShopForUsers">user - getShopForUsers</option>		
@@ -21,7 +66,7 @@
 		<option value="manageItemSource">wishlist - manageItemSource</option>
 		<option value="manageItemImage">wishlist - manageItemImage</option>
 		<option value="getItemDetails">wishlist - getItemDetails</option>
-		
+	-->	
 	</select><br><br>
 <input type='submit' name="submit" value="submit"/>	
 </td>
@@ -42,7 +87,13 @@
 	Val:<input name="argVal[]"/>	
 <br><br>
 </form>
-</td></tr>
+</td>
+<td>
+<textarea id="methodStuff" cols=50 rows=8>
+</textarea>
+
+</td>
+</tr>
 <tr><td valign="top">
 Data sent to page:
 <?php
