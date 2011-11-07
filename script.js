@@ -146,7 +146,6 @@ function displayWishlist(displayData){
 	debug = displayData;
 	//The table we're plugging this into.
 	table = $("#"+displayData.targetTable);	
-	table.html("");
 	
 	/*
 	Builds the Table header and puts the columns into a definable order.
@@ -161,6 +160,18 @@ function displayWishlist(displayData){
 		}
 	}
 	table.append(hRow);
+
+/*
+	itemDetailCell = jQuery(document.createElement("td"))
+						.attr("id","itemDetailCell")
+						.append(jQuery("#itemDetailRowContent"));
+
+	itemDetailRow = jQuery(document.createElement("tr"))
+						.attr("id","itemDetailRow")
+						.append(itemDetailCell);
+
+	table.append(itemDetailRow);
+*/
 
 	//Loop through each item on the user list and add it to a row, which is then added to the table.
 	$(displayData.list).each(function(i,e){
@@ -192,15 +203,19 @@ function displayWishlist(displayData){
 				);
 		    } 
 		}
+		
+		
 
 		table.append(row);
 	});	
 }
 
 /*
-	Method: generdateDisplayElements
+	Method: generateDisplayElements
 	This method takes a data object returned from the database and generates appriate display data. 
 	Returns the object
+	If you want to add controls, images, etc to individual list items on the list, this is the place to do it.
+	
 
 	object @itemObject - The item returned from the database.
 	
@@ -211,10 +226,17 @@ function generateDisplayElements(itemObject){
 		case "shop":
 			itemObject.displayToolbox = renderItemTools(itemObject,"shop");
 			
-			expandButton = jQuery(document.createElement('button')).addClass("expandItemButton");
+			expandButton = jQuery(document.createElement('button'))
+							.addClass("expandItemButton")
+							.html("expand").
+							addClass("expandButton")
+							.click(function(eventOb){
+								showMoreInfo(eventOb);
+							});
 			
 			itemObject.displayDescription = $(document.createElement("span"))
-				.append(itemObject.description);
+				.append(itemObject.description)
+				.append(expandButton);
 			
 		break;
 		case "edit":
@@ -232,56 +254,106 @@ function generateDisplayElements(itemObject){
 
 
 function showMoreInfo(eventObject){
-	currentRow = eventObject.target.parentNode.parentNode;
-	itemid = currentRow.getAttribute("data-itemid");	
+	infoContainer = jQuery("#itemDetailRow");
+	itemRow = jQuery(eventObject.target).closest('tr');
+	itemRow.after(infoContainer);
 	
-	rowCellCount = $("#"+currentRow.id+" td").length;
-	detailCell = $(document.createElement("td")).attr("id","item_"+itemid+"_detail_cell").attr("colspan",rowCellCount);
-
-	detailsBox = makeItemDetailsBox(itemid);
-	detailCell.append(detailsBox);
-
-	detailRow = $(document.createElement("tr")).attr("id","item_"+itemid+"_detail").append(detailCell);	
-	$(detailRow).insertAfter($(currentRow));
+	getItemDetailInfo(itemRow.attr("data-itemid"));
 }
 
 
-function makeItemDetailsBox(itemId){
-	
-	container = $(document.createElement("table"));
-	rowA = $(document.createElement("tr"));
-	rowB = $(document.createElement("tr"));
-	
-	sources = $(document.createElement("td")).html("sources");
-	images = $(document.createElement("td")).attr("rowspan",2).html("this is images");
-	comments =$(document.createElement("td")).html("this is comments"); 
-	
-	//get the data here.
-	
+/*
+	Method: getItemDetailInfo
+	This method takes an itemId and fetches detailed information about it: Images, Sources (shops), Reservation info, and Comments.
+
+	int @itemId - the id of the item to be requested.
+
+*/
+function getItemDetailInfo(itemId){
+	jQuery(".itemDetailContainer").html("");
+
 	data = {
 		interact:'wishlist',
 		action:'getItemDetails',
-		args:{'itemId':itemId}
+		args:{itemid:itemId}
 	}
 	
-	$.post('ajaxCalls.php',data,function(response){	
+	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		response.sources.each(function(i,e){
+		jQuery('#itemDetailName').html(response.itemDescription);
+		jQuery('#itemDetailComment').html(response.itemComment);
+		jQuery('#itemDetailRanking').html(renderRanking(response.itemRanking));
+		
+		
+		//Sources Data
+		if(response.sources != undefined){
+			jQuery(response.sources).each(function(i,e){
+			sourceRow = jQuery(document.createElement('tr'));
+			sourceNameCell = jQuery(document.createElement('td'));
+			sourcePriceCell = jQuery(document.createElement('td'));
 			
+			//Add a url source or just the sourcename.
+			if(e.itemSourceUrl != null){ 
+				sourceName = jQuery(document.createElement('a'))
+								.attr('href',e.itemSourceUrl)
+								.attr("target","_blank")
+								.append(e.itemSource);
+			}else{
+				sourceName = e.itemSource;
+			}
+			
+			sourceNameCell.append(sourceName);
+			sourcePriceCell.append(e.itemSourcePrice);
+			
+			sourceRow.append(sourceNameCell)
+					.append(sourcePriceCell);
+			
+			jQuery("#itemDetailSourcesTable").append(sourceRow);
 		});
 		
-				
-	},"json");
+		}else{
+			jQuery('#itemDetailSourcesTable').append("No Stores/Shops have been provided for this item.");
+		}
+		
+		
+		//Image data for Galleria
+		imageData = [];
+
+		if(response.images != undefined){
+			jQuery(response.images).each(function(i,e){
+				imgObj = {"image":"uploads/"+e.itemImageFilename};			
+				imageData.push(imgObj);
+			});
 	
-	rowA.append(sources).append(images);
-	rowB.append(comments);
+			jQuery('#imageDetailGallery').galleria({
+			    data_source: imageData,
+				height:300,
+				width:400
+			});
+		}else{
+			jQuery('#imageDetailGallery').append("No images have been provided for this item.");
+		}
+		
+		//Alloc Section
+		allocElement = jQuery(document.createElement("div"));
+		
+		if(response.allocs != undefined){
+			jQuery(response.allocs).each(function(i,e){
+				if(response.allocs.length > 1){
+					allocElement.append(e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+"of this item");
+				}else{
+					allocElement.append(e.itemAllocUserName+" has reserved this item");
+				}	
+			});
+		}else{
+			allocElement.append("This item has not be reserved yet.");
+		}
+
+		jQuery("#itemDetailAlloc").append(allocElement);
+		
+		
+	},"json");	
 	
-	container.append(rowA).append(rowB);
-	
-	
-	
-	
-	return container;
 }
 
 
@@ -380,6 +452,17 @@ function renderItemTools(itemObject, toolInfo){
 	
 }
 
+
+/*
+	Method: renderCategory
+		Takes a category Id and returns a relevant text or element.
+*/
+function renderCategory(categoryId){
+		
+}
+
+
+
 /*
 Function displayError
 	Displays an error returned from the system (Client or Serverside) to the user.
@@ -388,7 +471,6 @@ Function displayError
 		@title - The errorMessage's title.
 		@message - The related Error message.
 */
-
 function displayError(errorObject){
 	alert("Uh-Oh: "+errorObject.title+" Message:"+errorObject.message);
 }
@@ -439,4 +521,56 @@ function buildShopForSet(){
 		
 	},"json");
 }
+
+
+/*
+	Method: getCategories 
+		Gets a list of categories. Puts them into the storedData component.
+*/
+
+function getCategories(){
+	data = {
+		interact:'wishlist',
+		action:'getCategories'
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		storedData.categories = response;
+	},"json");
+}
+
+/*
+	Method: buildCategorySelect
+		Builds option elements with category names and their ids as values. Appends them to the second argument Element.
+		
+		array @categoryObject - a javascript array of objects that contain category names and ids.
+		string @parentElement - the element where these items should be appened to.
+*/
+function buildCategorySelect(parentElement){
+
+	data = {
+		interact:'wishlist',
+		action:'getCategories'
+	}
+	
+	//Get the Categories.
+	jQuery.post('ajaxCalls.php',data,function(response){
+
+		jQuery(response).each(function(i,e){
+			option = jQuery(document.createElement("option"))
+				.attr("value",e.categoryid)
+				.append(e.category);
+			
+			jQuery(parentElement).append(option);
+		});
+	},"json");
+}
+
+
+
+
+
+
+
+
 

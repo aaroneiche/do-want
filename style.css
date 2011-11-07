@@ -1,25 +1,26 @@
 body{
 	font-family:Arial;
-
+	z-index:-10;
 }
 
 #mainContainer{
 	width:800px;
 	margin-left:auto;
 	margin-right:auto;
-	height:100%;
+/*	height:100%; */
 	margin-bottom: 150px;
 }
 
 #pageContainer{
-	height:100%;
+/*	height:100%; */
 }
 
 #tabSet{
 	list-style-type:none;
 	position:relative;
 	margin-left:auto;
-	margin-right:auto;	
+	margin-right:auto;
+	
 }
 
 .zebraRow{
@@ -41,8 +42,44 @@ body{
 
 .section{
 	display:none;
+	
 }
 
 #pageContainer{
 	border:solid black 1px;
+	margin-bottom: 10px;
 }
+
+.expandButton{
+	float:right;
+}
+
+th{
+	text-align:left;
+}
+
+.tableBlock{
+	height: 600px; 
+	overflow-y:scroll;
+}
+
+.listTable{
+	margin: 0px auto;
+}
+
+#listOfUsers{
+	font-size:14pt;
+}
+
+
+#addEditItemForm{
+	border:1px solid black;
+	padding:6px;
+	width: 400px;
+	margin:0px auto;
+	position:relative;
+}
+
+
+
+

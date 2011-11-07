@@ -390,9 +390,9 @@ class wishlist extends db{
 			
 				//Random name to prevent overwriting files.
 				$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];
-			
+				
 				$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName); //
-
+				
 				$query = "insert into itemimages(itemid,filename) values(
 					'{$this->dbEscape($args['itemid'])}',
 					'{$this->dbEscape($randName)}'
@@ -419,33 +419,184 @@ class wishlist extends db{
 		return $result;		
 	}
 	
-	
 	/*
 		Method: getItemDetails
-		Fetches the item details for a particlar item and returns them in a associative array.
+		Fetches the item details for a particular item and returns them in a associative array.
+		returns an associative array containing item info, images, sources, and alloc data.
+		
 		int @itemid: The item to request details about.
 	*/
 	function getItemDetails($args){
-		$imagesQuery = "select * from itemimages where itemid = '{$args['itemid']}'";
-		$imagesResult = $this->dbQuery($imagesQuery);
-		$imagesData = $this->dbAssoc($imagesResult);
-//		print $query;
-		
-		$sourcesQuery = "select * from itemsources where itemid = {$args['itemid']}";
-		$sourcesResult = $this->dbQuery($sourcesQuery);
-		$sourcesData = $this->dbAssoc($sourcesResult);
-		
-		$allocQuery = "select allocs.*, users.fullname from allocs, users where itemid = '{$args['itemid']}' and users.userid = allocs.userid and allocs.userid != {$_SESSION['userid']}";
-		$allocResult = $this->dbQuery($allocQuery);
-		$allocData = $this->dbAssoc($allocResult);
 		
 		
-		return array('images'=>$imagesData,'sources'=>$sourcesData,'allocs'=>$allocData);
+		$query = "
+			(select
+			'item' as rowType,
+			items.itemid as commonId,
+			items.description as itemDescription,
+			items.ranking as itemRanking,
+			items.category as itemCategory,
+			items.comment as itemComment,
+			items.quantity as itemQuantity,
+			items.addedByUserId as itemAddedByUserId,
+
+			'' as itemSourceId,
+			'' as itemSource,
+			'' as itemSourceUrl,
+			'' as itemSourcePrice,
+			'' as itemSourceComments,
+
+			'' as itemImageId,
+			'' as itemImageFilename,
+
+			'' as itemAllocUserId,
+			'' as itemAllocUserName,			
+			'' as itemAllocBought,
+			'' as itemAllocQuantity
+
+			from items where itemid = '{$args['itemid']}'
+			)
+			UNION
+
+			(select
+			'source' as rowType,
+			itemsources.itemid as commonId,
+			'' as itemDescription,
+			'' as itemRanking,
+			'' as itemCategory,
+			'' as itemComment,
+			'' as itemQuantity,
+			'' as itemAddedByUserId,
+
+			itemsources.sourceid as itemSourceId,
+			itemsources.source as itemSource,
+			itemsources.sourceurl as itemSourceUrl,
+			itemsources.sourceprice as itemSourcePrice,
+			itemsources.sourcecomments as itemSourceComments,
+
+			'' as itemImageId,
+			'' as itemImageFilename,
+
+			'' as itemAllocUserId,
+			'' as itemAllocUserName,		
+			'' as itemAllocBought,
+			'' as itemAllocQuantity
+
+			from itemsources where itemsources.itemid = '{$args['itemid']}'
+			)
+
+			UNION
+
+			(select
+			'image' as rowType,
+			itemimages.itemid as commonId,
+			'' as itemDescription,
+			'' as itemRanking,
+			'' as itemCategory,
+			'' as itemComment,
+			'' as itemQuantity,
+			'' as itemAddedByUserId,
+
+			'' as itemSourceId,
+			'' as itemSource,
+			'' as itemSourceUrl,
+			'' as itemSourcePrice,
+			'' as itemSourceComments,
+
+			itemimages.imageid as itemImageId,
+			itemimages.filename as itemImageFilename,
+
+			'' as itemAllocUserId,
+			'' as itemAllocUserName,
+			'' as itemAllocBought,
+			'' as itemAllocQuantity
+
+			from itemimages where itemimages.itemid = '{$args['itemid']}'
+			)
+
+			UNION
+
+			(select
+			'alloc' as rowType,
+			allocs.itemid as commonId,
+			'' as itemDescription,
+			'' as itemRanking,
+			'' as itemCategory,
+			'' as itemComment,
+			'' as itemQuantity,
+			'' as itemAddedByUserId,
+
+			'' as itemSourceId,
+			'' as itemSource,
+			'' as itemSourceUrl,
+			'' as itemSourcePrice,
+			'' as itemSourceComments,
+
+			'' as itemImageId,
+			'' as itemImageFilename,
+
+			allocs.userid as itemAllocUserId,
+			users.fullname as itemAllocUserName,
+			allocs.bought as itemAllocBought,
+			allocs.quantity as itemAllocQuantity
+
+			from allocs,users 
+			where 
+				allocs.itemid = '{$args['itemid']}' and
+				users.userid = allocs.userid
+			)";
 		
+			$result = $this->dbQuery($query);
+			$itemDetailArray = $this->dbAssoc($result,true);
+			
+			$itemDetails = array();
+			
+			foreach($itemDetailArray as $line){
+
+				//eliminate empty values that are a carry-over from the Query.				
+				foreach($line as $key => $value){
+					if($value == null){
+						unset($line[$key]);
+					}
+				}
+				
+				switch($line['rowType']){
+					case 'item':
+						$itemDetails = $line;
+					break;
+					case 'source':
+						$itemDetails['sources'][] = $line;
+					break;
+					
+					case 'image':
+						$itemDetails['images'][] = $line;					
+					break;
+						
+					case 'alloc':
+						$itemDetails['allocs'][] = $line;					
+					break;									
+				}
+			}
+			
+		return $itemDetails;
 	}
-	
-	
+
+
+	/*
+		Method: getCategories
+		Fetches a list of categories with IDs and names
+	*/
+	function getCategories(){
+		
+		$query = "select * from categories";
+		$categoryResult = $this->dbQuery($query);
+		
+		return $this->dbAssoc($categoryResult);
+	}
+
 }
+
+	
 
 
 ?>
