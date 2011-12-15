@@ -328,8 +328,12 @@ class wishlist extends db{
 		}
 
 		$result = $this->dbQuery($query);
-		return $result;
-	
+		
+		if($args['itemAction'] == 'add'){
+			return $this->dbLastInsertId();
+		}else{
+			return $result;			
+		}
 	}
 	
 	/*
@@ -418,6 +422,21 @@ class wishlist extends db{
 		$result = $this->dbQuery($query);
 		return $result;		
 	}
+	
+	
+	/*
+		Method: addItem
+		A non-abstract version for adding items to the list in general - adds and item, then it's images and sources.
+	*/
+	function addItem($args){
+		
+		$itemId = manageItem($args);
+		
+				
+	}
+	
+	
+	
 	
 	/*
 		Method: getItemDetails

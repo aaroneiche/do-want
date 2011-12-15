@@ -108,10 +108,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	<div><label for="itemDescriptionInput">Item Description:</label><input id="itemDescriptionInput"></input></div>
 	<div><label for="itemCategoryInput">Item Category:</label><select id="itemCategoryInput"></select></div>
 	<div><label for="itemQuantityInput">Item Quantity:</label><input id="itemQuantityInput"></input></div>
-	<div><label for="itemDescriptionComment">Item Comment:</label><textarea id="itemDescriptionComment"></textarea></div>
-	
-	
-	
+	<div>
+		<label for="itemDescriptionComment">Item Comment:</label>
+		<textarea id="itemDescriptionComment"></textarea>
+	</div>
 	
 </div>	
 

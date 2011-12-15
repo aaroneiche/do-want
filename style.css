@@ -4,11 +4,12 @@ body{
 }
 
 #mainContainer{
+	position:relative;
 	width:800px;
 	margin-left:auto;
 	margin-right:auto;
-/*	height:100%; */
 	margin-bottom: 150px;
+	z-index:0;
 }
 
 #pageContainer{
@@ -73,11 +74,12 @@ th{
 
 
 #addEditItemForm{
+	position:relative;
 	border:1px solid black;
 	padding:6px;
 	width: 400px;
 	margin:0px auto;
-	position:relative;
+	z-index:100;	
 }
 
 

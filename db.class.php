@@ -74,6 +74,9 @@ class db{
 		return $assocData;
 	}
 	
+	function dbLastInsertId($resource = null){
+		return mysql_insert_id($resource);
+	}
 
 	function dbRowCount($resource){
 		return mysql_num_rows($resource);
