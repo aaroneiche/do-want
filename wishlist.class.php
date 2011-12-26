@@ -279,9 +279,9 @@ class wishlist extends db{
 	}
 	
 
-	/*------------------------------*/
+
 	/*
-		method: manageItem
+		Method: manageItem
 		Adds, Edits or Deletes an item from the database.
 
 		str @itemAction: The action name for managing an item: add,edit,or delete.
@@ -294,8 +294,9 @@ class wishlist extends db{
 		int @quantity: How many of this item the user would like.		
 		
 	*/
+	
 	function manageItem($args){
-
+				
 		switch($args['itemAction']){
 			case 'add':
 				$query = "insert into items(userid, description,ranking,category,comment,quantity)
@@ -323,7 +324,7 @@ class wishlist extends db{
 			break;
 			case 'delete':
 				$query = "delete from items where itemid = {$this->dbEscape($args['itemid'])}";
-			
+				
 			break;			
 		}
 
@@ -332,7 +333,7 @@ class wishlist extends db{
 		if($args['itemAction'] == 'add'){
 			return $this->dbLastInsertId();
 		}else{
-			return $result;			
+			return $result;
 		}
 	}
 	

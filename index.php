@@ -44,13 +44,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 ?>
 	<script>
 		jQuery(document).ready(function(){
-			$(".tab").click(function(e){showSection(e)});
+			jQuery(".tab").click(function(e){showSection(e)});
 
 			getCurrentUserList();
 			buildShopForSet();
-			getCategories();
 			
-			$("#myListTab").trigger("click");
+			//Calls getCategories with a callback to populate the category select on the item form.
+			getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
+			
+			jQuery("#myListTab").trigger("click");
 			
 			jQuery("#addItems").click(function(event){
 			

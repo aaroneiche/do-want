@@ -147,6 +147,8 @@ function displayWishlist(displayData){
 	//The table we're plugging this into.
 	table = $("#"+displayData.targetTable);	
 	
+	table.html("");
+	
 	/*
 	Builds the Table header and puts the columns into a definable order.
 	*/
@@ -405,8 +407,7 @@ function renderItemTools(itemObject, toolInfo){
 			});
 
 			itemDelete.click(function(){
-				alert("Delete: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
+				deleteItem(this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			toolBox.append(itemReceive);
@@ -528,7 +529,7 @@ function buildShopForSet(){
 		Gets a list of categories. Puts them into the storedData component.
 */
 
-function getCategories(){
+function getCategories(callbackFunction){
 	data = {
 		interact:'wishlist',
 		action:'getCategories'
@@ -536,6 +537,11 @@ function getCategories(){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		storedData.categories = response;
+		
+		//A callback function if we want it.
+		if(callbackFunction != undefined){
+			callbackFunction.func.apply(callbackFunction.func,callbackFunction.args);
+		}
 	},"json");
 }
 
@@ -546,25 +552,69 @@ function getCategories(){
 		array @categoryObject - a javascript array of objects that contain category names and ids.
 		string @parentElement - the element where these items should be appened to.
 */
-function buildCategorySelect(parentElement){
+function buildCategorySelect(categoryObject,parentElement){
 
+	//Set these to defaults if they're not defined in the call
+	categoryObject = (categoryObject == undefined)? storedData.categories: categoryObject;
+	parentElement = (parentElement == undefined)?".categorySelect": parentElement;
+
+	jQuery(categoryObject).each(function(i,e){
+		var option =  jQuery(document.createElement("option"))
+							.attr("id",e.categoryid)
+							.html(e.category);
+		jQuery(parentElement).append(option);
+	});
+		
+}
+
+/*
+	Method: deleteItem
+		Deletes an item from the user's wishlist
+		
+		int @itemId - The id of the item to delete.
+*/
+function deleteItem(itemId){
+	
 	data = {
 		interact:'wishlist',
-		action:'getCategories'
+		action:'manageItem',
+		args:{
+			itemAction:'delete',				
+			itemid:itemId
+		}
 	}
 	
 	//Get the Categories.
 	jQuery.post('ajaxCalls.php',data,function(response){
-
-		jQuery(response).each(function(i,e){
-			option = jQuery(document.createElement("option"))
-				.attr("value",e.categoryid)
-				.append(e.category);
-			
-			jQuery(parentElement).append(option);
-		});
-	},"json");
+		if(response){
+			getCurrentUserList();
+		}
+		
+	});
 }
+
+
+/*
+	Method: addItemFromForm
+		Takes formId, gets form data and inserts an item into the database. Goes through 3 steps to add item, images, and sources.
+			
+*/
+function addItemFromForm(formId){
+	
+				
+			
+				
+	
+}
+
+
+
+
+
+
+
+
+
 
 
 
