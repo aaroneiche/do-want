@@ -123,6 +123,36 @@ function getUserWishlist(forUserId){
 /*
 
 */
+
+function sortByDescriptionDesc(){	
+	wishlistData.list.sort(function(a,b){
+			if(a.description > b.description){
+				return -1;
+			}else if(a.description < b.description) {
+				return 1
+			}else{
+				return 0;
+			}
+		});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);
+
+}
+
+function sortByDescriptionAsc(){	
+	wishlistData.list.sort(function(a,b){
+		if(a.description > b.description){
+			return 1;
+		}else if(a.description < b.description) {
+			return -1
+		}else{
+			return 0;
+		}
+	});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);
+}
+
 function sortByRankingDesc(){	
 	wishlistData.list.sort(function(a,b){return a.ranking - b.ranking});
 	wishlistData.skipHeader = true;
@@ -136,11 +166,15 @@ function sortByRankingAsc(){
 }
 
 function sortByPriceDesc(wishlistObject){
-	wishlistObject.list.sort(function(a,b){return a.price - b.price});
+	wishlistData.list.sort(function(a,b){return a.price - b.price});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);
 }
 
 function sortByPriceAsc(wishlistObject){
-	wishlistObject.list.sort(function(a,b){return b.price - a.price});
+	wishlistData.list.sort(function(a,b){return b.price - a.price});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);	
 }
 
 

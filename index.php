@@ -26,7 +26,10 @@ session_start();
 		storedData.columns = {
 			"Description":{
 				"displayColumn":"displayDescription",
-				"sortFunctions":[]
+				"sortFunctions":[
+					sortByDescriptionDesc,
+					sortByDescriptionAsc
+				]
 			},
 			"Ranking":{
 				"displayColumn":"displayRanking",
@@ -37,7 +40,10 @@ session_start();
 			},
 			"Price":{
 				"displayColumn":"price",
-				"sortFunctions":[]
+				"sortFunctions":[
+					sortByPriceAsc,
+					sortByPriceDesc
+				]
 			},
 			"Category":{
 				"displayColumn":"category",
