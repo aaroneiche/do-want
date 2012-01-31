@@ -51,11 +51,17 @@ function getCurrentUserList(){
 	}
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
+		
+		storedData.userWishlist = response;
+		
 		wishlistData = {};
 		wishlistData.isCurrentUser = true;
 		wishlistData.toolset = "edit";		
 		wishlistData.list = response;		
 		wishlistData.targetTable = "userWishlist";
+		wishlistData.skipHeader = false;
+		wishlistData.columns = storedData.columns;
+		/*
 		wishlistData.columns = [
 			{"Description":"displayDescription"},
 			{"Ranking":"displayRanking"},
@@ -63,7 +69,7 @@ function getCurrentUserList(){
 			{"Category":"category"},
 			{"Tools":"displayToolbox"}
 		];
-
+		*/
 
 		displayWishlist(wishlistData);
 				
@@ -118,16 +124,25 @@ function getUserWishlist(forUserId){
 
 */
 function sortByRankingDesc(){	
+	wishlistData.list.sort(function(a,b){return a.ranking - b.ranking});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);
 }
 
 function sortByRankingAsc(){
+	wishlistData.list.sort(function(a,b){return b.ranking - a.ranking});
+	wishlistData.skipHeader = true;
+	displayWishlist(wishlistData);	
 }
 
-function sortByPriceDesc(){
+function sortByPriceDesc(wishlistObject){
+	wishlistObject.list.sort(function(a,b){return a.price - b.price});
 }
 
-function sortByPriceAsc(){
+function sortByPriceAsc(wishlistObject){
+	wishlistObject.list.sort(function(a,b){return b.price - a.price});
 }
+
 
 /*
 	Method: displayWishlist
@@ -143,43 +158,40 @@ function sortByPriceAsc(){
 */
 
 function displayWishlist(displayData){
-	debug = displayData;
+	//debug = displayData;
 	//The table we're plugging this into.
 	table = $("#"+displayData.targetTable);	
-	
-	table.html("");
-	
+		
 	/*
 	Builds the Table header and puts the columns into a definable order.
 	*/
-	hRow = $(document.createElement("tr"));
-	
-	for(key in displayData.columns){
-	    for(colName in displayData.columns[key]){
+	if(displayData.skipHeader == true){
+		jQuery(".itemRow").remove();
+		
+	}else{
+		table.html("");	
+		
+		hRow = $(document.createElement("tr"));
+
+		for(columnName in displayData.columns){
 			hRow.append(
-				$(document.createElement("th")).append(colName)
-			);
+				$(document.createElement("th")).append(columnName)
+				.toggle(
+					displayData.columns[columnName].sortFunctions[0],
+					displayData.columns[columnName].sortFunctions[1]
+				)
+			);		
 		}
+
+		table.append(hRow);		
 	}
-	table.append(hRow);
-
-/*
-	itemDetailCell = jQuery(document.createElement("td"))
-						.attr("id","itemDetailCell")
-						.append(jQuery("#itemDetailRowContent"));
-
-	itemDetailRow = jQuery(document.createElement("tr"))
-						.attr("id","itemDetailRow")
-						.append(itemDetailCell);
-
-	table.append(itemDetailRow);
-*/
 
 	//Loop through each item on the user list and add it to a row, which is then added to the table.
 	$(displayData.list).each(function(i,e){
 		row = $(document.createElement("tr"))
 			.attr("data-itemId",e.itemid)
-			.attr("id","item_"+e.itemid+"_row");
+			.attr("id","item_"+e.itemid+"_row")
+			.addClass("itemRow");
 			
 		if(i % 2 != 0){
 			row.addClass("zebraRow");
@@ -194,20 +206,16 @@ function displayWishlist(displayData){
 		to change the column order, or add/remove columns if they care to without resorting to the
 		code. There will need to be a tool to change column order to make this valuable.
 		*/	
-		
-		for(key in displayData.columns){
-		    for(colName in displayData.columns[key]){
-				row.append(
-					$(document.createElement("td"))
-						.append(e[displayData.columns[key][colName]])
-						.attr("id","item_"+e.itemid+"_"+displayData.columns[key][colName])
-						.addClass("item_"+displayData.columns[key][colName])
-				);
-		    } 
+
+		for(column in displayData.columns){
+			row.append(					
+				$(document.createElement("td"))
+					.append(e[displayData.columns[column].displayColumn])
+					.attr("id","item_"+e.itemid+"_"+displayData.columns[column].displayColumn)
+					.addClass("item_"+displayData.columns[column].displayColumn)
+			);	
 		}
 		
-		
-
 		table.append(row);
 	});	
 }
@@ -560,11 +568,28 @@ function buildCategorySelect(categoryObject,parentElement){
 
 	jQuery(categoryObject).each(function(i,e){
 		var option =  jQuery(document.createElement("option"))
-							.attr("id",e.categoryid)
+							.attr("value",e.categoryid)
 							.html(e.category);
 		jQuery(parentElement).append(option);
 	});
 		
+}
+
+
+/*
+	Method: buildRankSelect
+		Builds option elements with Rank display, Appends them to the second argument Element. Depends on renderRanking
+
+		array @rankObject - a javascript array of objects that contain category names and ids.
+		string @parentElement - the element where these items should be appened to.
+*/
+function buildRankSelect(rankCount,parentElement){
+	var rankOptionsList = "";
+	
+	for(var i = 1; i <= rankCount; i++){
+		var rankOption = '<option value="'+i+'">'+renderRanking(i)+'</option>';
+		jQuery(parentElement).append(rankOption);
+	}
 }
 
 /*
@@ -595,15 +620,29 @@ function deleteItem(itemId){
 
 
 /*
-	Method: addItemFromForm
-		Takes formId, gets form data and inserts an item into the database. Goes through 3 steps to add item, images, and sources.
-			
+	Method: manageItem
+
+	Adds or edits an item from the manageItemForm form. 
+				
 */
-function addItemFromForm(formId){
+function manageItem(){
 	
-				
-			
-				
+	data = {
+		interact:'wishlist',
+		action:'manageItem',
+		args:{}
+	}
+	
+	currentItemId = jQuery("#manageItemForm #itemId").val();
+	
+	//Ternary operation to determine whether we're editing or adding an item.
+	data.args.itemAction = (currentItemId == "") ? "add" : "edit";
+	
+	data.args.description = jQuery("#itemDescriptionInput").val();
+	data.args.category = jQuery("#itemCategoryInput").val();
+	data.args.quantity = jQuery("#itemQuantityInput").val();
+	data.args.comment = jQuery("#itemCommentInput").val();
+	data.args.ranking = jQuery("#itemRankInput").val();
 	
 }
 

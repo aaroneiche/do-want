@@ -278,8 +278,6 @@ class wishlist extends db{
 		//	return $this->dbAssoc($result);				
 	}
 	
-
-
 	/*
 		Method: manageItem
 		Adds, Edits or Deletes an item from the database.
@@ -424,7 +422,6 @@ class wishlist extends db{
 		return $result;		
 	}
 	
-	
 	/*
 		Method: addItem
 		A non-abstract version for adding items to the list in general - adds and item, then it's images and sources.
@@ -435,9 +432,6 @@ class wishlist extends db{
 		
 				
 	}
-	
-	
-	
 	
 	/*
 		Method: getItemDetails
@@ -600,7 +594,6 @@ class wishlist extends db{
 			
 		return $itemDetails;
 	}
-
 
 	/*
 		Method: getCategories

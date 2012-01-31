@@ -18,10 +18,8 @@ body{
 
 #tabSet{
 	list-style-type:none;
-	position:relative;
-	margin-left:auto;
-	margin-right:auto;
-	
+	margin:0 auto;
+	width:500px;
 }
 
 .zebraRow{
@@ -31,7 +29,10 @@ body{
 .tab{
 	background-color: lightgreen;
 	margin-left:5px;
-	padding:3px;
+	padding-right:3px;
+	padding-left:3px;	
+	padding-top:3px;	
+	
 	display:inline;
 	border: black 1px solid;
 }

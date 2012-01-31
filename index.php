@@ -23,6 +23,32 @@ session_start();
 		userId = "<?php if(isset($_SESSION['userId'])) print $_SESSION['userId'] ?>";
 		storedData = {};
 		
+		storedData.columns = {
+			"Description":{
+				"displayColumn":"displayDescription",
+				"sortFunctions":[]
+			},
+			"Ranking":{
+				"displayColumn":"displayRanking",
+				"sortFunctions":[
+					sortByRankingAsc,
+					sortByRankingDesc
+				]				
+			},
+			"Price":{
+				"displayColumn":"price",
+				"sortFunctions":[]
+			},
+			"Category":{
+				"displayColumn":"category",
+				"sortFunctions":[]
+			},
+			"Tools":{
+				"displayColumn":"displayToolbox",
+				"sortFunctions":[]
+			},
+		};
+		
 		//Setup our galleria theme, even though we won't do anything with it for a while.
 		Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
 		
@@ -44,6 +70,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 ?>
 	<script>
 		jQuery(document).ready(function(){
+			
 			jQuery(".tab").click(function(e){showSection(e)});
 
 			getCurrentUserList();
@@ -52,12 +79,18 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			//Calls getCategories with a callback to populate the category select on the item form.
 			getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
 			
+			buildRankSelect(5,"#itemRankInput");
+			
+			
+			
 			jQuery("#myListTab").trigger("click");
 			
 			jQuery("#addItems").click(function(event){
-			
 			});
 			
+			jQuery("#itemSubmit").click(function(){
+				//send item.
+			});
 		});
 		
 	</script>
@@ -102,38 +135,42 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</tr>
 	</table>
 
-	
-
 </div>
 
-<div id="addEditItemForm">
-	<div><label for="itemDescriptionInput">Item Description:</label><input id="itemDescriptionInput"></input></div>
-	<div><label for="itemCategoryInput">Item Category:</label><select id="itemCategoryInput"></select></div>
-	<div><label for="itemQuantityInput">Item Quantity:</label><input id="itemQuantityInput"></input></div>
-	<div>
-		<label for="itemDescriptionComment">Item Comment:</label>
-		<textarea id="itemDescriptionComment"></textarea>
-	</div>
-	
+<div id="manageItemFormBlock">
+	<form id="manageItemForm" onsubmit="return false;">
+		<input type="hidden" id="itemId" />
+		<div><label for="itemDescriptionInput">Item Description:</label><input id="itemDescriptionInput"/></div>
+		<div><label for="itemRankingInput">Item Rank:</label><select id="itemRankInput"></select></div>				
+		<div><label for="itemCategoryInput">Item Category:</label><select id="itemCategoryInput"></select></div>
+		<div><label for="itemQuantityInput">Item Quantity:</label><input id="itemQuantityInput"/></div>
+		<div>
+			<label for="itemDescriptionComment">Item Comment:</label>
+			<textarea id="itemDescriptionComment"></textarea>
+		</div>
+		<div><input id="itemSubmit" type="submit" value="submit" ></div>
+	</form>
 </div>	
 
 
 <div id="mainContainer">
-	<ul id="tabSet">
-		<!-- Contains Navigation Tabs-->
-		<li class="tab" data-openSection="myList" id="myListTab">
-				My Wishlist
-		</li>
-		<li class="tab" data-openSection="otherLists">
-				Other People's Lists
-		</li>
-		<li class="tab" data-openSection="shoppingList">
-				My Shopping List
-		</li>
-		<li class="tab lastTab" data-openSection="manage">
-				Manage
-		</li>
-	</ul>
+	<div id="tabSetContainer">
+		<ul id="tabSet">
+			<!-- Contains Navigation Tabs-->
+			<li class="tab" data-openSection="myList" id="myListTab">
+					My Wishlist
+			</li>
+			<li class="tab" data-openSection="otherLists">
+					Other People's Lists
+			</li>
+			<li class="tab" data-openSection="shoppingList">
+					My Shopping List
+			</li>
+			<li class="tab lastTab" data-openSection="manage">
+					Manage
+			</li>
+		</ul>
+	</div>
 	<div id="pageContainer">
 		<div id="myList" class="section">
 			<h3>My Wishlist</h3>
