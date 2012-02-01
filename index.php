@@ -54,6 +54,7 @@ session_start();
 				"sortFunctions":[]
 			},
 		};
+
 		
 		//Setup our galleria theme, even though we won't do anything with it for a while.
 		Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');

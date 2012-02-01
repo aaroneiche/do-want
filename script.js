@@ -100,8 +100,11 @@ function getUserWishlist(forUserId){
 			wishlistData.isCurrentUser = false;
 			wishlistData.toolset = "shop";
 			wishlistData.list = response;		
+			wishlistData.skipHeader = false;			
 			wishlistData.targetTable = "otherUserWishlist";
-			wishlistData.columns = [
+			wishlistData.columns = storedData.columns;
+			/*
+			[
 				{"Description":"displayDescription"},
 				{"Ranking":"displayRanking"},
 				{"Price":"price"},
@@ -109,7 +112,7 @@ function getUserWishlist(forUserId){
 				{"Quantity":"quantity"},			
 				{"Tools":"displayToolbox"}
 			]; 
-			
+			*/
 			displayWishlist(wishlistData);
 			
 			//create trigger foreach item row to display detail info
@@ -121,7 +124,7 @@ function getUserWishlist(forUserId){
 }
 
 /*
-
+Javascript sort functions
 */
 
 function sortByDescriptionDesc(){	
@@ -200,7 +203,7 @@ function displayWishlist(displayData){
 	Builds the Table header and puts the columns into a definable order.
 	*/
 	if(displayData.skipHeader == true){
-		jQuery(".itemRow").remove();
+		jQuery("#"+displayData.targetTable+" tr.itemRow").remove();
 		
 	}else{
 		table.html("");	
@@ -214,7 +217,7 @@ function displayWishlist(displayData){
 					displayData.columns[columnName].sortFunctions[0],
 					displayData.columns[columnName].sortFunctions[1]
 				)
-			);		
+			);
 		}
 
 		table.append(hRow);		

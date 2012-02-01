@@ -58,6 +58,7 @@ body{
 
 th{
 	text-align:left;
+	cursor:pointer;	
 }
 
 .tableBlock{
