@@ -96,7 +96,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			});
 			
 			jQuery("#itemSubmit").click(function(){
-				//send item.
+				manageItem();
 			});
 		});
 		
@@ -152,8 +152,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div><label for="itemCategoryInput">Item Category:</label><select id="itemCategoryInput"></select></div>
 		<div><label for="itemQuantityInput">Item Quantity:</label><input id="itemQuantityInput"/></div>
 		<div>
-			<label for="itemDescriptionComment">Item Comment:</label>
-			<textarea id="itemDescriptionComment"></textarea>
+			<label for="itemCommentInput">Item Comment:</label>
+			<textarea id="itemCommentInput"></textarea>
 		</div>
 		<div><input id="itemSubmit" type="submit" value="submit" ></div>
 	</form>

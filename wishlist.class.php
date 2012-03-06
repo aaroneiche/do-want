@@ -294,12 +294,14 @@ class wishlist extends db{
 	*/
 	
 	function manageItem($args){
+		
+		error_log(print_r($args,true));
 				
 		switch($args['itemAction']){
 			case 'add':
 				$query = "insert into items(userid, description,ranking,category,comment,quantity)
 						values(
-							'{$this->dbEscape($args['userid'])}',
+							'{$_SESSION['userid']}',
 							'{$this->dbEscape($args['description'])}',
 							'{$this->dbEscape($args['ranking'])}',
 							'{$this->dbEscape($args['category'])}',
@@ -327,9 +329,10 @@ class wishlist extends db{
 		}
 
 		$result = $this->dbQuery($query);
+		error_log($result);
 		
 		if($args['itemAction'] == 'add'){
-			return $this->dbLastInsertId();
+			return $this->dbLastInsertId($result);
 		}else{
 			return $result;
 		}

@@ -681,6 +681,10 @@ function manageItem(){
 	data.args.comment = jQuery("#itemCommentInput").val();
 	data.args.ranking = jQuery("#itemRankInput").val();
 	
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		console.log(response);
+	});	
 }
 
 

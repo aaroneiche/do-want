@@ -2,6 +2,7 @@
 /*
 This script handles ajax calls for the server.
 */
+
 function __autoload($class_name) {
     require_once strtolower($class_name . '.class.php');
 }
