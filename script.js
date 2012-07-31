@@ -136,7 +136,9 @@ function displayWishlist(displayData){
 	
 			if(column != "Tools"){
 				cell.click(function(){
-					displayItemsDetails(e);
+					//displayItemsDetails(e);
+					getItemDetailInfo(e.itemid);
+					//debug = e;
 				});
 			}
 
@@ -391,9 +393,9 @@ function generateDisplayElements(itemObject){
 
 
 function showMoreInfo(eventObject){
-	infoContainer = jQuery("#itemDetailRow");
+	//infoContainer = jQuery("#itemDetailRow");
 	itemRow = jQuery(eventObject.target).closest('tr');
-	itemRow.after(infoContainer);
+	//itemRow.after(infoContainer);
 	
 	getItemDetailInfo(itemRow.attr("data-itemid"));
 }
@@ -407,8 +409,8 @@ function showMoreInfo(eventObject){
 
 */
 function getItemDetailInfo(itemId){
-	jQuery(".itemDetailContainer").html("");
-
+	//jQuery(".itemDetailContainer").html("");
+	
 	data = {
 		interact:'wishlist',
 		action:'getItemDetails',
@@ -417,6 +419,8 @@ function getItemDetailInfo(itemId){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
+		console.log("getItemDetailInfo: query response received");
+		debug = response;
 		jQuery('#itemDetailName').html(response.itemDescription);
 		jQuery('#itemDetailComment').html(response.itemComment);
 		jQuery('#itemDetailRanking').html(renderRanking(response.itemRanking));
@@ -487,7 +491,10 @@ function getItemDetailInfo(itemId){
 		}
 
 		jQuery("#itemDetailAlloc").append(allocElement);
-				
+		
+		$("#itemDetailsModal").modal();
+		
+		
 	},"json");	
 	
 }
@@ -595,22 +602,6 @@ function renderItemTools(itemObject, toolInfo){
 function renderCategory(categoryId){
 		
 }
-
-
-
-/*
-Function displayError
-	Displays an error returned from the system (Client or Serverside) to the user.
-	
-	object @errorObject
-		@title - The errorMessage's title.
-		@message - The related Error message.
-*/
-function displayError(errorObject){
-	alert("Uh-Oh: "+errorObject.title+" Message:"+errorObject.message);
-}
-
-
 
 
 /*
