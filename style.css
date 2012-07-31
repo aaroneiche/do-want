@@ -84,6 +84,11 @@ th{
 	z-index:100;	
 }
 
+#displayAlert{
+	display:none;
+}
 
-
+#listOfUsers{
+	height:100%;
+}
 
