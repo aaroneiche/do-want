@@ -419,7 +419,6 @@ function getItemDetailInfo(itemId){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		console.log("getItemDetailInfo: query response received");
 		debug = response;
 		jQuery('#itemDetailName').html(response.itemDescription);
 		jQuery('#itemDetailComment').html(response.itemComment);
@@ -453,7 +452,7 @@ function getItemDetailInfo(itemId){
 		});
 		
 		}else{
-			jQuery('#itemDetailSourcesTable').append("No Stores/Shops have been provided for this item.");
+			jQuery('#itemDetailSourcesTable').html("No Stores/Shops have been provided for this item.");
 		}
 		
 		
@@ -472,7 +471,7 @@ function getItemDetailInfo(itemId){
 				width:400
 			});
 		}else{
-			jQuery('#imageDetailGallery').append("No images have been provided for this item.");
+			jQuery('#imageDetailGallery').html("No images have been provided for this item.");
 		}
 		
 		//Alloc Section
@@ -487,7 +486,7 @@ function getItemDetailInfo(itemId){
 				}	
 			});
 		}else{
-			allocElement.append("This item has not be reserved yet.");
+			allocElement.html("This item has not be reserved yet.");
 		}
 
 		jQuery("#itemDetailAlloc").append(allocElement);
@@ -750,7 +749,8 @@ function manageItem(){
 	
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
-		console.log(response);
+		getCurrentUserList();
+		$("#manageItemFormBlock").modal('hide');
 	});	
 }
 

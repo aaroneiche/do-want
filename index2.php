@@ -72,7 +72,7 @@ session_start();
 		};
 
 		$(document).ready(function(){
-			$("#tabSetContainer button")
+			$("#tabSetContainer a")
 				.click(function(e){showSection(e);})
 				.button();
 			
@@ -101,7 +101,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	{
 /*
 	If we have a logged in user, let's take them to the site.
-*/		
+*/
 ?>
 	<script>
 		jQuery(document).ready(function(){
@@ -132,29 +132,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 	<button class="btn" onclick="logout();">Logout</button>
 
-<div id="curtain">&nbsp;</div>
-
-<!-- Meant to hold all the stuff we want to. Some browsers don't like it when you stick random table rows outside of a table, so I made a bag of holding-->
-<div id="bagOfHolding" style="display:none">
-	<table id="bohTable">
-		<tr id="itemDetailRow">
-			<td colspan="6">
-				<div id="itemDetailRowContent">
-					
-				</div>
-			</td>
-		</tr>
-	</table>
-
-</div>
-
 <div class="modal hide fade" id="manageItemFormBlock">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h3>Manage Item</h3>
-  </div>
-  <div class="modal-body">
 	<form id="manageItemForm" class="form-horizontal" onsubmit="return false;">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage Item</h2>
+	  </div>
+	  <div class="modal-body">
 		<input type="hidden" id="itemId" />
 		<div><label for="itemDescriptionInput">Item Description:</label><input id="itemDescriptionInput"/></div>
 		<div><label for="itemRankingInput">Item Rank:</label><select id="itemRankInput"></select></div>				
@@ -165,14 +149,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<textarea id="itemCommentInput"></textarea>
 		</div>
 		
-		<input id="itemSubmit" type="submit" value="submit" >
-	</form>
-
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-    <a href="#" class="btn btn-primary">Save changes</a>
-  </div>
+		<!-- <input id="itemSubmit" type="submit" value="submit" > -->
+		
+	  </div>
+	  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
+	  </div>
+  </form>
 </div>
 
 
@@ -180,7 +164,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h3>Item Details</h3>
-	<table border="1" width="100%">
+	<table border="1" width="100%" class="table table-bordered">
 		<tr>
 			<td id="itemDetailInfoBox">
 				<h3 id="itemDetailName" class="itemDetailContainer"></h3>
@@ -211,25 +195,28 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-    <a href="#" class="btn btn-primary">Save changes</a>
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
   </div>
 </div>
 
 
 
 <div class="row">
-	<div id="tabSetContainer" class="btn-group span6 offset3" data-toggle="buttons-radio">
-		<button class="btn" id="myListTab" data-section="myList">My Wishlist</button>
-		<button class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</button>
-		<button class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</button>
-		<button class="btn" id="manageTab" data-section="manage">Manage</button>
+	<div id="tabSetContainer" class="span8 offset2">		
+		<div class="btn-group buttons-radio">
+			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
+			<a href="#" class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</a>
+			<a href="#" class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</a>
+				<?php if($_SESSION['admin'] == 1){ ?>
+			<a href="#" class="btn" id="manageTab" data-section="manage">Manage</a>
+				<?php } ?>
+		</div>		
 	</div>
 </div>
 <div class="row">
 	<div id="pageBlock" class="span8 offset2">
 		<div id="myList" class="section">
-			<h3>My Wishlist</h3>
+			<h2>My Wishlist</h2>
 			<button id="addItems" class="btn">Add Item</button>
 
 			<div id="userWishlistBlock" class="tableBlock">
@@ -239,11 +226,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 		
 		<div id="otherLists" class="section">
-			<h3>List of users to shop for</h3>
+			<h2>List of users to shop for</h2>
 			<select id="listOfUsers" class="">
 				<option selected> -- </option>
 			</select>
-			<h3>Other user Wishlist</h3>
+			<h2>Other user Wishlist</h2>
 			
 			<div id="otherUserWishlistBlock" class="tableBlock">
 				<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
@@ -253,9 +240,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="shoppingList" class="section">
 			Shopping List
 		</div>
+	<?php if($_SESSION['admin'] == 1){ ?>
 		<div id="manage" class="section">
 			Admin (not visible for non-admin users)
 		</div>
+	<?php } ?>
 	</div>
 </div>
 

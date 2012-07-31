@@ -2,7 +2,7 @@ body{
 	font-family:Arial;
 	z-index:-10;
 }
-
+/*
 #mainContainer{
 	position:relative;
 	width:800px;
@@ -11,17 +11,12 @@ body{
 	margin-bottom: 150px;
 	z-index:0;
 }
-
+*/
 #pageContainer{
 /*	height:100%; */
 }
 
-#tabSet{
-	list-style-type:none;
-	margin:0 auto;
-	width:500px;
-}
-
+/*
 .zebraRow{
 	background-color: #E7E7FF;
 }
@@ -41,6 +36,18 @@ body{
 	border-bottom:none;
 	background-color:white;
 }
+*/
+
+.btn-group {
+    margin: 0px auto; 
+    text-align: center;
+    font-size:0 !important;
+}
+
+.btn-group .btn {
+	float:none;
+    display:inline-block;
+}
 
 .section{
 	display:none;
@@ -59,11 +66,6 @@ body{
 th{
 	text-align:left;
 	cursor:pointer;	
-}
-
-.tableBlock{
-	height: 600px; 
-	overflow-y:scroll;
 }
 
 .listTable{
