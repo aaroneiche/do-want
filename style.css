@@ -2,41 +2,6 @@ body{
 	font-family:Arial;
 	z-index:-10;
 }
-/*
-#mainContainer{
-	position:relative;
-	width:800px;
-	margin-left:auto;
-	margin-right:auto;
-	margin-bottom: 150px;
-	z-index:0;
-}
-*/
-#pageContainer{
-/*	height:100%; */
-}
-
-/*
-.zebraRow{
-	background-color: #E7E7FF;
-}
-
-.tab{
-	background-color: lightgreen;
-	margin-left:5px;
-	padding-right:3px;
-	padding-left:3px;	
-	padding-top:3px;	
-	
-	display:inline;
-	border: black 1px solid;
-}
-
-.tabSelected{
-	border-bottom:none;
-	background-color:white;
-}
-*/
 
 .btn-group {
     margin: 0px auto; 

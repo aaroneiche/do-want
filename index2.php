@@ -20,7 +20,7 @@ session_start();
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
-	
+
 	<link href="style.css" rel="stylesheet">
 	
 	<style type="text/css">
@@ -116,8 +116,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			
 			buildRankSelect(5,"#itemRankInput");
 			
-			
-			
 			jQuery("#myListTab").trigger("click");
 			
 			jQuery("#addItems").click(function(event){
@@ -140,22 +138,27 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  </div>
 	  <div class="modal-body">
 		<input type="hidden" id="itemId" />
-		<div><label for="itemDescriptionInput">Item Description:</label><input id="itemDescriptionInput"/></div>
-		<div><label for="itemRankingInput">Item Rank:</label><select id="itemRankInput"></select></div>				
-		<div><label for="itemCategoryInput">Item Category:</label><select id="itemCategoryInput"></select></div>
-		<div><label for="itemQuantityInput">Item Quantity:</label><input id="itemQuantityInput"/></div>
-		<div>
-			<label for="itemCommentInput">Item Comment:</label>
-			<textarea id="itemCommentInput"></textarea>
+		<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input id="itemDescriptionInput"/></div></div>
+		<div class="control-group"><label class="control-label" for="itemRankingInput">Item Rank:</label><div class="controls"><select id="itemRankInput"></select></div></div>				
+		<div class="control-group"><label class="control-label" for="itemCategoryInput">Item Category:</label><div class="controls"><select id="itemCategoryInput"></select></div></div>
+		<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input id="itemQuantityInput" class="input-mini"/></div></div>
+		<div class="control-group">
+			<label class="control-label" for="itemCommentInput">Item Comment:</label>
+			<div class="controls">
+				<textarea id="itemCommentInput"></textarea>
+			</div>
 		</div>
-		
-		<!-- <input id="itemSubmit" type="submit" value="submit" > -->
-		
-	  </div>
-	  <div class="modal-footer">
+		<div class="control-group">
+			<label class="control-label" for="itemSourcesEdit">Sources:</label>
+			<div class="controls">
+				<select id="itemSourcesEdit" multiple="multiple"></select>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
 		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
-	  </div>
+	</div>
   </form>
 </div>
 
@@ -199,11 +202,33 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
   </div>
 </div>
 
-
+<div class="modal hide fade" id="itemSourceFormBlock">
+	<form id="itemSourceForm" class="form-horizontal" onsubmit="return false;">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage Source</h2>
+	  </div>
+	  <div class="modal-body">
+		<input type="hidden" id="itemId" />
+		<input type="hidden" id="sourceId" />
+		<div><label for="sourceName">Source Name:</label><input id="sourceName"/></div>
+		<div><label for="sourceUrl">Source URL:</label><input id="sourceUrl"/></div>
+		<div><label for="sourcePrice">Source Price:</label><input id="sourcePrice"/></div>
+		<div>
+			<label for="sourceComments">Source Comments:</label>
+			<textarea id="sourceComments"></textarea>
+		</div>
+	  </div>
+	  <div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
+	  </div>
+  </form>
+</div>
 
 <div class="row">
 	<div id="tabSetContainer" class="span8 offset2">		
-		<div class="btn-group buttons-radio">
+		<div class="btn-group" data-toggle="buttons-radio">
 			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
 			<a href="#" class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</a>
 			<a href="#" class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</a>

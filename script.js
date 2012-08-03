@@ -41,7 +41,6 @@ function createAlert(message,type){
 
 }
 
-
 /*
 	Function showSection
 		Displays the related section on the page when a tab has been clicked. The click binding is done in the index document
@@ -70,7 +69,7 @@ function showSection(eventOb){
 function displayWishlist(displayData){
 	//debug = displayData;
 	//The table we're plugging this into.
-	table = $("#"+displayData.targetTable);	
+	table = $("#"+displayData.targetTable);
 		
 	/*
 	Builds the Table header and puts the columns into a definable order.
@@ -102,20 +101,8 @@ function displayWishlist(displayData){
 			.attr("data-itemId",e.itemid)
 			.attr("id","item_"+e.itemid+"_row")
 			.attr("data-toggle","collapse")
-			.attr("data-target","detail"+i);
-			
-		
-		/*
-		detailRow = $(document.createElement("tr"))
-			.addClass("collapse");
-			
-		detailCell = $(document.createElement("td"))
-			.attr("id","detail"+i)
-			.html("This is a test row for "+i)
-			.attr("colspan","5");
-			
-		detailRow.append(detailCell);
-		*/
+			.attr("data-target","detail"+i)
+			.addClass("itemRow");
 		
 		//Generates any needed display versions of properties. Builds display-specific items depending on toolset value.
 		e.toolset = displayData.toolset;
@@ -160,12 +147,6 @@ function displayItemsDetails(itemInfo){
 	
 	$("#itemDetailsModal").modal('show');
 }
-
-
-
-
-
-
 
 /* --------------------- This break separates functions that were made after the move to bootstrap. -------------------------------------*/
 
@@ -480,16 +461,16 @@ function getItemDetailInfo(itemId){
 		if(response.allocs != undefined){
 			jQuery(response.allocs).each(function(i,e){
 				if(response.allocs.length > 1){
-					allocElement.append(e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+"of this item");
+					allocElement.html(e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+"of this item");
 				}else{
-					allocElement.append(e.itemAllocUserName+" has reserved this item");
+					allocElement.html(e.itemAllocUserName+" has reserved this item");
 				}	
 			});
 		}else{
 			allocElement.html("This item has not be reserved yet.");
 		}
 
-		jQuery("#itemDetailAlloc").append(allocElement);
+		jQuery("#itemDetailAlloc").html(allocElement);
 		
 		$("#itemDetailsModal").modal();
 		
@@ -542,8 +523,11 @@ function renderItemTools(itemObject, toolInfo){
 			});
 
 			itemEdit.click(function(){
+				/*
 				alert("Edit: "+
 				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
+				*/
+				populateManageItemForm(this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
 			});
 
 			itemDelete.click(function(){
@@ -755,7 +739,68 @@ function manageItem(){
 }
 
 
-
+/**/
+function populateManageItemForm(itemId){
+	data = {
+		interact:'wishlist',
+		action:'getItemDetails',
+		args:{itemid:itemId}
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		debug = response;
+		
+		jQuery('#itemDescriptionInput').val(response.itemDescription);
+		jQuery('#itemQuantityInput').val(response.itemQuantity);
+		jQuery('#itemRankInput').val(response.itemRanking);
+		jQuery('#itemCategoryInput').val(response.itemCategory);
+		
+		//Sources Data
+		if(response.sources != undefined){
+			jQuery(response.sources).each(function(i,e){
+			
+				sourceOption = jQuery(document.createElement('option'))
+								.html(e.itemSource)
+								.dblclick(function(){
+									$("#manageItemFormBlock").modal('hide');
+									$("#itemSourceFormBlock").modal('show');
+								})
+				
+				jQuery("#itemSourcesEdit").append(sourceOption);
+				
+				/*
+				sourceRow = jQuery(document.createElement('tr'));
+				sourceNameCell = jQuery(document.createElement('td'));
+				sourcePriceCell = jQuery(document.createElement('td'));
+				
+				//Add a url source or just the sourcename.
+				if(e.itemSourceUrl != null){ 
+					sourceName = jQuery(document.createElement('a'))
+									.attr('href',e.itemSourceUrl)
+									.attr("target","_blank")
+									.append(e.itemSource);
+				}else{
+					sourceName = e.itemSource;
+				}
+				
+				sourceNameCell.append(sourceName);
+				sourcePriceCell.append(e.itemSourcePrice);
+				
+				sourceRow.append(sourceNameCell)
+						.append(sourcePriceCell);
+				
+				jQuery("#itemDetailSourcesTable").append(sourceRow);
+				*/
+			});
+		
+		}else{
+			jQuery('#itemDetailSourcesTable').html("No Stores/Shops have been provided for this item.");
+		}		
+		
+		
+		$('#manageItemFormBlock').modal('show');
+	},"json");
+}
 
 
 
