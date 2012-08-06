@@ -294,7 +294,7 @@ class wishlist extends db{
 	*/
 	
 	function manageItem($args){
-		
+		error_log("test");
 		error_log(print_r($args,true));
 				
 		switch($args['itemAction']){

@@ -329,10 +329,6 @@ function sortByPriceAsc(wishlistObject){
 }
 
 
-
-
-
-
 /*
 	Method: generateDisplayElements
 	This method takes a data object returned from the database and generates appropriate display data. 
@@ -408,6 +404,8 @@ function getItemDetailInfo(itemId){
 		
 		//Sources Data
 		if(response.sources != undefined){
+			jQuery("#itemDetailSourcesTable").html("");
+		
 			jQuery(response.sources).each(function(i,e){
 			sourceRow = jQuery(document.createElement('tr'));
 			sourceNameCell = jQuery(document.createElement('td'));
@@ -519,19 +517,15 @@ function renderItemTools(itemObject, toolInfo){
 
 			itemReceive.click(function(){
 				alert("Marked Received: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
+				$(this).closest("tr").attr("data-itemId"))
 			});
 
 			itemEdit.click(function(){
-				/*
-				alert("Edit: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
-				*/
-				populateManageItemForm(this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
+				populateManageItemForm($(this).closest("tr").attr("data-itemId"));
 			});
 
 			itemDelete.click(function(){
-				deleteItem(this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
+				deleteItem($(this).closest("tr").attr("data-itemId"));
 			});
 
 			toolBox.append(itemReceive);
@@ -706,10 +700,8 @@ function deleteItem(itemId){
 }
 
 
-/*
-	Method: manageItem
-
-	Adds or edits an item from the manageItemForm form. 
+/*	Method: manageItem
+	Takes data from manageItemForm and sends it to the database via AJAX
 				
 */
 function manageItem(){
@@ -719,28 +711,47 @@ function manageItem(){
 		action:'manageItem',
 		args:{}
 	}
-	
 	currentItemId = jQuery("#manageItemForm #itemId").val();
 	
 	//Ternary operation to determine whether we're editing or adding an item.
 	data.args.itemAction = (currentItemId == "") ? "add" : "edit";
 	
+	data.args.itemid = currentItemId;
 	data.args.description = jQuery("#itemDescriptionInput").val();
 	data.args.category = jQuery("#itemCategoryInput").val();
 	data.args.quantity = jQuery("#itemQuantityInput").val();
 	data.args.comment = jQuery("#itemCommentInput").val();
 	data.args.ranking = jQuery("#itemRankInput").val();
 	
-	
 	jQuery.post('ajaxCalls.php',data,function(response){
+		
 		getCurrentUserList();
 		$("#manageItemFormBlock").modal('hide');
 	});	
 }
 
+/* Method: clearMangeItemForm
+	Clears unique inputs on manageItemForm
+	
+*/
+function clearManageItemForm(){
+	jQuery('#itemId').val("");
+	jQuery('#itemDescriptionInput').val("");
+	jQuery('#itemQuantityInput').val("");
+	jQuery('#itemRankInput').val("1");
+	jQuery('#itemCategoryInput').val("1");
+	jQuery('#itemSourcesEdit').html("");
+	
+	//console.log("form cleared");
+}
 
-/**/
+/* Method: populateManageItemForm
+	Gets the itemDetails and puts them into the #manageItemForm form, then calls the modal to display.
+*/
 function populateManageItemForm(itemId){
+	
+	clearManageItemForm(); //Clears the form of any previous data. 
+	
 	data = {
 		interact:'wishlist',
 		action:'getItemDetails',
@@ -750,6 +761,7 @@ function populateManageItemForm(itemId){
 	jQuery.post('ajaxCalls.php',data,function(response){
 		debug = response;
 		
+		jQuery('#itemId').val(itemId);
 		jQuery('#itemDescriptionInput').val(response.itemDescription);
 		jQuery('#itemQuantityInput').val(response.itemQuantity);
 		jQuery('#itemRankInput').val(response.itemRanking);
@@ -767,30 +779,6 @@ function populateManageItemForm(itemId){
 								})
 				
 				jQuery("#itemSourcesEdit").append(sourceOption);
-				
-				/*
-				sourceRow = jQuery(document.createElement('tr'));
-				sourceNameCell = jQuery(document.createElement('td'));
-				sourcePriceCell = jQuery(document.createElement('td'));
-				
-				//Add a url source or just the sourcename.
-				if(e.itemSourceUrl != null){ 
-					sourceName = jQuery(document.createElement('a'))
-									.attr('href',e.itemSourceUrl)
-									.attr("target","_blank")
-									.append(e.itemSource);
-				}else{
-					sourceName = e.itemSource;
-				}
-				
-				sourceNameCell.append(sourceName);
-				sourcePriceCell.append(e.itemSourcePrice);
-				
-				sourceRow.append(sourceNameCell)
-						.append(sourcePriceCell);
-				
-				jQuery("#itemDetailSourcesTable").append(sourceRow);
-				*/
 			});
 		
 		}else{
@@ -803,9 +791,13 @@ function populateManageItemForm(itemId){
 }
 
 
+/* Method populateItemSourceForm
+	Gets itemSource details and puts them into the #itemSourceForm form, then calls teh modal to display.
+*/
+function populateItemSourceForm(sourceId){
+// Note to developer: This should probably also get the name of the related item, so it's available to the user for context.
 
-
-
+}
 
 
 
