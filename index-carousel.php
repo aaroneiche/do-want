@@ -72,9 +72,11 @@ session_start();
 		};
 
 		$(document).ready(function(){
+			/*
 			$("#tabSetContainer a")
 				.click(function(e){showSection(e);})
 				.button();
+			*/
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
@@ -117,10 +119,18 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			
 			buildRankSelect(5,"#itemRankInput");
 
-			jQuery("#myCarousel").carousel('pause');
-
+//			jQuery("#pageCarousel").carousel();
+//			jQuery("#myCarousel").carousel();
+			
+			jQuery("#myListTab").click(function(){jQuery("#pageCarousel").carousel(0).carousel("pause");});
+			jQuery("#otherListsTab").click(function(){jQuery("#pageCarousel").carousel(1).carousel("pause");});
+			jQuery("#shoppingListTab").click(function(){jQuery("#pageCarousel").carousel(2).carousel("pause");});
+			jQuery("#manageTab").click(function(){jQuery("#pageCarousel").carousel(3).carousel("pause");});
+			
+			
+			
 			jQuery("#backToUsersLink").click(function(){
-				jQuery("#myCarousel").carousel('prev');
+				jQuery("#myCarousel").carousel('prev').carousel("pause");
 			});
 
 			jQuery("#itemSubmit").click(function(){
@@ -130,7 +140,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			
 			
 			jQuery("#myListTab").trigger("click");
-						
+			jQuery("#myCarousel").carousel('pause');			
+			
 		});
 		
 	</script>
@@ -248,58 +259,64 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 </div>
 <div class="row">
 	<div id="pageBlock" class="span8 offset2">
-		<div id="myList" class="section">
-			<h2>My Wishlist</h2>
-			<button id="addItems" class="btn">Add Item</button>
-
-			<div id="userWishlistBlock" class="tableBlock">
-				<table id="userWishlist" class="table table-striped table-bordered table-condensed">
-				</table>
-			</div>
-		</div>
-		
-		<div id="otherLists" class="section">
-			<!--
-			<h2>List of users to shop for</h2>
-			<select id="listOfUsers" class="">
-				<option selected> -- </option>
-			</select>
-			<h2>Other user Wishlist</h2>
-			-->
-			<div id="myCarousel" class="carousel slide">
-			  <!-- Carousel items -->
-			  <div class="carousel-inner">
+		<div id="pageCarousel" class="carousel slide">
+			<!-- Carousel items -->
+			<div class="carousel-inner">
 				<div class="active item">
-					<h2>People I'm shopping for.</h2>
-					<!-- <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a> -->
-					Click on a User to see their wishlist.
-					<table id="listOfUsersTable" class="table table-striped table-bordered table-condensed">
-					</table>					
+					<div id="myList" class="section">
+						<h2>My Wishlist</h2>
+						<button id="addItems" class="btn">Add Item</button>
+
+						<div id="userWishlistBlock" class="tableBlock">
+							<table id="userWishlist" class="table table-striped table-bordered table-condensed">
+							</table>
+						</div>
+					</div>
 				</div>
 				<div class="item">
-					<h2>Wishlist:</h2>
-					<a class="btn" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left"></i> Back to Users</a>
-					<div id="otherUserWishlistBlock" class="tableBlock">
-						<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
-						</table>
-					</div>	
+					<div id="otherLists" class="section">
+						<!--
+						<h2>List of users to shop for</h2>
+						<select id="listOfUsers" class="">
+							<option selected> -- </option>
+						</select>
+						<h2>Other user Wishlist</h2>
+						-->
+						<div id="myCarousel" class="carousel slide">
+						  <!-- Carousel items -->
+						  <div class="carousel-inner">
+							<div class="active item">
+								<h2>People I'm shopping for.</h2>
+								<!-- <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a> -->
+								Click on a User to see their wishlist.
+								<table id="listOfUsersTable" class="table table-striped table-bordered table-condensed">
+								</table>					
+							</div>
+							<div class="item">
+								<h2>Wishlist:</h2>
+								<a class="btn" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left"></i> Back to Users</a>
+								<div id="otherUserWishlistBlock" class="tableBlock">
+									<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
+									</table>
+								</div>	
+							</div>
+						  </div>
+						  <!-- Carousel nav -->
+						</div>					
+					</div><!-- end otherLists block -->			
 				</div>
-			  </div>
-			  <!-- Carousel nav -->
-			  
-			  
-			</div>
-
-			
+				<div class="item">
+					<div id="shoppingList" class="section">
+						Shopping List
+					</div>
+				</div>
+				<div class="item">
+					<div id="manage" class="section">
+						Admin (not visible for non-admin users)
+					</div>
+				</div>
+			</div><!-- end carousel-inner -->
 		</div>
-		<div id="shoppingList" class="section">
-			Shopping List
-		</div>
-	<?php if($_SESSION['admin'] == 1){ ?>
-		<div id="manage" class="section">
-			Admin (not visible for non-admin users)
-		</div>
-	<?php } ?>
 	</div>
 </div>
 	

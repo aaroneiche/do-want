@@ -15,8 +15,8 @@ body{
 }
 
 .section{
+	height:100%;
 	display:none;
-	
 }
 
 #pageContainer{
@@ -59,3 +59,6 @@ th{
 	height:100%;
 }
 
+#myCarousel{
+	height:200px;
+}
