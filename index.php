@@ -55,7 +55,7 @@ session_start();
 				]				
 			},
 			"Price":{
-				"displayColumn":"price",
+				"displayColumn":"minprice",
 				"sortFunctions":[
 					sortByPriceAsc,
 					sortByPriceDesc

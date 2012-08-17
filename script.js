@@ -741,6 +741,7 @@ function clearManageItemForm(){
 	jQuery('#itemRankInput').val("1");
 	jQuery('#itemCategoryInput').val("1");
 	jQuery('#itemSourcesEdit').html("");
+	jQuery('#itemCommentinput').val("");	
 	
 	//console.log("form cleared");
 }

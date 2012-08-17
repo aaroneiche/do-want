@@ -10,7 +10,11 @@ class wishlist extends db{
 	*/
 
 	function getCurrentUserWishlist(){
-		$query = "select * from {$this->options['table_prefix']}items where userid = '{$_SESSION['userid']}'";
+			// "select * from {$this->options['table_prefix']}items where userid = '{$_SESSION['userid']}'";
+		$query ="select 
+					items.*, 
+					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice 
+				from items where userid = '{$_SESSION['userid']}'";
 		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
@@ -44,7 +48,7 @@ class wishlist extends db{
 				     	(select min(sourceprice)
 				          from {$this->options['table_prefix']}itemsources
 				          where itemsources.itemid = items.itemid)
-				     as price,
+				     as minprice,
 				     quantity,
 					quantity -
 						(select allocs.quantity from {$this->options['table_prefix']}allocs where allocs.itemid = items.itemid)
