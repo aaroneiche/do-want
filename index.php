@@ -62,7 +62,7 @@ session_start();
 				]
 			},
 			"Category":{
-				"displayColumn":"category",
+				"displayColumn":"displayCategory",
 				"sortFunctions":[]
 			},
 			"Tools":{
@@ -70,6 +70,8 @@ session_start();
 				"sortFunctions":[]
 			},
 		};
+
+		storedData.categories = [];
 
 		$(document).ready(function(){
 			$("#tabSetContainer a")
@@ -113,7 +115,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			buildShopForSet();
 			
 			//Calls getCategories with a callback to populate the category select on the item form.
-			getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
+			//getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
 			
 			buildRankSelect(5,"#itemRankInput");
 

@@ -13,8 +13,10 @@ class wishlist extends db{
 			// "select * from {$this->options['table_prefix']}items where userid = '{$_SESSION['userid']}'";
 		$query ="select 
 					items.*, 
-					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice 
-				from items where userid = '{$_SESSION['userid']}'";
+					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice, 
+					categories.category as displayCategory 
+				from items,categories where userid = '{$_SESSION['userid']}'
+					and categories.categoryid = items.category";
 		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
@@ -44,7 +46,7 @@ class wishlist extends db{
 				     itemid,
 				     description,
 				     ranking,
-				     category,
+				     categories.category as displayCategory,
 				     	(select min(sourceprice)
 				          from {$this->options['table_prefix']}itemsources
 				          where itemsources.itemid = items.itemid)
@@ -55,11 +57,13 @@ class wishlist extends db{
 				     as available
 				from
 				     {$this->options['table_prefix']}items,
-					{$this->options['table_prefix']}shoppers
+					{$this->options['table_prefix']}shoppers,
+					{$this->options['table_prefix']}categories
 				where
 					{$this->options['table_prefix']}items.userid = '{$args['shopForId']}' and 
 					{$this->options['table_prefix']}shoppers.shopper = '{$_SESSION['userid']}' and
-					{$this->options['table_prefix']}shoppers.mayshopfor = '{$args['shopForId']}'";
+					{$this->options['table_prefix']}shoppers.mayshopfor = '{$args['shopForId']}' and
+					{$this->options['table_prefix']}categoryid = items.category";s
 				
 			$result = $this->dbQuery($query);
 			return $this->dbAssoc($result);
@@ -610,7 +614,6 @@ class wishlist extends db{
 		
 		$query = "select * from categories";
 		$categoryResult = $this->dbQuery($query);
-		
 		return $this->dbAssoc($categoryResult);
 	}
 

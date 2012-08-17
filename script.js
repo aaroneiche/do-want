@@ -495,6 +495,35 @@ function renderRanking(rankValue){
 }
 
 /*
+
+-----DEPRECATED! RenderCategory is currently doing nothing!-------------
+
+Function renderCategory
+	Takes a category id and returns the category display name. Fetches the category set and populates the storedData.categories object if it's empty.
+	
+	int @categoryId - the id (interger) of the category
+*/
+function renderCategory(categoryId){
+	console.log("render Category Called");
+	if(storedData.categories.length == 0){
+		console.log("preparing to request data");
+		data = {
+			interact:'wishlist',
+			action:'getCategories'
+		}
+		jQuery.post('ajaxCalls.php',data,function(response){
+			console.log("data received");
+			storedData.categories = response;
+			return storedData.categories[categoryId];
+		},"json");
+	}else{
+		console.log("data is local");
+		return storedData.categories[categoryId].category;		
+	}
+}
+
+
+/*
 Function renderItemTools
 	Produces HTML buttons/icons for interacting with the item in the row.
 	
@@ -571,16 +600,6 @@ function renderItemTools(itemObject, toolInfo){
 	
 }
 
-
-/*
-	Method: renderCategory
-		Takes a category Id and returns a relevant text or element.
-*/
-function renderCategory(categoryId){
-		
-}
-
-
 /*
 Function buildShopForSet
 	Builds a set of html option elements and places them in the shop for select element on the "Other's lists" tab.
@@ -635,7 +654,7 @@ function buildShopForSet(){
 	Method: getCategories 
 		Gets a list of categories. Puts them into the storedData component.
 */
-
+/*
 function getCategories(callbackFunction){
 	data = {
 		interact:'wishlist',
@@ -651,6 +670,7 @@ function getCategories(callbackFunction){
 		}
 	},"json");
 }
+*/
 
 /*
 	Method: buildCategorySelect
