@@ -266,7 +266,7 @@ function getUserWishlist(forUserId){
 			//create trigger foreach item row to display detail info
 			// we do this here because we don't want to provide this detail function for the currentUserWishlist
 			$(".item_description").click(function(clickEvent){showMoreInfo(clickEvent);});
-			
+			$("#myCarousel").carousel('next');
 		}			
 	},"json");	
 }
@@ -595,13 +595,31 @@ function buildShopForSet(){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		userSelect = $("#listOfUsers");
-
+		listOfUsersTable = $("#listOfUsersTable");
+		
 		$(response).each(function(i,e){
 			userOption = $(document.createElement("option"))
-				.html(e.fullname).attr("value",e.userid);
+							.html(e.fullname).attr("value",e.userid);
 				
 				
 			userSelect.append(userOption);
+			
+			userRow = $(document.createElement("tr"));
+			nameCell = $(document.createElement("td"))
+						.html(e.fullname)
+						.attr("data-userid",e.userid);
+			userRow.append(nameCell);
+			
+			nameCell.click(function(e){
+				
+				getUserWishlist($(e.target).attr("data-userid"));
+			})
+			
+			listOfUsersTable.append(userRow);
+			
+			
+			//getUserWishlist(this.value);
+			
 		});
 		
 		
