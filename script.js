@@ -115,9 +115,16 @@ function displayWishlist(displayData){
 		*/	
 
 		for(column in displayData.columns){
-
+			
+			displayVal = e[displayData.columns[column].displayColumn];
+			
+			//Uses a predefined alternative display Value if the display value isn't populated.
+			if(displayVal == null){ 
+				displayVal = displayData.columns[column].altDisplay;
+			}
+						
 			var cell =	$(document.createElement("td"))
-						.append(e[displayData.columns[column].displayColumn])
+						.append(displayVal)
 						.attr("id","item_"+e.itemid+"_"+displayData.columns[column].displayColumn)
 						.addClass("item_"+displayData.columns[column].displayColumn)
 	
@@ -503,8 +510,8 @@ Function renderCategory
 	
 	int @categoryId - the id (interger) of the category
 */
+/*
 function renderCategory(categoryId){
-	console.log("render Category Called");
 	if(storedData.categories.length == 0){
 		console.log("preparing to request data");
 		data = {
@@ -512,16 +519,14 @@ function renderCategory(categoryId){
 			action:'getCategories'
 		}
 		jQuery.post('ajaxCalls.php',data,function(response){
-			console.log("data received");
 			storedData.categories = response;
 			return storedData.categories[categoryId];
 		},"json");
 	}else{
 		console.log("data is local");
-		return storedData.categories[categoryId].category;		
 	}
 }
-
+*/
 
 /*
 Function renderItemTools
@@ -682,8 +687,10 @@ function getCategories(callbackFunction){
 function buildCategorySelect(categoryObject,parentElement){
 
 	//Set these to defaults if they're not defined in the call
-	categoryObject = (categoryObject == undefined)? storedData.categories: categoryObject;
-	parentElement = (parentElement == undefined)?".categorySelect": parentElement;
+	//I don't think these are necessary any longer because this is no longer generated on the fly.
+	
+//	categoryObject = (categoryObject == undefined)? storedData.categories: categoryObject;
+//	parentElement = (parentElement == undefined)?".categorySelect": parentElement;
 
 	jQuery(categoryObject).each(function(i,e){
 		var option =  jQuery(document.createElement("option"))

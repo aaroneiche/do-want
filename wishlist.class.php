@@ -63,7 +63,7 @@ class wishlist extends db{
 					{$this->options['table_prefix']}items.userid = '{$args['shopForId']}' and 
 					{$this->options['table_prefix']}shoppers.shopper = '{$_SESSION['userid']}' and
 					{$this->options['table_prefix']}shoppers.mayshopfor = '{$args['shopForId']}' and
-					{$this->options['table_prefix']}categoryid = items.category";s
+					{$this->options['table_prefix']}categoryid = items.category";
 				
 			$result = $this->dbQuery($query);
 			return $this->dbAssoc($result);

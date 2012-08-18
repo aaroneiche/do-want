@@ -29,9 +29,7 @@ session_start();
         padding-bottom: 40px;
       }
     </style>
-		
 
-	
 	<script>
 		/* Lest you sneaky users think you can change this and gain access to your list, 
 		 all db calls check session IDs, so messing with this value won't get you very far.*/
@@ -39,9 +37,19 @@ session_start();
 		userId = "<?php if(isset($_SESSION['userId'])) print $_SESSION['userId'] ?>";
 		storedData = {};
 		
+		/* This is really hacky, but it's the easiest way to call this and not break the existing methodology.*/
+		
+		storedData.categories = jQuery.parseJSON('<?php
+			$_REQUEST["action"] = "getCategories";
+			$_REQUEST["interact"] = "wishlist";
+			include("ajaxCalls.php");
+			unset($_REQUEST);
+		?>');
+		
 		storedData.columns = {
 			"Description":{
 				"displayColumn":"displayDescription",
+				"altDisplay":"--",
 				"sortFunctions":[
 					sortByDescriptionDesc,
 					sortByDescriptionAsc
@@ -56,6 +64,7 @@ session_start();
 			},
 			"Price":{
 				"displayColumn":"minprice",
+				"altDisplay":"--",				
 				"sortFunctions":[
 					sortByPriceAsc,
 					sortByPriceDesc
@@ -63,6 +72,7 @@ session_start();
 			},
 			"Category":{
 				"displayColumn":"displayCategory",
+				"altDisplay":"--",				
 				"sortFunctions":[]
 			},
 			"Tools":{
@@ -70,8 +80,6 @@ session_start();
 				"sortFunctions":[]
 			},
 		};
-
-		storedData.categories = [];
 
 		$(document).ready(function(){
 			$("#tabSetContainer a")
@@ -118,6 +126,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			//getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
 			
 			buildRankSelect(5,"#itemRankInput");
+			buildCategorySelect(storedData.categories,"#itemCategoryInput");
 
 			jQuery("#myCarousel").carousel('pause');
 
