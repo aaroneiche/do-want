@@ -5,9 +5,9 @@ switch($_SERVER['HTTP_HOST']){
 		
 	default:
 		$dbhost = "localhost";
-		$dbname = "wishlist2";
-		$dbuser = "mywishlist";
-		$dbpass = "password";
+		$dbname = "wishlist";
+		$dbuser = "wishlist";
+		$dbpass = "wishlist";
 	break;
 }
 
