@@ -27,23 +27,25 @@ if(isset($_REQUEST['submit']) && $_REQUEST['submit'] =='submit'){
 }
 
 ?>
-<form method="POST" >
+<form method="POST" enctype="multipart/form-data"  >
 
 <!-- <input type="hidden" name="" value=""> -->
 
 <input type="hidden" name="interact" value="wishlist">
-<input type="hidden" name="action" value="manageItem">
+<input type="hidden" name="action" value="manageItemImage">
 
-<input type="hidden" name="itemAction" value="add">
-
+<!--
 userid<input name="userid" value="1"/><br>
 description<input name="description" value="test item"/><br>
 ranking<input name="ranking" value="4"/><br>
 category<input name="category" value="1"/><br>
 comment<input name="comment" value="my comment"/><br>
 quantity<input name="quantity" value="1"/><br>
-	
-<input type="file" >	
+-->
+
+<input type="hidden" name="itemImageAction" value="add">
+ItemId: <input name="itemid" value="1"/><br>
+File: <input type="file" name="uploadfile" id="uploadfile">
 	
 <input name="submit" type="submit" value="submit">
 </form>

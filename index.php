@@ -91,12 +91,22 @@ session_start();
 				$('#manageItemFormBlock').modal();
 			});
 			
+			//binds firing the update images event to the loading of the relevant iframe.
+			//Most of this should be rewritten into a method on script.js
+			$("#uploadframe").load(function(){
+				uploadResult = $.parseJSON($("#uploadframe").contents().text());
+				if(uploadResult.queryResult == true){
+					$("#uploadAlert").addClass("alert-success");
+					$("#uploadAlertMessage").append("The file upload is complete");
+					populateImagesOnForm(uploadResult.itemId);
+				}else{
+					$("#uploadAlert").addClass("alert-error");
+					$("#uploadAlertMessage").append("The file upload encountered some problems. Please try again.")				
+				}
+				$("#uploadAlert").show();
+			});
 			
-		})
-		
-		
-		//Setup our galleria theme, even though we won't do anything with it for a while.
-		//Galleria.loadTheme('galleria/themes/classic/galleria.classic.min.js');
+		});
 		
 	</script>
 	
@@ -116,15 +126,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 ?>
 	<script>
 		jQuery(document).ready(function(){
-			
-			//jQuery(".tab").click(function(e){showSection(e)});
 
 			getCurrentUserList();
 			buildShopForSet();
-			
-			//Calls getCategories with a callback to populate the category select on the item form.
-			//getCategories({func:buildCategorySelect,args:[storedData.categories,"#itemCategoryInput"]});
-			
+						
 			buildRankSelect(5,"#itemRankInput");
 			buildCategorySelect(storedData.categories,"#itemCategoryInput");
 
@@ -137,9 +142,19 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			jQuery("#itemSubmit").click(function(){
 				manageItem();
 			});
+			
+			$("#openAddImageForm").click(function(){
+				
+				var forItemId = $("#openAddImageForm").attr("data-forItemId")
+				populateImagesOnForm(forItemId);
+				
+				$("#manageItemFormBlock").modal('hide');
+				$('#itemImagesFormBlock').modal('show');
 
-			
-			
+				//Sets the itemIdForImage to the ID we're editing.
+				$("#itemIdForImage").val(forItemId);
+			});
+
 			jQuery("#myListTab").trigger("click");
 						
 		});
@@ -150,42 +165,55 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	<button class="btn" onclick="logout();">Logout</button>
 
 <div class="modal hide fade" id="manageItemFormBlock">
-	<form id="manageItemForm" class="form-horizontal" onsubmit="return false;">
+
+
 	  <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h2>Manage Item</h2>
 	  </div>
 	  <div class="modal-body">
-		<input type="hidden" id="itemId" />
-		<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input id="itemDescriptionInput"/></div></div>
-		<div class="control-group"><label class="control-label" for="itemRankingInput">Item Rank:</label><div class="controls"><select id="itemRankInput"></select></div></div>				
-		<div class="control-group"><label class="control-label" for="itemCategoryInput">Item Category:</label><div class="controls"><select id="itemCategoryInput"></select></div></div>
-		<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input id="itemQuantityInput" class="input-mini"/></div></div>
-		<div class="control-group">
-			<label class="control-label" for="itemCommentInput">Item Comment:</label>
-			<div class="controls">
-				<textarea id="itemCommentInput"></textarea>
+		<form id="manageItemForm" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="itemId" />
+			<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input id="itemDescriptionInput"/></div></div>
+			<div class="control-group"><label class="control-label" for="itemRankingInput">Item Rank:</label><div class="controls"><select id="itemRankInput"></select></div></div>				
+			<div class="control-group"><label class="control-label" for="itemCategoryInput">Item Category:</label><div class="controls"><select id="itemCategoryInput"></select></div></div>
+			<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input id="itemQuantityInput" class="input-mini"/></div></div>
+			<div class="control-group">
+				<label class="control-label" for="itemCommentInput">Item Comment:</label>
+				<div class="controls">
+					<textarea id="itemCommentInput"></textarea>
+				</div>
 			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label" for="itemSourcesEdit">Sources:</label>
-			<div class="controls">
-				<select id="itemSourcesEdit" multiple="multiple"></select>
+			<div class="control-group">
+				<label class="control-label" for="itemSourcesEdit">Sources:</label>
+				<div class="controls">
+					<select id="itemSourcesEdit" multiple="multiple"></select>
+				</div>
 			</div>
-		</div>
+			<div class="control-group">
+				<div class="controls">
+					<a href="#" id="openAddImageForm" class="btn btn-primary" data-forItemId="">Manage Images</a>
+				</div>
+			</div>			
+			
+			
+  		</form>
 	</div>
+
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
 		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
 	</div>
-  </form>
-</div>
 
+</div>
 
 <div class="modal hide fade" id="itemDetailsModal">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h3>Item Details</h3>
+	</div>
+	<div class="modal-body">
+
 	<table border="1" width="100%" class="table table-bordered">
 		<tr>
 			<td id="itemDetailInfoBox">
@@ -194,7 +222,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div id="itemDetailAlloc" class="itemDetailContainer"></div>
 			</td>
 			<td id="itemDetailImageBox" rowspan="3" width="50%">
-				<div id="imageDetailGallery" class="itemDetailContainer">
+				<div id="itemDetailImageCarousel" class="carousel slide">
+					<div class="carousel-inner">
+					</div>
+					 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-arrow-left"></i></a>
+					 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-arrow-right"></i></a>
 				</div>
 			</td>
 		</tr>
@@ -211,10 +243,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</td>
 		</tr>
 	</table>
-	
-  </div>
-  <div class="modal-body">
-	
+
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">Close</a>
@@ -245,6 +274,41 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
   </form>
 </div>
 
+<div class="modal hide fade" id="itemImagesFormBlock">
+
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage Images</h2>
+	  </div>
+	  <div class="modal-body">
+			<!--	<form id="itemImagesForm" class="form-horizontal" onsubmit="return false;"> -->
+			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" action="ajaxCalls.php" target="uploadframe" >
+				
+			<input type="hidden" name="interact" value="wishlist">
+			<input type="hidden" name="action" value="manageItemImage">
+			<input type="hidden" name="itemImageAction" value="add">
+			<input type="hidden" name="itemid" id="itemIdForImage" value="1"/><br>
+			
+			<div class="control-group"><label class="control-label" for="uploadfile">Select A file for upload</label><div class="controls"><input type="file" name="uploadfile" id="uploadfile" class="input"/></div></div>
+			<button type="submit" class="btn btn-primary">Upload Image</button>
+			</form>
+
+			<div id="uploadAlert" class="alert">
+			  <a class="close" data-dismiss="alert" href="#">×</a>
+			  <span id="uploadAlertMessage"></span>
+			</div>
+			<div id="currentImagesBlock">
+				
+			</div>	
+			<!-- iframe for uploading files - this is hidden via CSS. -->
+			<iframe id="uploadframe" name="uploadframe"></iframe>
+	  </div>
+	  <div class="modal-footer">
+		<a href="#" id="manageImageCloseButton" class="btn" data-dismiss="modal">Close</a>
+	  </div>
+</div>
+
+
 <div class="row">
 	<div id="tabSetContainer" class="span8 offset2">		
 		<div class="btn-group" data-toggle="buttons-radio">
@@ -270,19 +334,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 		
 		<div id="otherLists" class="section">
-			<!--
-			<h2>List of users to shop for</h2>
-			<select id="listOfUsers" class="">
-				<option selected> -- </option>
-			</select>
-			<h2>Other user Wishlist</h2>
-			-->
 			<div id="myCarousel" class="carousel slide">
 			  <!-- Carousel items -->
 			  <div class="carousel-inner">
 				<div class="active item">
 					<h2>People I'm shopping for.</h2>
-					<!-- <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a> -->
 					Click on a User to see their wishlist.
 					<table id="listOfUsersTable" class="table table-striped table-bordered table-condensed">
 					</table>					
@@ -297,11 +353,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				</div>
 			  </div>
 			  <!-- Carousel nav -->
-			  
-			  
 			</div>
-
-			
 		</div>
 		<div id="shoppingList" class="section">
 			Shopping List
@@ -312,6 +364,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 	<?php } ?>
 	</div>
+
 </div>
 	
 <?php
@@ -333,7 +386,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		
 	</div>
 	<div class="row" id="alertLocation">
-		
 		<!--
 		<div id="displayAlert" class="span4 offset4 alert">
 			<span id="loginAlertMessage"></span>

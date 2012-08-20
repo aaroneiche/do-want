@@ -59,6 +59,27 @@ th{
 	height:100%;
 }
 
-#myCarousel{
-	height:200px;
+#itemDetailImageCarousel div.carousel-inner{
+	height:250px;
+	width:250px;
+	overflow:hidden;
 }
+
+.alert{
+	display:none;
+}
+
+#uploadframe{
+	display:none;
+}
+
+.imageBlock{
+	float:left;
+	width:75px;
+}
+
+.imageDeleteBlock img{
+	width:100px;
+}
+
+

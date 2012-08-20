@@ -398,10 +398,12 @@ class wishlist extends db{
 		str @itemImageAction: The desired action: add or delete.
 	*/	
 	function manageItemImage($args){
+			//print_r($args);
+		$resultArray = array();	
 			
 		switch($args['itemImageAction']){
 			case 'add':
-			
+
 				//Random name to prevent overwriting files.
 				$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];
 				
@@ -411,6 +413,9 @@ class wishlist extends db{
 					'{$this->dbEscape($args['itemid'])}',
 					'{$this->dbEscape($randName)}'
 				)";
+				
+				$resultArray['itemId'] = $args['itemid'];
+				
 			break;
 			case 'delete':
 				
@@ -423,14 +428,15 @@ class wishlist extends db{
 					$query = "delete from itemimages where imageid = '{$this->dbEscape($args['imageid'])}'";
 				}else{
 					return $error = array('errorMessage'=>"There was a problem deleting the image file: ".$deleteResult);
-				}
-				
+				}		
 			break;
 		}
 
-		
 		$result = $this->dbQuery($query);
-		return $result;		
+		
+		$resultArray['queryResult'] = $result;
+		
+		return $resultArray;
 	}
 	
 	/*
@@ -617,6 +623,18 @@ class wishlist extends db{
 		return $this->dbAssoc($categoryResult);
 	}
 
+
+	/*
+		Method: getImages
+		Fetches a list of images for a given item
+		@itemId = The id of the item for the images you want.
+	*/
+	function getImages($args){
+		$query = "select * from itemimages where itemid = '{$args['itemId']}'";
+		$imageResult = $this->dbQuery($query);
+		
+		return $this->dbAssoc($imageResult);
+	}
 }
 
 	

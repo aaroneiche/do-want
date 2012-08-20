@@ -409,7 +409,7 @@ function getItemDetailInfo(itemId){
 		jQuery('#itemDetailRanking').html(renderRanking(response.itemRanking));
 		
 		
-		//Sources Data
+		//Sources Section
 		if(response.sources != undefined){
 			jQuery("#itemDetailSourcesTable").html("");
 		
@@ -440,24 +440,26 @@ function getItemDetailInfo(itemId){
 		}else{
 			jQuery('#itemDetailSourcesTable').html("No Stores/Shops have been provided for this item.");
 		}
-		
-		
-		//Image data for Galleria
-		imageData = [];
 
+		//Images Section
 		if(response.images != undefined){
+			
+			//Clears out previous carousel items
+			jQuery('#itemDetailImageCarousel div.carousel-inner').empty();
+			
+			//Generates carousel images & containers.
 			jQuery(response.images).each(function(i,e){
-				imgObj = {"image":"uploads/"+e.itemImageFilename};			
-				imageData.push(imgObj);
+				img = $(document.createElement('img')).attr('src',"uploads/"+e.itemImageFilename);
+				itemImageDiv = $(document.createElement('div')).addClass("item").append(img);
+				if(i == 0)itemImageDiv.addClass("active");
+				jQuery('#itemDetailImageCarousel div.carousel-inner').append(itemImageDiv);
 			});
-	
-			jQuery('#imageDetailGallery').galleria({
-			    data_source: imageData,
-				height:300,
-				width:400
-			});
+			
+			//Starts the carousel.
+			jQuery('#itemDetailImageCarousel').carousel();
+			
 		}else{
-			jQuery('#imageDetailGallery').html("No images have been provided for this item.");
+			jQuery('#itemDetailImageCarousel div.carousel-inner').html("No images have been provided for this item.");
 		}
 		
 		//Alloc Section
@@ -529,7 +531,7 @@ function renderCategory(categoryId){
 */
 
 /*
-Function renderItemTools
+Function renderItemToolss
 	Produces HTML buttons/icons for interacting with the item in the row.
 	
 	JS Object @itemObject - A Javascript object returned from the wishlist system.
@@ -542,11 +544,26 @@ function renderItemTools(itemObject, toolInfo){
 	switch(toolInfo){
 		
 		case "edit":
-		
+			
+			/*		
+			//Old icons using images. Not sure how I feel about the Glyph Icons.
+			
 			itemReceive = $(document.createElement("img")).attr("src","images/refresh_nav.gif");
 			itemEdit = $(document.createElement("img")).attr("src","images/write_obj.gif");
 			itemDelete = $(document.createElement("img")).attr("src","images/cross.png");		
-
+			*/				
+			itemDelete = $(document.createElement("i"))
+							.addClass("icon-trash")
+							.attr("title","Delete Item");
+							
+			itemReceive = $(document.createElement("i"))
+							.addClass("icon-gift")
+							.attr("title","Mark Item Received");
+							
+			itemEdit = $(document.createElement("i"))
+							.addClass("icon-pencil")
+							.attr("title","Edit Item");
+			
 			//data-itemId is stored on the row element: tool->div->td->tr
 
 			itemReceive.click(function(){
@@ -786,7 +803,8 @@ function clearManageItemForm(){
 	jQuery('#itemRankInput').val("1");
 	jQuery('#itemCategoryInput').val("1");
 	jQuery('#itemSourcesEdit').html("");
-	jQuery('#itemCommentinput').val("");	
+	jQuery('#itemCommentInput').val("");	
+	jQuery('#openAddImageForm').attr("data-forItemId","");	
 	
 	//console.log("form cleared");
 }
@@ -812,6 +830,8 @@ function populateManageItemForm(itemId){
 		jQuery('#itemQuantityInput').val(response.itemQuantity);
 		jQuery('#itemRankInput').val(response.itemRanking);
 		jQuery('#itemCategoryInput').val(response.itemCategory);
+		jQuery('#itemCommentInput').val(response.itemComment);		
+		jQuery('#openAddImageForm').attr("data-forItemId",itemId);
 		
 		//Sources Data
 		if(response.sources != undefined){
@@ -845,8 +865,63 @@ function populateItemSourceForm(sourceId){
 
 }
 
+/*	
+	Method getItemImages
+	Gets an array of image information for a given itemid
+	
+	@itemId: The id of the item for which you are requesting images.
+	
+	Note: This is a rather generic function and doesn't really fit in the client-side component.
+	As a result, I'm commenting it out and will leave it here if people really want it.
+*/
+/*
+function getItemImages(itemId){
+	data = {
+		interact:'wishlist',
+		action:'getImages',
+		args:{"itemId":itemId}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		return response;
+	});
+}
+*/
 
+function populateImagesOnForm(itemId){
+	data = {
+		interact:'wishlist',
+		action:'getImages',
+		args:{"itemId":itemId}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		$("#currentImagesBlock").empty();
+		
+		$(response).each(function(i,e){
+			var img = $(document.createElement('img')).attr('src',"uploads/"+e.filename);
+			var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
+			var removeImageControl =  $(document.createElement('a')).append("×").addClass("close").click(function(){
+				
+				remove = {
+					interact:'wishlist',
+					action:'manageItemImage',
+					args:{
+						"imageid":e.imageid,
+						"itemImageAction":"delete"
+					}
+				}
+				jQuery.post('ajaxCalls.php',remove,function(response){
+					$(this.parent).remove();
+					//This seems recursive, but it's really just setting up the call to refresh the images on the form here.
+					populateImagesOnForm(itemId); 
+				});
+			});
+			
+			itemImageDiv.append(removeImageControl);
+			$("#currentImagesBlock").append(itemImageDiv);
+		});
 
+	},"json");
+}
 
 
 

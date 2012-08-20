@@ -10,8 +10,13 @@ function __autoload($class_name) {
 //We need the configuration
 require_once("config.php");
 
+/*
+Previously, we were passing an empty array if args were not provided, by setting args to the $_REQUEST array, we can pass
+information from defined forms or non-ajax made calls.
+*/
+
 if(!isset($_REQUEST['args'])){
-	$_REQUEST['args'] = array();
+	$_REQUEST['args'] = $_REQUEST; //array();
 }
 
 
@@ -27,7 +32,10 @@ $instance->options = $options;
 $instance->dbConnect();
 
 //encode and return whatever the class method returned.
-print json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
+//$jsonData =  json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
+//print $jsonData;
+//if($options['logErrors']) error_log($jsonData);
 
+print json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
 
 ?>
