@@ -1,29 +1,36 @@
 <?php
 session_start();
 
-$wishlist = file_get_contents("wishlist.class.php");
-$user = file_get_contents("user.class.php");
+$classFileNames = array(
+	"wishlist.class.php",
+	"user.class.php"
+);
 
-$wlMethodNames = array();
-preg_match_all("`/\*\s+?Method:(.+?)$(.+?)\*/`ms",$wishlist,$wlMethodNames);
-
-$uMethodNames = array();
-preg_match_all("`/\*\s+?Method:(.+?)$(.+?)\*/`ms",$user,$uMethodNames);
-
-$options = "";
-
-$methodList = array_merge($wlMethodNames[1],$uMethodNames[1]);
-$commentsList = array_merge($wlMethodNames[2],$uMethodNames[2]);
-	
+$optionSet = array();
 $jsonArray = array();
 
-foreach($methodList as $key=> $method){
-	$jsonArray[trim($method)] = $commentsList[$key];
-}
-
-
-foreach($methodList as $method){
-	$options .="<option value=\"".trim($method)."\">$method</option>";
+foreach($classFileNames as $file){
+	$currentFile = file_get_contents($file); //get the file contents.
+	$methodNames = array(); //Instantiate an array to store matches in.
+	preg_match_all("`/\*\s+?Method:(.+?)$(.+?)\*/`ms",$currentFile,$methodNames);
+	
+	$className = substr($file,0,strlen(strstr($file,".",true)));
+		
+	foreach($methodNames[1] as $key => $method){
+		
+		$jsonArray[trim($method)] = array(
+			'name' => trim($method),
+			'comments' => $methodNames[2][$key],
+			'classToCall' => $className
+		);
+		
+		
+		if(isset($_REQUEST['submit']) && $_REQUEST['submit'] =='submit'){
+			$selected = (trim($method) == $_REQUEST['action'])?"selected":"";
+		}
+		
+		$optionSet .="<option value=\"".trim($method)."\" {$selected}>{$className} - {$method}</option>";
+	}	
 }
 
 ?>
@@ -33,63 +40,64 @@ foreach($methodList as $method){
 		print json_encode($jsonArray);
 	?>;
 	
+
+function getParams(methodNotes){
+		var pattern = /@(.+?)\s-\s/g;  
+		var match;
+		
+		var valLocation = document.getElementById("nameValueSet");
+		valLocation.innerHTML = "";
+		
+		while (match = pattern.exec(methodNotes))
+		{
+			label1 = document.createElement("label");
+			label1.innerHTML = match[1];
+			nameInput = document.createElement("input");
+			nameInput.setAttribute("name","argName[]")
+			nameInput.setAttribute("type","hidden");
+			
+			nameInput.value = match[1]
+			
+			valInput = document.createElement("input");
+			//valInput.name = "argVal[]";
+			valInput.setAttribute("name","argVal[]");
+
+			valLocation.appendChild(nameInput);
+			valLocation.appendChild(label1);
+			valLocation.appendChild(valInput);
+			valLocation.appendChild(document.createElement("br"));												
+		}
+	}
+		
 	function displayNotes(methodName){
-		element = document.getElementById("methodStuff").innerHTML = methodsNotes[methodName];
+		element = document.getElementById("methodStuff").innerHTML = methodsNotes[methodName].comments;
+		document.getElementById("interact").value = methodsNotes[methodName].classToCall;
+		getParams(methodsNotes[methodName].comments);
+			
 	}
 	
 	
 </script>
 
-<table>
-<tr><td valign="top">
 <form name="sendForm" method="POST" >
-	<label for="interact">Interact</label>
-	<select name="interact">
-		<option value="wishlist">Wishlist</option>
-		<option value="user">User</option>		
-	</select>
-	<br><br>
+<table>
+<tr><td colspan="2">Current User: <?php print $_SESSION['fullname']?> Is Admin? <?php print ($_SESSION['admin']==1)? "Yes":"No" ?> </td></tr>
+<tr><td valign="top">
+	<input type="hidden" id="interact" name="interact"/>
 	<label for="action">Action</label>
-	<select name="action" onchange="displayNotes(this.value);">
+	<select id="action" name="action" onchange="displayNotes(this.value);">
 		<?php 
-			print $options;
+			print $optionSet;
 		?>
-<!--
-		<option value="loginUser">User - LoginUser</option>
-		<option value="logoutUser">user - LogoutUser</option>
-		<option value="getShopForUsers">user - getShopForUsers</option>		
-		<option value="getCurrentUserWishlist">wishlist - getCurrentUserWishlist</option>
-		<option value="getShoppingForList">wishlist - getShoppingForList</option>
-		<option value="getCurrentCount">wishlist - getCurrentCount</option>
-		<option value="adjustReservedItem">wishlist - adjustReservedItem</option>
-		<option value="manageItem">wishlist - manageItem</option>
-		<option value="manageItemSource">wishlist - manageItemSource</option>
-		<option value="manageItemImage">wishlist - manageItemImage</option>
-		<option value="getItemDetails">wishlist - getItemDetails</option>
-	-->	
 	</select><br><br>
 <input type='submit' name="submit" value="submit"/>	
 </td>
-<td>
-	Name:<input name="argName[]"/> 
-	Val:<input name="argVal[]"/>	
-<br>
-	Name:<input name="argName[]"/>
-	Val:<input name="argVal[]"/>	
-<br>
-	Name:<input name="argName[]"/>
-	Val:<input name="argVal[]"/>	
-<br>
-	Name:<input name="argName[]"/>
-	Val:<input name="argVal[]"/>	
-<br>
-	Name:<input name="argName[]"/>
-	Val:<input name="argVal[]"/>	
+<td id="nameValueSet" valign="top" style="width:200px;">
+
 <br><br>
-</form>
 </td>
 <td>
-<textarea id="methodStuff" cols=50 rows=8>
+<textarea id="methodStuff" cols=50 rows=12>
 </textarea>
 
 </td>
@@ -101,12 +109,11 @@ print "<pre>";
 print_r($_REQUEST);
 print "</pre>";
 ?>
-</td><td>
+</td><td colspan="2">
 Database response:
-<div  style="overflow-y:scroll; height: 500px; border:solid black 1px; padding:4px;">
+<div  style="overflow-y:scroll; height: 350px; border:solid black 1px; padding:4px;">
 <?php
 if(isset($_REQUEST['submit']) && $_REQUEST['submit'] =='submit'){
-
 	
 	if(count($_REQUEST['argName']) > 0){
 		$_REQUEST['args'] = array();
@@ -134,8 +141,6 @@ if(isset($_REQUEST['submit']) && $_REQUEST['submit'] =='submit'){
 
 	$instance->dbConnect();
 
-	
-
 	print "<pre>";
 	print_r($instance->$_REQUEST['action']($_REQUEST['args']));
 	print "</pre>";
@@ -144,3 +149,4 @@ if(isset($_REQUEST['submit']) && $_REQUEST['submit'] =='submit'){
 ?>
 </td></tr>
 </table>
+</form>

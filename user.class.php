@@ -3,6 +3,13 @@ session_start();
 
 class user extends db{
 	
+/*
+	Method: loginUser
+	Logs a user in by setting $_SESSION variables appropriate to the session.
+	
+	@username - The username of the user logging in.
+	@password - the password of the user logging in.
+*/	
 	function loginUser(){
 		
 		$cleanUsername = $this->dbEscape($_REQUEST['username']); 
@@ -25,6 +32,11 @@ class user extends db{
 		}
 	}
 	
+/*
+	Method: logoutuser
+	Logs out the current user by destroying their session.
+	
+*/	
 	function logoutUser(){
 		//clear out the session and remove it.
 		session_unset();
@@ -33,6 +45,11 @@ class user extends db{
 		return true;		
 	}
 
+/*
+	Method: getShopForUsers
+	Gets a list of users that the current logged-on user may shop for uses the $_SESSION['userid'] variable.
+	
+*/
 	function getShopForUsers(){
 		$query = "select fullname,userid from users, shoppers where shoppers.mayShopFor = users.userid and shoppers.shopper = {$_SESSION['userid']}";
 
@@ -40,12 +57,71 @@ class user extends db{
 		return $this->dbAssoc($result);
 	}
 
+
+/*
+	Method: getUser
+	Returns basic information about a user. Logged on user must be that user or an administrator. 
+	@userid - The ID of the user you want the information for.
+*/
+	function getUser($args){
+		if($_SESSION['userid'] == $args['userid'] || $_SESSION['admin'] == 1)
+		$cleanUserId = $this->dbEscape($args["userid"]);
+		$query = "select username, fullname, userid, email, admin, approved from users where userid = '{$cleanUserId}'";
+		
+		$result = $this->dbQuery($query);
+		return $this->dbAssoc($result);
+	}
+	
+/*
+	Method: manageUser
+	Takes a set of Arguements and adds, edits, or deletes a user.
+	
+	@userAction - The action to perform: add, edit, delete.
+	@userid - The id of the user to edit or delete. If Empty, this will add a user.
+	@username - The desired username
+	@password - The desired password
+	@fullname - The Full (real) name of the user
+	@email - Email address
+	@approved - Whether or not this user is approved to use the system.
+	@admin - Whether or not this user is an admin.
+*/	
+	function manageUser($args){
+		
+		$cleanAction = $this->dbEscape($args['userAction']);
+		$cleanUserid = $this->dbEscape($args['userid']);
+		$cleanUsername = $this->dbEscape($args['username']);
+		$cleanPassword = $this->dbEscape($args['password']);
+		$cleanFullname = $this->dbEscape($args['fullname']);
+		$cleanEmail = $this->dbEscape($args['email']);
+		$cleanApproved = ($this->dbEscape($args['approved']) == 1)?1:0; //$this->dbEscape($args['approved']);
+		$cleanAdmin = ($this->dbEscape($args['admin']) == 1)?1:0;
+		
+		switch($cleanAction){
+			case 'add':
+				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) 
+						  VALUES('$cleanUsername',{$this->options["password_hasher"]}('$cleanPassword'),'$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";			
+			break;
+			case 'edit':
+
+				$query = "UPDATE {$this->options["table_prefix"]}users SET fullname='{$cleanFullname}', email='{$cleanEmail}', 
+							approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserid}'";			
+			break;
+			case 'delete':
+				$query = "DELETE FROM {$this->options["table_prefix"]}users WHERE userid = '{$cleanUserid}'";
+			break;
+		}
+		
+		
+		$result = $this->dbQuery($query);
+		return $result;
+	}
+	
+
+	
 /*
 TODO:
-addUser
 deleteUser
 editUser
-
 */
 
 	

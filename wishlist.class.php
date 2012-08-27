@@ -29,7 +29,7 @@ class wishlist extends db{
 		Fetches and returns an array of items for the requested user id if current logged-in user is allowed to view.
 		
 		@args - array of arguments for this function
-			@shopForId: The user id for the requested user's shopping list.
+		@shopForId - The user id for the requested user's shopping list.
 	*/
 	function getShoppingForList($args){
 	
@@ -75,10 +75,10 @@ class wishlist extends db{
 		Gets the current quantity available for reserving and purchasing based on current user.
 		
 		@args - array of arguments for this function
-			int @itemid: The id of the item which is being affected
-			int @userid: The id of the user affecting 
-			string @allocateAction: purchase, reserve, return, release
-			int @adjustment: Quantity to adjust by, positive or negative	
+			int @itemid - The id of the item which is being affected
+			int @userid - The id of the user affecting 
+			string @allocateAction - purchase, reserve, return, release
+			int @adjustment - Quantity to adjust by, positive or negative	
 	*/
 	
 	function getCurrentCount($args){
@@ -148,10 +148,10 @@ class wishlist extends db{
 		Reserves, Releases, Purchases, or Returns item according to arguments provided 
 		
 		@args - array of arguments for this function
-			int @itemid: The id of the item which is being affected
-			int @userid: The id of the user affecting 
-			string @allocateAction: buy,return, reserve, release
-			int @adjustment: Quantity to adjust by, positive or negative
+			int @itemid - The id of the item which is being affected
+			int @userid - The id of the user affecting 
+			string @allocateAction - buy,return, reserve, release
+			int @adjustment - Quantity to adjust by, positive or negative
 			
 	*/	
 	function adjustReservedItem($args){
@@ -290,14 +290,14 @@ class wishlist extends db{
 		Method: manageItem
 		Adds, Edits or Deletes an item from the database.
 
-		str @itemAction: The action name for managing an item: add,edit,or delete.
+		str @itemAction - The action name for managing an item: add,edit,or delete.
 		
-		int @userid: The id of the user who owns this item - note: does not have to be the logged in user
-		str @description: The 'name' of the item 
-		int @ranking: The rank according to user.
-		int @category: integer based on categories table.
-		str @comment: any comment the user wishes to share about the item.
-		int @quantity: How many of this item the user would like.		
+		int @userid - The id of the user who owns this item - note: does not have to be the logged in user
+		str @description - The 'name' of the item 
+		int @ranking - The rank according to user.
+		int @category - integer based on categories table.
+		str @comment - any comment the user wishes to share about the item.
+		int @quantity - How many of this item the user would like.		
 		
 	*/
 	
@@ -349,11 +349,11 @@ class wishlist extends db{
 	/*
 		method manageSource:
 		This function adds or removes sources for a particular item.
-		int @itemid: The itemid that this source is for
-		string @source: The name of the source: A store or website
-		string @sourceurl: The URL for the source
-		string @sourceprice: The price for the source
-		int @addedByUserId: The userId who provided the source. - other users can offer sources for products.
+		int @itemid - The itemid that this source is for
+		string @source - The name of the source: A store or website
+		string @sourceurl - The URL for the source
+		string @sourceprice - The price for the source
+		int @addedByUserId - The userId who provided the source. - other users can offer sources for products.
 	*/
 	function manageItemSource($args){
 
@@ -393,9 +393,9 @@ class wishlist extends db{
 	
 	/*
 		Method: manageItemImage
-		int @itemid: The item this image will be associated with 
-		string @filename: The name of the file that was uploaded.
-		str @itemImageAction: The desired action: add or delete.
+		int @itemid - The item this image will be associated with 
+		string @filename - The name of the file that was uploaded.
+		str @itemImageAction - The desired action: add or delete.
 	*/	
 	function manageItemImage($args){
 			//print_r($args);
@@ -455,7 +455,7 @@ class wishlist extends db{
 		Fetches the item details for a particular item and returns them in a associative array.
 		returns an associative array containing item info, images, sources, and alloc data.
 		
-		int @itemid: The item to request details about.
+		int @itemid - The item to request details about.
 	*/
 	function getItemDetails($args){
 		

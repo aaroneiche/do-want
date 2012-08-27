@@ -34,7 +34,7 @@ session_start();
 		/* Lest you sneaky users think you can change this and gain access to your list, 
 		 all db calls check session IDs, so messing with this value won't get you very far.*/
 		
-		userId = "<?php if(isset($_SESSION['userId'])) print $_SESSION['userId'] ?>";
+		userId = "<?php if(isset($_SESSION['userid'])) print $_SESSION['userid'] ?>";
 		storedData = {};
 		
 		/* This is really hacky, but it's the easiest way to call this and not break the existing methodology.*/
@@ -88,6 +88,7 @@ session_start();
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
+				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
 				$('#manageItemFormBlock').modal();
 			});
 			
@@ -143,6 +144,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				manageItem();
 			});
 			
+			$("#openManageUserForm").click(function(){
+				console.log(userId);
+				populateManageUserForm(userId);
+			});
+			
 			$("#openAddImageForm").click(function(){
 				
 				var forItemId = $("#openAddImageForm").attr("data-forItemId")
@@ -192,7 +198,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 			<div class="control-group">
 				<div class="controls">
-					<a href="#" id="openAddImageForm" class="btn btn-primary" data-forItemId="">Manage Images</a>
+					<button id="openAddImageForm" class="btn btn-primary">Manage Images</button>
 				</div>
 			</div>			
 			
@@ -308,6 +314,68 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  </div>
 </div>
 
+<div class="modal hide fade" id="userFormBlock">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage User</h2>
+	  </div>
+	  <div class="modal-body">
+		<form id="manageUser" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="userId" />
+			<input type="hidden" id="userAction" />
+			
+			<div class="control-group">
+				<label class="control-label" for="">Username</label>
+				<div class="controls">
+					<input class="input-medium" type="text" id="username"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userPassword">Password</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="userPassword"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userPasswordConfirm">Confirm Password</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="userPasswordConfirm"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userFullName">Full Name</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="userFullName"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="emailAddress">Email Address</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="emailAddress"/>
+				</div>
+			</div>
+			<?php if($_SESSION['admin'] == 1){ ?>
+				<div class="control-group">
+					<label class="control-label" for="userApproved">User is Approved</label>
+					<div class="controls">
+						<input type="checkbox" id="userApproved"/>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="userIsAdmin">User may Administer</label>										
+					<div class="controls">
+						<input type="checkbox" id="userIsAdmin"/>						
+					</div>
+				</div>
+			<?php }?>																
+ 		</form>
+
+	  </div>
+	  <div class="modal-footer">
+		<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Save</a>
+	  </div>
+</div>
+
 
 <div class="row">
 	<div id="tabSetContainer" class="span8 offset2">		
@@ -315,9 +383,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
 			<a href="#" class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</a>
 			<a href="#" class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</a>
-				<?php if($_SESSION['admin'] == 1){ ?>
 			<a href="#" class="btn" id="manageTab" data-section="manage">Manage</a>
-				<?php } ?>
 		</div>		
 	</div>
 </div>
@@ -358,11 +424,22 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="shoppingList" class="section">
 			Shopping List
 		</div>
-	<?php if($_SESSION['admin'] == 1){ ?>
+
 		<div id="manage" class="section">
-			Admin (not visible for non-admin users)
+			User Settings
+			<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>
+			
+						
+			<?php if($_SESSION['admin'] == 1){ ?>
+			This Section visible only to Admins.
+			
+			List of Users
+			
+			List of Categories
+			
+			List of Ratings
+			<?php } ?>
 		</div>
-	<?php } ?>
 	</div>
 
 </div>

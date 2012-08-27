@@ -29,28 +29,6 @@ class db{
 		
 	}
 
-	/*
-	function dbQueryTest($query){
-		//print "dbQueryTest";
-		
-		$result = mysql_query($query,$this->dbConn);
-		$resultArray = array();
-
-		if($result !== false){
-
-			while($row = mysql_fetch_assoc($result)){
-				$resultArray[] = $row;			
-			}		
-			return $resultArray;
-			
-		}else{
-			error_log(mysql_error()." ".$query);
-			return "error";
-		}		
-	}
-	*/
-
-
 	function dbValue($resource){
 		return mysql_result($resource,0);
 	}

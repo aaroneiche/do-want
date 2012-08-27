@@ -573,6 +573,7 @@ function renderItemTools(itemObject, toolInfo){
 
 			itemEdit.click(function(){
 				populateManageItemForm($(this).closest("tr").attr("data-itemId"));
+				$("#openAddImageForm").removeClass("disabled").prop("disabled","");
 			});
 
 			itemDelete.click(function(){
@@ -671,28 +672,6 @@ function buildShopForSet(){
 	},"json");
 }
 
-
-/*
-	Method: getCategories 
-		Gets a list of categories. Puts them into the storedData component.
-*/
-/*
-function getCategories(callbackFunction){
-	data = {
-		interact:'wishlist',
-		action:'getCategories'
-	}
-	
-	jQuery.post('ajaxCalls.php',data,function(response){
-		storedData.categories = response;
-		
-		//A callback function if we want it.
-		if(callbackFunction != undefined){
-			callbackFunction.func.apply(callbackFunction.func,callbackFunction.args);
-		}
-	},"json");
-}
-*/
 
 /*
 	Method: buildCategorySelect
@@ -865,27 +844,6 @@ function populateItemSourceForm(sourceId){
 
 }
 
-/*	
-	Method getItemImages
-	Gets an array of image information for a given itemid
-	
-	@itemId: The id of the item for which you are requesting images.
-	
-	Note: This is a rather generic function and doesn't really fit in the client-side component.
-	As a result, I'm commenting it out and will leave it here if people really want it.
-*/
-/*
-function getItemImages(itemId){
-	data = {
-		interact:'wishlist',
-		action:'getImages',
-		args:{"itemId":itemId}
-	}
-	jQuery.post('ajaxCalls.php',data,function(response){
-		return response;
-	});
-}
-*/
 
 function populateImagesOnForm(itemId){
 	data = {
@@ -922,6 +880,58 @@ function populateImagesOnForm(itemId){
 
 	},"json");
 }
+
+/*
+// In light of the more aptly named "populateManageUserForm", I'm deprecating this unless I see a need for it.
+	Method getUserDetails
+		Gets User information from server.
+*/
+
+/*
+function getUserDetails(userId){
+	data = {
+		interact:'user',
+		action:'getUser',
+		args:{"userid":userId}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		debug = response;
+	},"json");
+}
+*/
+
+/*
+	Method populateManageUserForm
+		Populates the Manage User Form.
+*/
+function populateManageUserForm(userId){
+	data = {
+		interact:'user',
+		action:'getUser',
+		args:{"userid":userId}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		
+		$("#username").val(response.username)
+		$("#userFullName").val(response.fullname);
+		$("#emailAddress").val(response.email);
+
+		//We need some logic for these when the logged in user is not an Admin, and these elements don't exist.
+		var userApproved = (response.approved == 1)?true:false;
+		var userAdmin = (response.admin == 1)?true:false;
+		
+		$("#userApproved").prop("checked",userApproved);
+		$("#userIsAdmin").prop("checked",userAdmin);
+		
+		$("#userFormBlock").modal();
+		
+	},"json");
+	
+}
+
+
+
+
 
 
 
