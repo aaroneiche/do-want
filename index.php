@@ -538,6 +538,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
 	  </div>
 </div>
-</div>	
+</div>
+
+<span id="versionNumber">v0.5</span>
 </body>
 </html>
