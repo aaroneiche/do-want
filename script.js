@@ -882,25 +882,6 @@ function populateImagesOnForm(itemId){
 }
 
 /*
-// In light of the more aptly named "populateManageUserForm", I'm deprecating this unless I see a need for it.
-	Method getUserDetails
-		Gets User information from server.
-*/
-
-/*
-function getUserDetails(userId){
-	data = {
-		interact:'user',
-		action:'getUser',
-		args:{"userid":userId}
-	}
-	jQuery.post('ajaxCalls.php',data,function(response){
-		debug = response;
-	},"json");
-}
-*/
-
-/*
 	Method populateManageUserForm
 		Populates the Manage User Form.
 */
@@ -910,11 +891,17 @@ function populateManageUserForm(userId){
 		action:'getUser',
 		args:{"userid":userId}
 	}
+	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		$("#username").val(response.username)
+		
+		$("#manageUser input#userId").val(userId);
+		$("#username").val(response.username);
 		$("#userFullName").val(response.fullname);
 		$("#emailAddress").val(response.email);
+
+		//Any time we're populating this form, we're going to be editing, so we can put this in the function call.
+		$("#manageUser input#userAction").val("edit"); 
 
 		//We need some logic for these when the logged in user is not an Admin, and these elements don't exist.
 		var userApproved = (response.approved == 1)?true:false;
@@ -929,13 +916,155 @@ function populateManageUserForm(userId){
 	
 }
 
+/*
+	Method updateUserData
+		Updates 
+*/
+function updateUserData(){
+	args = {};
+	data = {
+		interact:'user',
+		action:'manageUser'
+	}
+
+	fields = {
+		"username":"#manageUser #username",
+		"fullname":"#manageUser #userFullName",
+		"email":"#manageUser #emailAddress",
+	}
+	
+	for(fieldName in fields){
+		args[fieldName] = $(fields[fieldName]).val();
+	}
+	
+	var approvedCheck = $("#manageUser #userApproved:checked");
+	var adminCheck = $("#manageUser #userIsAdmin:checked");
+
+	for(field in args){
+		if(args[field].length == 0){
+			//If the field has a length 0, we set the help text, and attach the error class to the parent control-group
+			$(fields[field]).next(".help-inline").append("Field must not be empty")
+							.closest(".control-group").addClass("error");
+			return false;	
+		}
+	}
+	
+	if(approvedCheck != undefined && approvedCheck.length > 0){
+		args.approved = 1;
+	}
+	
+	if(adminCheck != undefined && adminCheck.length > 0){
+		args.admin = 1;
+	}
+		
+	var pass = $("#manageUser #userPassword").val();
+	var confirmPass = $("#manageUser #userPasswordConfirm").val();
+
+	if(confirmPass == pass){
+		args.password = pass;
+	}else{
+		$("#manageUser .passwordSet").closest(".control-group").addClass("error");
+		$("#userPassword").next(".help-inline").append("Both password fields must match");
+		
+		// This will set the interface to remove the error class and warning on clicking the field.
+		$("#manageUser .passwordSet").click(function(){
+			$("#manageUser .passwordSet")
+				.unbind("click")
+				.next(".help-inline")
+					.html("")
+				.closest(".control-group")
+					.removeClass("error");
+		});
+		return false;
+	}
+	args.userId = $("#manageUser #userId").val();
+	args.userAction =$("#manageUser #userAction").val();
+	
+	
+	//If we've made it this far, we're packaging up and sending off!
+	data.args = args;	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		$("#userFormBlock").modal("hide");
+	});	
+	
+}
 
 
 
+/*
+	method deleteUserFromSystem
+
+*/
+function deleteUserFromSystem(userId){
+	data = {
+		interact:"user",
+		action:'manageUser',
+		args:{"userAction":"delete","userId":userId}
+		
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		$("#deleteConfirmBlock").modal('hide');
+		displaySystemUsers();
+	});
+}
 
 
-
-
+/*
+	Method displaySystemUsers
+		Gets a list of users in the system. Only works for Admins.
+*/
+function displaySystemUsers(){
+	data = {
+		interact:'user',
+		action:'getListOfUsers'
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		
+		var userListTable = $("table#adminUserList");
+		userListTable.empty();
+		for(user in response){
+			
+			var row = $(document.createElement("tr")).attr("data-userId",response[user].userid);
+			var name = $(document.createElement("td")).append(response[user].fullname);
+			var userName = $(document.createElement("td")).append(response[user].username);
+			var email = $(document.createElement("td")).append(response[user].email);
+			
+			//We should probably expand on tool construction above - but barring that here are some quick tools for management.
+			var editUserButton = $(document.createElement("button"))
+									.addClass("btn btn-info btn-mini")
+									.append("Edit user")
+									.click(function(){
+										
+										populateManageUserForm($(this).closest("tr").attr("data-userId"));
+									});
+									
+			var deleteUserButton = $(document.createElement("button"))
+										.addClass("btn btn-danger btn-mini")
+										.append("Delete user")
+										.click(function(){
+											//Set the form delete ID to the userId provided and show the warning Modal.
+											$("#deleteObjectForm #deleteObjectId").val($(this).closest("tr").attr("data-userId"))
+											$("#deleteConfirmBlock").modal('show');
+										});
+									
+									
+									
+			
+			var userTools = $(document.createElement("td")).append();
+			userTools.append(editUserButton)
+					.append(deleteUserButton);
+			
+			row.append(name)
+				.append(userName)
+				.append(email)
+				.append(userTools);
+			
+			userListTable.append(row);
+		}
+	},"json");
+	
+}
 
 
 

@@ -92,6 +92,22 @@ session_start();
 				$('#manageItemFormBlock').modal();
 			});
 			
+			
+			$("#requestAccount").click(function(){
+				$("#manageUser input#userId").val("");
+				$("#manageUser input#userAction").val("add");
+				$("#manageUserSaveButton").html("Request Account");
+
+				$("#userFormBlock").modal('show');
+			});
+						
+			
+			//Moved into general script section to provide form action when not logged in.
+			$("#manageUserSaveButton").click(function(){				
+				updateUserData();
+			});			
+			
+			
 			//binds firing the update images event to the loading of the relevant iframe.
 			//Most of this should be rewritten into a method on script.js
 			$("#uploadframe").load(function(){
@@ -145,7 +161,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			});
 			
 			$("#openManageUserForm").click(function(){
-				console.log(userId);
+				$("#manageUserSaveButton").html("Update Account");				
 				populateManageUserForm(userId);
 			});
 			
@@ -161,6 +177,22 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				$("#itemIdForImage").val(forItemId);
 			});
 
+
+<?php
+	//admin-only javascript load calls;
+	if($_SESSION['admin'] == 1){
+?>
+			displaySystemUsers();
+			
+			$("#deleteObjectForm #deleteSubmit").click(function(){
+				deleteUserFromSystem($("#deleteObjectForm #deleteObjectId").val());
+			});
+			
+<?php
+}
+?>
+
+			//This is the point that loads which tab the user is on. This will eventually be a choose-able option.
 			jQuery("#myListTab").trigger("click");
 						
 		});
@@ -171,8 +203,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	<button class="btn" onclick="logout();">Logout</button>
 
 <div class="modal hide fade" id="manageItemFormBlock">
-
-
 	  <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h2>Manage Item</h2>
@@ -314,67 +344,27 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  </div>
 </div>
 
-<div class="modal hide fade" id="userFormBlock">
-	  <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">&times;</button>
-		<h2>Manage User</h2>
-	  </div>
-	  <div class="modal-body">
-		<form id="manageUser" class="form-horizontal" onsubmit="return false;">
-			<input type="hidden" id="userId" />
-			<input type="hidden" id="userAction" />
-			
-			<div class="control-group">
-				<label class="control-label" for="">Username</label>
-				<div class="controls">
-					<input class="input-medium" type="text" id="username"/>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userPassword">Password</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="userPassword"/>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userPasswordConfirm">Confirm Password</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="userPasswordConfirm"/>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userFullName">Full Name</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="userFullName"/>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="emailAddress">Email Address</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="emailAddress"/>
-				</div>
-			</div>
-			<?php if($_SESSION['admin'] == 1){ ?>
-				<div class="control-group">
-					<label class="control-label" for="userApproved">User is Approved</label>
-					<div class="controls">
-						<input type="checkbox" id="userApproved"/>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="userIsAdmin">User may Administer</label>										
-					<div class="controls">
-						<input type="checkbox" id="userIsAdmin"/>						
-					</div>
-				</div>
-			<?php }?>																
- 		</form>
-
-	  </div>
-	  <div class="modal-footer">
-		<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Save</a>
-	  </div>
+<div class="modal hide fade" id="deleteConfirmBlock">
+	<form id="deleteObjectForm">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h2>Are you Sure?</h2>
+		</div>
+		<div class="modal-body">
+			<input type="hidden" id="deleteObjectId" />
+			<input type="hidden" id="deleteType" />
+			<p id="deleteWarningMessage">
+				Warning! You are deleting a user on the system. If you continue, they will not be able to log in or access any of their items.
+				A Deleted user cannot be recovered!
+			</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+			<a href="#" id="deleteSubmit" class="btn btn-danger">Yes, Delete</a>
+		</div>
+	</form>
 </div>
+
 
 
 <div class="row">
@@ -398,7 +388,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				</table>
 			</div>
 		</div>
-		
 		<div id="otherLists" class="section">
 			<div id="myCarousel" class="carousel slide">
 			  <!-- Carousel items -->
@@ -424,7 +413,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="shoppingList" class="section">
 			Shopping List
 		</div>
-
 		<div id="manage" class="section">
 			User Settings
 			<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>
@@ -433,8 +421,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<?php if($_SESSION['admin'] == 1){ ?>
 			This Section visible only to Admins.
 			
-			List of Users
-			
+			<table id="adminUserList" class="table table-striped table-bordered table-condensed">
+				
+			</table>
 			List of Categories
 			
 			List of Ratings
@@ -457,10 +446,16 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<form name="loginForm" id="loginForm" method="POST" onsubmit="return false;" class="form-inline">
 				<input name="username" id="username" type="text" class="input-small" placeholder="Username"/>
 				<input name="password" id="password" type="password" class="input-small" placeholder="Password" />
-				<button type="submit" onclick="login();" value="login" class="btn">Login</button>
+				<button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button>
 			</form>			
 		</div>
 		
+	</div>
+	<div class="row" id="additionalInfo">
+		<!-- A great place for extra buttons, messages, etc. -->
+		<div class="span4 offset4">
+			<button id="requestAccount" type="button" class="btn btn-small">Request an Account</button> <button type="button" class="btn btn-small disabled" disabled>I Forgot my password</button>
+		</div>
 	</div>
 	<div class="row" id="alertLocation">
 		<!--
@@ -469,10 +464,80 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<a class="close" data-dismiss="alert" href="#">&times;</a>
 		</div>
 		-->
-	</div>
+	</div>	
 <?php 
 }
-?>	
+?>
+<!-- As we need the User Form available for requesting an account, we have to have the form outside the limit-->	
+<div class="modal hide fade" id="userFormBlock">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage User</h2>
+	  </div>
+	  <div class="modal-body">
+		<form id="manageUser" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="userId" />
+			<input type="hidden" id="userAction" />
+			
+			<div class="control-group">
+				<label class="control-label" for="">Username</label>
+				<div class="controls">
+					<input class="input-medium" type="text" id="username"/>
+					<span class="help-inline"></span>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userPassword">Password</label>
+				<div class="controls">
+					<input class="input-medium passwordSet" type="password" id="userPassword"/>
+					<span class="help-inline"></span>					
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userPasswordConfirm">Confirm Password</label>
+				<div class="controls">
+					<input class="input-medium passwordSet" type="password"  id="userPasswordConfirm"/>
+					<span class="help-inline"></span>					
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="userFullName">Full Name</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="userFullName"/>
+					<span class="help-inline"></span>					
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="emailAddress">Email Address</label>
+				<div class="controls">
+					<input class="input-medium" type="text"  id="emailAddress"/>
+					<span class="help-inline"></span>					
+				</div>
+			</div>
+			<?php if($_SESSION['admin'] == 1){ ?>
+				<div class="control-group">
+					<label class="control-label" for="userApproved">User is Approved</label>
+					<div class="controls">
+						<input type="checkbox" id="userApproved"/>
+						<span class="help-inline"></span>						
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="userIsAdmin">User may Administer</label>										
+					<div class="controls">
+						<input type="checkbox" id="userIsAdmin"/>
+						<span class="help-inline"></span>
+					</div>
+				</div>
+			<?php }?>																
+ 		</form>
+
+	  </div>
+	  <div class="modal-footer">
+		<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
+	  </div>
+</div>
 </div>	
 </body>
 </html>

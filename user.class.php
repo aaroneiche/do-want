@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_id() == "") session_start();
 
 class user extends db{
 	
@@ -64,13 +64,18 @@ class user extends db{
 	@userid - The ID of the user you want the information for.
 */
 	function getUser($args){
-		if($_SESSION['userid'] == $args['userid'] || $_SESSION['admin'] == 1)
-		$cleanUserId = $this->dbEscape($args["userid"]);
-		$query = "select username, fullname, userid, email, admin, approved from users where userid = '{$cleanUserId}'";
+		if($_SESSION['userid'] == $args['userid'] || $_SESSION['admin'] == 1){
+			$cleanUserId = $this->dbEscape($args["userid"]);
+			$query = "select username, fullname, userid, email, admin, approved from users where userid = '{$cleanUserId}'";
 		
-		$result = $this->dbQuery($query);
-		return $this->dbAssoc($result);
+			$result = $this->dbQuery($query);
+			return $this->dbAssoc($result);
+		}else{
+			//error_log("User information was requested for UserId ".$args['userid']." by a non-admin, non-self user");
+			return array("message"=>"You do not have permission to get that information");
+		}
 	}
+	
 	
 /*
 	Method: manageUser
@@ -88,7 +93,7 @@ class user extends db{
 	function manageUser($args){
 		
 		$cleanAction = $this->dbEscape($args['userAction']);
-		$cleanUserid = $this->dbEscape($args['userid']);
+		$cleanUserId = $this->dbEscape($args['userId']);
 		$cleanUsername = $this->dbEscape($args['username']);
 		$cleanPassword = $this->dbEscape($args['password']);
 		$cleanFullname = $this->dbEscape($args['fullname']);
@@ -98,16 +103,23 @@ class user extends db{
 		
 		switch($cleanAction){
 			case 'add':
-				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) 
-						  VALUES('$cleanUsername',{$this->options["password_hasher"]}('$cleanPassword'),'$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";			
+				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) VALUES('$cleanUsername',{$this->options["password_hasher"]}('$cleanPassword'),'$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";			
 			break;
 			case 'edit':
+		
+				if(strlen($cleanPassword) > 0){
+					//Now we know we have a password to update.
+					//We're going to want to move this to an external function from SQL.
+					$passwordSQL = "password={$this->options["password_hasher"]}('$cleanPassword'), ";
+				}else{
+					$passwordSQL = "";
+				}
 
-				$query = "UPDATE {$this->options["table_prefix"]}users SET fullname='{$cleanFullname}', email='{$cleanEmail}', 
-							approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserid}'";			
+				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', $passwordSQL
+							approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserId}'";			
 			break;
 			case 'delete':
-				$query = "DELETE FROM {$this->options["table_prefix"]}users WHERE userid = '{$cleanUserid}'";
+				$query = "DELETE FROM {$this->options["table_prefix"]}users WHERE userid = '{$cleanUserId}'";
 			break;
 		}
 		
@@ -118,14 +130,26 @@ class user extends db{
 	
 
 	
+
 /*
-TODO:
-deleteUser
-editUser
-*/
-
+	Method: getListOfUsers
+	Returns a list of all users in the system. - Takes no arguments.
 	
-
+*/
+	function getListOfUsers(){
+		if($_SESSION['admin'] == 1){
+			$query = "select userid, username, fullname, email from users";
+			
+			$result = $this->dbQuery($query);
+			return $this->dbAssoc($result);
+		}
+	}
+	
+		
 }
+
+
+
+
 
 ?>
