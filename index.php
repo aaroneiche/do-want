@@ -46,8 +46,14 @@ session_start();
 			unset($_REQUEST);
 		?>');
 		
-		storedData.columns = {
-			"Description":{
+
+		/*
+			Eventually we'll store this information in the DB somewhere so it can be changed at a whim.
+		*/
+
+		storedData.columns = [
+			{
+				"columnName":"Description",
 				"displayColumn":"displayDescription",
 				"altDisplay":"--",
 				"sortFunctions":[
@@ -55,14 +61,16 @@ session_start();
 					sortByDescriptionAsc
 				]
 			},
-			"Ranking":{
+			{
+				"columnName":"Ranking",
 				"displayColumn":"displayRanking",
 				"sortFunctions":[
 					sortByRankingAsc,
 					sortByRankingDesc
 				]				
 			},
-			"Price":{
+			{
+				"columnName":"Price",
 				"displayColumn":"minprice",
 				"altDisplay":"--",				
 				"sortFunctions":[
@@ -70,16 +78,28 @@ session_start();
 					sortByPriceDesc
 				]
 			},
-			"Category":{
+			{
+				"columnName":"Category",
 				"displayColumn":"displayCategory",
 				"altDisplay":"--",				
 				"sortFunctions":[]
 			},
-			"Tools":{
+			{
+				"columnName":"Tools",
 				"displayColumn":"displayToolbox",
 				"sortFunctions":[]
 			},
-		};
+		];
+
+
+		storedData.columns2 = storedData.columns.slice(0);
+		storedData.columns2.splice(4,0,{
+			"columnName":"Status",
+			"displayColumn":"displayStatus",
+			"sortFunctions":[]
+		});
+		
+
 
 		$(document).ready(function(){
 			$("#tabSetContainer a")
@@ -100,7 +120,11 @@ session_start();
 
 				$("#userFormBlock").modal('show');
 			});
-						
+			
+			//System information accessible by the version number in the lower righthand corner.			
+			$("#versionNumber").click(function(){
+				$("#systemInformation").modal('show');
+			});
 			
 			//Moved into general script section to provide form action when not logged in.
 			$("#manageUserSaveButton").click(function(){				
@@ -414,20 +438,28 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			Shopping List
 		</div>
 		<div id="manage" class="section">
+			
+			
 			User Settings
 			<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>
 			
 						
-			<?php if($_SESSION['admin'] == 1){ ?>
-			This Section visible only to Admins.
+
 			
-			<table id="adminUserList" class="table table-striped table-bordered table-condensed">
-				
-			</table>
-			List of Categories
-			
-			List of Ratings
-			<?php } ?>
+			<div class="row">
+				<div class="span8">
+					<?php if($_SESSION['admin'] == 1){ ?>
+					This Section visible only to Admins.
+
+					<table id="adminUserList" class="table table-striped table-bordered table-condensed">
+
+					</table>
+					List of Categories
+
+					List of Ratings
+					<?php } ?>				
+				</div>
+			</div>			
 		</div>
 	</div>
 
@@ -469,77 +501,92 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 }
 ?>
 <!-- As we need the User Form available for requesting an account, we have to have the form outside the limit-->	
-<div class="modal hide fade" id="userFormBlock">
-	  <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">&times;</button>
-		<h2>Manage User</h2>
-	  </div>
-	  <div class="modal-body">
-		<form id="manageUser" class="form-horizontal" onsubmit="return false;">
-			<input type="hidden" id="userId" />
-			<input type="hidden" id="userAction" />
+	<div class="modal hide fade" id="userFormBlock">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h2>Manage User</h2>
+		  </div>
+		  <div class="modal-body">
+			<form id="manageUser" class="form-horizontal" onsubmit="return false;">
+				<input type="hidden" id="userId" />
+				<input type="hidden" id="userAction" />
 			
-			<div class="control-group">
-				<label class="control-label" for="">Username</label>
-				<div class="controls">
-					<input class="input-medium" type="text" id="username"/>
-					<span class="help-inline"></span>
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userPassword">Password</label>
-				<div class="controls">
-					<input class="input-medium passwordSet" type="password" id="userPassword"/>
-					<span class="help-inline"></span>					
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userPasswordConfirm">Confirm Password</label>
-				<div class="controls">
-					<input class="input-medium passwordSet" type="password"  id="userPasswordConfirm"/>
-					<span class="help-inline"></span>					
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="userFullName">Full Name</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="userFullName"/>
-					<span class="help-inline"></span>					
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="emailAddress">Email Address</label>
-				<div class="controls">
-					<input class="input-medium" type="text"  id="emailAddress"/>
-					<span class="help-inline"></span>					
-				</div>
-			</div>
-			<?php if($_SESSION['admin'] == 1){ ?>
 				<div class="control-group">
-					<label class="control-label" for="userApproved">User is Approved</label>
+					<label class="control-label" for="">Username</label>
 					<div class="controls">
-						<input type="checkbox" id="userApproved"/>
-						<span class="help-inline"></span>						
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="userIsAdmin">User may Administer</label>										
-					<div class="controls">
-						<input type="checkbox" id="userIsAdmin"/>
+						<input class="input-medium" type="text" id="username"/>
 						<span class="help-inline"></span>
 					</div>
 				</div>
-			<?php }?>																
- 		</form>
+				<div class="control-group">
+					<label class="control-label" for="userPassword">Password</label>
+					<div class="controls">
+						<input class="input-medium passwordSet" type="password" id="userPassword"/>
+						<span class="help-inline"></span>					
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="userPasswordConfirm">Confirm Password</label>
+					<div class="controls">
+						<input class="input-medium passwordSet" type="password"  id="userPasswordConfirm"/>
+						<span class="help-inline"></span>					
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="userFullName">Full Name</label>
+					<div class="controls">
+						<input class="input-medium" type="text"  id="userFullName"/>
+						<span class="help-inline"></span>					
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="emailAddress">Email Address</label>
+					<div class="controls">
+						<input class="input-medium" type="text"  id="emailAddress"/>
+						<span class="help-inline"></span>					
+					</div>
+				</div>
+				<?php if($_SESSION['admin'] == 1){ ?>
+					<div class="control-group">
+						<label class="control-label" for="userApproved">User is Approved</label>
+						<div class="controls">
+							<input type="checkbox" id="userApproved"/>
+							<span class="help-inline"></span>						
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="userIsAdmin">User may Administer</label>										
+						<div class="controls">
+							<input type="checkbox" id="userIsAdmin"/>
+							<span class="help-inline"></span>
+						</div>
+					</div>
+				<?php }?>																
+	 		</form>
 
-	  </div>
-	  <div class="modal-footer">
-		<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Cancel</a>
-		<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
-	  </div>
-</div>
+		  </div>
+		  <div class="modal-footer">
+			<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Cancel</a>
+			<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
+		  </div>
+	</div>
+
+	<div class="modal hide fade" id="systemInformation">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h2>About Do-Want</h2>
+		  </div>
+		  <div class="modal-body">
+			<h2>Do-want version 0.5</h2>
+			<p>Do-want is a wishlist management system that helps families and friends organize gift exchanges.</p>
+			<p>Do-Want is released under a GPL 2.0 License</p>
+		  </div>
+		  <div class="modal-footer">
+		  </div>
+	</div>			
+
 </div>
 
-<span id="versionNumber">v0.5</span>
+<a href="#" id="versionNumber">v0.6</a>
 </body>
 </html>

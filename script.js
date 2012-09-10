@@ -70,6 +70,8 @@ function displayWishlist(displayData){
 	//debug = displayData;
 	//The table we're plugging this into.
 	table = $("#"+displayData.targetTable);
+	
+	table.attr("data-listOwner",displayData.forUserId);
 		
 	/*
 	Builds the Table header and puts the columns into a definable order.
@@ -81,21 +83,23 @@ function displayWishlist(displayData){
 		table.html("");	
 		
 		hRow = $(document.createElement("tr"));
+		
+		$(displayData.columns).each(function(i,e){
 
-		for(columnName in displayData.columns){
-			hRow.append(
-				$(document.createElement("th")).append(columnName)
-				.toggle(
-					displayData.columns[columnName].sortFunctions[0],
-					displayData.columns[columnName].sortFunctions[1]
-				)
-			);
-		}
-
+				hRow.append(
+					$(document.createElement("th")).append(e.columnName)
+					.toggle(
+						e.sortFunctions[0],
+						e.sortFunctions[1]
+					)
+				);
+		});
+		
 		table.append(hRow);		
 	}
 
 	//Loop through each item on the user list and add it to a row, which is then added to the table.
+
 	$(displayData.list).each(function(i,e){
 		row = $(document.createElement("tr"))
 			.attr("data-itemId",e.itemid)
@@ -113,38 +117,35 @@ function displayWishlist(displayData){
 		to change the column order, or add/remove columns if they care to without resorting to the
 		code. There will need to be a tool to change column order to make this valuable.
 		*/	
-
+		
 		for(column in displayData.columns){
 			
-			displayVal = e[displayData.columns[column].displayColumn];
+			colToDisplay = displayData.columns[column].displayColumn;
+			colDisplayAlt = displayData.columns[column].displayAlt;
 			
-			//Uses a predefined alternative display Value if the display value isn't populated.
+			displayVal = e[colToDisplay];
+			
 			if(displayVal == null){ 
-				displayVal = displayData.columns[column].altDisplay;
-			}
-						
+				displayVal = e[colDisplayAlt];
+			}			
+
+
 			var cell =	$(document.createElement("td"))
 						.append(displayVal)
-						.attr("id","item_"+e.itemid+"_"+displayData.columns[column].displayColumn)
-						.addClass("item_"+displayData.columns[column].displayColumn)
-	
-			if(column != "Tools"){
+						.attr("id","item_"+e.itemid+"_"+e[colToDisplay])
+						.addClass("item_"+e[colToDisplay]);
+
+			if(displayData.columns[column].columnName != "Tools"){
 				cell.click(function(){
-					//displayItemsDetails(e);
 					getItemDetailInfo(e.itemid);
-					//debug = e;
 				});
 			}
 
 			row.append(cell);
-		}
-		
-		table.append(row);
-		//table.append(detailRow);
-	});	
-
-	
-	
+			
+			}
+			table.append(row);								
+		});	
 }
 
 function displayItemsDetails(itemInfo){
@@ -211,20 +212,12 @@ function getCurrentUserList(){
 		
 		wishlistData = {};
 		wishlistData.isCurrentUser = true;
+		wishlistData.forUserId = userId;		
 		wishlistData.toolset = "edit";		
 		wishlistData.list = response;		
 		wishlistData.targetTable = "userWishlist";
 		wishlistData.skipHeader = false;
 		wishlistData.columns = storedData.columns;
-		/*
-		wishlistData.columns = [
-			{"Description":"displayDescription"},
-			{"Ranking":"displayRanking"},
-			{"Price":"price"},
-			{"Category":"category"},
-			{"Tools":"displayToolbox"}
-		];
-		*/
 
 		displayWishlist(wishlistData);
 				
@@ -244,7 +237,6 @@ function getUserWishlist(forUserId){
 		action:'getShoppingForList',
 		args:{shopForId:forUserId}
 	}
-	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		if(response.responseType != undefined && response.responseType == "error"){
@@ -253,27 +245,14 @@ function getUserWishlist(forUserId){
 		}else{
 			wishlistData = {};
 			wishlistData.isCurrentUser = false;
+			wishlistData.forUserId = forUserId;
 			wishlistData.toolset = "shop";
 			wishlistData.list = response;		
 			wishlistData.skipHeader = false;			
 			wishlistData.targetTable = "otherUserWishlist";
-			wishlistData.columns = storedData.columns;
-			/*
-			[
-				{"Description":"displayDescription"},
-				{"Ranking":"displayRanking"},
-				{"Price":"price"},
-				{"Category":"category"},
-				{"Quantity":"quantity"},			
-				{"Tools":"displayToolbox"}
-			]; 
-			*/
+			wishlistData.columns = storedData.columns2;
+
 			displayWishlist(wishlistData);
-			
-			//create trigger foreach item row to display detail info
-			// we do this here because we don't want to provide this detail function for the currentUserWishlist
-			$(".item_description").click(function(clickEvent){showMoreInfo(clickEvent);});
-			$("#myCarousel").carousel('next');
 		}			
 	},"json");	
 }
@@ -352,14 +331,13 @@ function generateDisplayElements(itemObject){
 		case "shop":
 			itemObject.displayToolbox = renderItemTools(itemObject,"shop");
 
-			itemObject.displayDescription = $(document.createElement("span"))
-				.append(itemObject.description);
-				/*
-				.click(function(){
-					getItemDetailInfo(itemObject.id);
-				}
-				
-				);*/
+			itemObject.displayDescription = $(document.createElement("div"));		
+			itemObject.displayDescription.append($(document.createElement("span")).append(itemObject.description))
+			
+
+			if(itemObject.available == null) itemObject.available = itemObject.quantity;
+			itemObject.displayStatus = (itemObject.available > 0)? itemObject.available+" Remaining":"None Remaining";
+			
 			
 		break;
 		case "edit":
@@ -467,11 +445,8 @@ function getItemDetailInfo(itemId){
 		
 		if(response.allocs != undefined){
 			jQuery(response.allocs).each(function(i,e){
-				if(response.allocs.length > 1){
-					allocElement.html(e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+"of this item");
-				}else{
-					allocElement.html(e.itemAllocUserName+" has reserved this item");
-				}	
+				message = e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+" of this item";
+				allocElement.append($(document.createElement('div')).html(message));				
 			});
 		}else{
 			allocElement.html("This item has not be reserved yet.");
@@ -585,37 +560,60 @@ function renderItemTools(itemObject, toolInfo){
 			toolBox.append(itemDelete);				
 		break;
 		case "shop":
+
+			//Reserve
+			if(itemObject.available > 0 ){	
+				itemReserve = $(document.createElement("i"))
+						.addClass("icon-lock tool")
+						.attr("title","Reserve Item")
+						.click(function(){
+							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"reserve", $(this).closest("table").attr("data-listOwner"));
+						});
+				toolBox.append(itemReserve);
+			}
 		
-			//Reserve, Copy, Buy, Return
-		
-			itemReserve = $(document.createElement("img")).attr("src","images/lock_co.gif");
-			itemCopy = $(document.createElement("img")).attr("src","images/toolbar_replace.gif");
-			itemReturn = $(document.createElement("img")).attr("src","images/cross.png");		
-			itemBuy = $(document.createElement("img")).attr("src","images/step_done.gif");		
+			if(itemObject.reservedByThisUser > itemObject.boughtByThisUser){
+				//Release
+				itemRelease = $(document.createElement("i"))
+						.addClass("icon-hand-left tool")
+						.attr("title","Release Item")
+						.click(function(){
+							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"release", $(this).closest("table").attr("data-listOwner"));
+						});
+				toolBox.append(itemRelease);
 
+				//Purchase
+				itemBuy = $(document.createElement("i"))
+						.addClass("icon-shopping-cart tool")
+						.attr("title","Buy Item")
+						.click(function(){
+							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"purchase", $(this).closest("table").attr("data-listOwner"));
+						});
+				toolBox.append(itemBuy);
+			}
+			
+			//Return
+			if(itemObject.boughtByThisUser > 0){
+				itemReturn = $(document.createElement("i"))
+						.addClass("icon-share tool")
+						.attr("title","Buy Item")
+						.click(function(){
+							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"return", $(this).closest("table").attr("data-listOwner"));
+						});
+				toolBox.append(itemReturn);
+			}
+			
 
-			itemReserve.click(function(){
-				alert("Reserve: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
-			});
-
-			itemCopy.click(function(){
-				alert("Copy: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
-			});
-
-			itemReturn.click(function(){
-				alert("Return: "+
-				this.parentNode.parentNode.parentNode.getAttribute("data-itemId"));
-			});
-
-			itemBuy.click(function(){
-				alert("Buy: "+
-				this.parentNode.getAttribute("data-itemId"));
-			});
-
-			toolBox.append(itemReserve);
+			//There are no limitations on copying an item. 
+			itemCopy = $(document.createElement("i"))
+					.addClass("icon-tags tool")
+					.attr("title","Copy Item")
+					.click(function(){
+						alert("Copy ItemId "+$(this).closest("tr").attr("data-itemId")+" - not implemented yet.");
+						//this.parentNode.parentNode.parentNode.getAttribute("data-itemId");
+					});
 			toolBox.append(itemCopy);
+
 		break;		
 	}
 	
@@ -655,6 +653,9 @@ function buildShopForSet(){
 			nameCell.click(function(e){
 				
 				getUserWishlist($(e.target).attr("data-userid"));
+
+				//Sets the request to fire the slideshow transition onclick.
+				$("#myCarousel").carousel('next');
 			})
 			
 			listOfUsersTable.append(userRow);
@@ -1065,6 +1066,38 @@ function displaySystemUsers(){
 	},"json");
 	
 }
+
+/*
+	Method allocateHandler
+		manages calls to allocating Methods on backend.
+*/
+function allocateHandler(itemId,userId,action,forUserId){
+	
+	arguments = {
+		"userid":userId,
+		"itemid":itemId,
+		"allocateAction":action,
+		"adjustment":1
+	}
+	
+	data = {
+		interact:'wishlist',
+		action:'adjustReservedItem',
+		"args":arguments
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		getUserWishlist(forUserId);
+	});
+}
+
+
+
+
+
+
+
+
 
 
 

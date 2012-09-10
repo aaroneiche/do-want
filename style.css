@@ -90,3 +90,11 @@ th{
 	color:#d8d8d8;
 }
 
+.available{
+	float:right;
+	color:#d8d8d8;
+}
+
+.tool{
+	margin-right:3px;
+}

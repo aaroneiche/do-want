@@ -28,7 +28,6 @@ class wishlist extends db{
 	Method: getShoppingForList	
 		Fetches and returns an array of items for the requested user id if current logged-in user is allowed to view.
 		
-		@args - array of arguments for this function
 		@shopForId - The user id for the requested user's shopping list.
 	*/
 	function getShoppingForList($args){
@@ -42,31 +41,50 @@ class wishlist extends db{
 				
 		}else{
 	
-			$query = "select
-				     itemid,
-				     description,
-				     ranking,
-				     categories.category as displayCategory,
-				     	(select min(sourceprice)
-				          from {$this->options['table_prefix']}itemsources
-				          where itemsources.itemid = items.itemid)
-				     as minprice,
-				     quantity,
-					quantity -
-						(select allocs.quantity from {$this->options['table_prefix']}allocs where allocs.itemid = items.itemid)
-				     as available
-				from
-				     {$this->options['table_prefix']}items,
-					{$this->options['table_prefix']}shoppers,
-					{$this->options['table_prefix']}categories
-				where
-					{$this->options['table_prefix']}items.userid = '{$args['shopForId']}' and 
-					{$this->options['table_prefix']}shoppers.shopper = '{$_SESSION['userid']}' and
-					{$this->options['table_prefix']}shoppers.mayshopfor = '{$args['shopForId']}' and
-					{$this->options['table_prefix']}categoryid = items.category";
-				
+	
+		$query = "select 
+			   items.itemid,
+			   items.description,
+			   items.ranking,
+			   allocs.quantity as reservedByThisUser,
+			   allocs.bought as boughtByThisUser,
+				categories.category as displayCategory,
+				(select min(sourceprice)
+			          from itemsources
+			          where itemsources.itemid = items.itemid)
+			     as minprice,
+			   items.quantity,
+				items.quantity -
+					(select sum(allocs.quantity) from allocs where allocs.itemid = items.itemid)
+			     as available
+			from {$this->options['table_prefix']}items
+				join {$this->options['table_prefix']}categories on `categoryid` = items.`category`
+				join {$this->options['table_prefix']}shoppers on shopper = '{$_SESSION['userid']}' and mayshopfor = '{$args['shopForId']}'
+				left join {$this->options['table_prefix']}allocs on allocs.itemid = items.itemid and allocs.userid = '{$_SESSION['userid']}'
+				where items.`userid` = '{$args['shopForId']}'";
 			$result = $this->dbQuery($query);
-			return $this->dbAssoc($result);
+			
+			
+			$list = $this->dbAssoc($result);
+
+
+			foreach($list as &$listItem){
+
+				if($listItem['reservedByThisUser'] == null){
+					$listItem['reservedByThisUser'] = 0;
+				}
+
+				if($listItem['boughtByThisUser'] == null){
+					$listItem['boughtByThisUser'] = 0;
+				}
+				
+				if($listItem['available'] == null){
+					$listItem['available'] = $listItem['quantity'];
+				}
+				
+			}
+
+			return $list;
 		}
 	}
 	
@@ -74,11 +92,10 @@ class wishlist extends db{
 	Method: getCurrentCount	
 		Gets the current quantity available for reserving and purchasing based on current user.
 		
-		@args - array of arguments for this function
-			int @itemid - The id of the item which is being affected
-			int @userid - The id of the user affecting 
-			string @allocateAction - purchase, reserve, return, release
-			int @adjustment - Quantity to adjust by, positive or negative	
+		int @itemid - The id of the item which is being affected
+		int @userid - The id of the user affecting 
+		string @allocateAction - purchase, reserve, return, release
+		int @adjustment - Quantity to adjust by, positive or negative	
 	*/
 	
 	function getCurrentCount($args){
@@ -118,7 +135,15 @@ class wishlist extends db{
 							{$this->options['table_prefix']}items.quantity - 
 							sum({$this->options['table_prefix']}allocs.quantity)
 						) as availableToReserve,
-						{$this->options['table_prefix']}items.itemid as item
+						{$this->options['table_prefix']}items.itemid as item,
+						(select 
+							count({$this->options['table_prefix']}allocs.quantity) 
+						from 
+							{$this->options['table_prefix']}allocs 
+						where 
+							{$this->options['table_prefix']}allocs.userid = '{$args['userid']}' and 
+							{$this->options['table_prefix']}allocs.itemid = '{$args['itemid']}') 
+						as userHasReserved
 					from 
 						{$this->options['table_prefix']}items, 
 						{$this->options['table_prefix']}allocs
@@ -139,6 +164,7 @@ class wishlist extends db{
 						";
 			break;
 		}
+			
 			$result = $this->dbQuery($query);
 			return $this->dbAssoc($result);	
 	}
@@ -147,27 +173,24 @@ class wishlist extends db{
 	Method: adjustReservedItem	
 		Reserves, Releases, Purchases, or Returns item according to arguments provided 
 		
-		@args - array of arguments for this function
-			int @itemid - The id of the item which is being affected
-			int @userid - The id of the user affecting 
-			string @allocateAction - buy,return, reserve, release
-			int @adjustment - Quantity to adjust by, positive or negative
+		int @itemid - The id of the item which is being affected
+		int @userid - The id of the user affecting 
+		string @allocateAction - purchase, return, reserve, release
+		int @adjustment - Unsigned Quantity to adjust by.
 			
 	*/	
 	function adjustReservedItem($args){
 		
 		$query = "";
+		$currentCount = $this->getCurrentCount($args);			
 		
 		switch($args['allocateAction']){
 			case 'reserve':
-			
-				$currentCount = $this->getCurrentCount($args);	
-
+				
 				//Check if we've reserved any of this before.
-				if($currentCount['availableToReserve'] != null){
-
+				if($currentCount['userHasReserved'] > 0){
 					//we check that we're not trying to reserve more than we can.
-					if($currentCount['availableToReserve'] <= $args['adjustment']){
+					if($currentCount['availableToReserve'] >= $args['adjustment']){						
 						//we set our query to update to the new value
 						$query = "update 
 									{$this->options['table_prefix']}allocs 
@@ -180,13 +203,14 @@ class wishlist extends db{
 									";
 						
 					}else{
+
 						//we return an error saying the requested reservation is too high.
 						$error = array("errorMessage"=>"Reservation quantity was greater than requested quantity.");
 						return $error;
 					}
 					
 				}else{
-					//we isnert the row into the alloc table.
+					//we insert the row into the alloc table.
 					$query = "insert into {$this->options['table_prefix']}allocs(
 								itemid,userid,bought,quantity
 								) 
@@ -200,11 +224,19 @@ class wishlist extends db{
 				
 			break;
 			case 'release':
-				$currentCount = $this->getCurrentCount($args);
-								
-				//check to see if we've reserved anything before now:
-				if(($currentCount['quantity'] - $currentCount['bought']) >= $args['adjustment'] && $currentCount['bought'] > 0){
-				
+
+				$availableToRelease = $currentCount['quantity'] - $currentCount['bought'];
+
+				if($availableToRelease == $args['adjustment'] && $currentCount['bought'] == 0){
+					//Delete the row - nothing is bought, and we're releasing all reservations
+					$query = "delete from 
+								{$this->options['table_prefix']}allocs					
+							where 
+								{$this->options['table_prefix']}allocs.itemid = {$args['itemid']} and
+								{$this->options['table_prefix']}allocs.userid = {$args['userid']}
+							";					
+					
+				}else if($availableToRelease >= $args['adjustment']){
 					$query = "update 
 								{$this->options['table_prefix']}allocs 
 							set 
@@ -213,26 +245,15 @@ class wishlist extends db{
 							where 
 								{$this->options['table_prefix']}allocs.itemid = {$args['itemid']} and
 								{$this->options['table_prefix']}allocs.userid = {$args['userid']}
-								";
-					
-				//We want to deleted the row if we don't need it anymore.
-				}else if($currentCount['quantity'] == $args['adjustment'] &&  $currentCount['bought'] == 0){
-					$query = "delete from 
-								{$this->options['table_prefix']}allocs					
-							where 
-								{$this->options['table_prefix']}allocs.itemid = {$args['itemid']} and
-								{$this->options['table_prefix']}allocs.userid = {$args['userid']}
-							";
-				}else{
+								";					
+				}else{					
 					$error = array("errorMessage"=>"Unpurchased Reserved quantity is less than requested adjustment");
 					return $error;
 				}
 				
-				
 			break;
 			case 'purchase':
-				$currentCount = $this->getCurrentCount($args);
-				
+
 				//Check to make sure that the reservation row exists.
 				if(count($currentCount) > 0){
 				
@@ -253,7 +274,7 @@ class wishlist extends db{
 						return $error;
 					}
 					
-				}else{
+				}else{				
 					$error = array("errorMessage"=>"You have not reserved this item.");
 					return $error;					
 				}
@@ -261,7 +282,6 @@ class wishlist extends db{
 				
 			break;
 			case 'return':
-				$currentCount = $this->getCurrentCount($args);
 				
 				if($currentCount['bought'] >= $args['adjustment']){
 					$query = "update 
@@ -273,17 +293,15 @@ class wishlist extends db{
 									{$this->options['table_prefix']}allocs.itemid = {$args['itemid']} and
 									{$this->options['table_prefix']}allocs.userid = {$args['userid']}
 							";
-				}else{
+				}else{			
 					$error = array("errorMessage"=>"Trying to return more than you've bought!");
 					return $error;					
 				}
 				
 			break;
 		}
-		print $query;	
 
-		//	$result = $this->dbQuery($query);
-		//	return $this->dbAssoc($result);				
+		return $this->dbQuery($query);
 	}
 	
 	/*
@@ -302,8 +320,6 @@ class wishlist extends db{
 	*/
 	
 	function manageItem($args){
-		error_log("test");
-		error_log(print_r($args,true));
 				
 		switch($args['itemAction']){
 			case 'add':
@@ -347,9 +363,11 @@ class wishlist extends db{
 	}
 	
 	/*
-		method manageSource:
+		Method: manageItemSource
 		This function adds or removes sources for a particular item.
+		
 		int @itemid - The itemid that this source is for
+		string @itemSourceAction - What action to take: add, edit, delete
 		string @source - The name of the source: A store or website
 		string @sourceurl - The URL for the source
 		string @sourceprice - The price for the source
@@ -384,8 +402,6 @@ class wishlist extends db{
 				$query = "delete from itemsources where sourceid = {$args['sourceid']}";
 			break;
 		}
-		
-		error_log($query);
 		
 		$result = $this->dbQuery($query);
 		return $result;
