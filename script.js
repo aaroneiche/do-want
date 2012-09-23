@@ -528,15 +528,15 @@ function renderItemTools(itemObject, toolInfo){
 			itemDelete = $(document.createElement("img")).attr("src","images/cross.png");		
 			*/				
 			itemDelete = $(document.createElement("i"))
-							.addClass("icon-trash")
+							.addClass("icon-trash tool")
 							.attr("title","Delete Item");
 							
 			itemReceive = $(document.createElement("i"))
-							.addClass("icon-gift")
+							.addClass("icon-gift tool")
 							.attr("title","Mark Item Received");
 							
 			itemEdit = $(document.createElement("i"))
-							.addClass("icon-pencil")
+							.addClass("icon-pencil tool")
 							.attr("title","Edit Item");
 			
 			//data-itemId is stored on the row element: tool->div->td->tr
@@ -623,8 +623,7 @@ function renderItemTools(itemObject, toolInfo){
 
 /*
 Function buildShopForSet
-	Builds a set of html option elements and places them in the shop for select element on the "Other's lists" tab.
-
+	Builds a set of html option elements and places them in shop for list on the "Other's lists" tab and the "I'm shopping for" list on the "manage" tab.
 */
 
 function buildShopForSet(){
@@ -634,35 +633,56 @@ function buildShopForSet(){
 	}
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
-		userSelect = $("#listOfUsers");
 		listOfUsersTable = $("#listOfUsersTable");
+		shopForTable = $("#currentShopFor");
+		
+		shopForTable.empty();
 		
 		$(response).each(function(i,e){
-			userOption = $(document.createElement("option"))
-							.html(e.fullname).attr("value",e.userid);
-				
-				
-			userSelect.append(userOption);
-			
-			userRow = $(document.createElement("tr"));
-			nameCell = $(document.createElement("td"))
-						.html(e.fullname)
-						.attr("data-userid",e.userid);
-			userRow.append(nameCell);
-			
-			nameCell.click(function(e){
-				
-				getUserWishlist($(e.target).attr("data-userid"));
+			shopForRow = $(document.createElement("tr"));
+			shopForCell = $(document.createElement("td"))
+							.html(e.fullname)
+							.attr("data-userid",e.userid);
+			if(e.pending == 1){
+				shoppingForState = $(document.createElement('span')).html("Pending").addClass("label label-warning cellInfo");
 
-				//Sets the request to fire the slideshow transition onclick.
-				$("#myCarousel").carousel('next');
-			})
+			}else{
+				shoppingForState = $(document.createElement('button')).html("Remove")
+							.addClass("btn btn-mini btn-danger cellInfo")
+							.click(function(){
+								removeShoppingFor($(this).closest('td').attr("data-userid"));
+							});				
+			}
+			shopForCell.append(shoppingForState);
 			
-			listOfUsersTable.append(userRow);
+						
+			shopForRow.append(shopForCell);
+			shopForTable.append(shopForRow);			
+
+
+
+			if(e.pending == 0){
+				userRow = $(document.createElement("tr"));
+				nameCell = $(document.createElement("td"))
+							.html(e.fullname)
+							.attr("data-userid",e.userid)
+							.attr("id","listRowUser-"+e.userid);
 			
+				//I was using the extend method of jQuery here to simply duplicate the object
+				//but it was causing problems in terms of one table or the other.
+
+
+				nameCell.click(function(e){
+				
+					getUserWishlist($(e.target).attr("data-userid"));
+
+					//Sets the request to fire the slideshow transition onclick.
+					$("#myCarousel").carousel('next');
+				});
 			
-			//getUserWishlist(this.value);
-			
+				userRow.append(nameCell);			
+				listOfUsersTable.append(userRow);
+			}
 		});
 		
 		
@@ -1092,11 +1112,150 @@ function allocateHandler(itemId,userId,action,forUserId){
 }
 
 
+/*
+	Method setupUserSearch
+		Gets all users, associated IDs, sets up array for searching and sets up user search field.
+		
+*/
+function setupUserSearch(){
+	data = {
+		interact:'user',
+		action:'getListOfUsers'
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		storedData.userlist = response;
+		
+		$('#shopForSearch').typeahead({
+			source:storedData.userlist,
+		    onselect: function(obj){requestToShopFor(userId,obj.userid)},
+			property:'fullname'
+		});		
+	},"json");	
+}
+
+/*
+	Method requestToShopFor
+		Requests that a user may shop for the current user.
+		
+		@userid - The userId of the user making the request
+		@shopForId - The user to be shopped for.
+*/
+function requestToShopFor(userId,shopForId){
+	data = {
+		interact:'user',
+		action:'requestShopForUser',
+		args:{'shopperId':userId,
+			'shopForUserId':shopForId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		buildShopForSet();
+	},"json");
+}
+
+/*
+	Method removeShoppingFor
+		Removes a user from your 'shopping for' set.
+*/
+function removeShoppingFor(shopForId){
+	//	$(this).closest('td').attr("data-userid")
+	data = {
+		interact:'user',
+		action:'removeShopForUser',
+		args:{'shopperId':userId,
+			'shopForUserId':shopForId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		buildShopForSet();
+	},"json");
+	
+}
 
 
 
+/*
+	Method approveShopper
+		Approves a shopper's request to shop for you
+*/
+function approveShopper(shopperId){
+
+	data = {
+		interact:'user',
+		action:'approveShopForUser',
+		args:{'shopForId':userId,
+			'shopperId':shopperId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		displayShopForMeList();
+	},"json");
+}
+
+/*
+	Method approveShopper
+		Approves a shopper's request to shop for you
+*/
+function disapproveShopper(shopperId){
+
+	data = {
+		interact:'user',
+		action:'disapproveShopForUser',
+		args:{'shopForId':userId,
+			'shopperId':shopperId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		displayShopForMeList();
+	},"json");
+}
 
 
+/*
+	Method displayShopForMeList
+	Displays the list of users shopping for current user in the manage panel.
+	
+*/
+function displayShopForMeList(){
+	data = {
+		interact:'user',
+		action:'getUsersShoppingFor'
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+
+		shopForMeTable = $("#shoppingForMe");
+		shopForMeTable.empty();
+
+		$(response).each(function(i,e){
+			shopForMeRow = $(document.createElement("tr"));
+			shopForMeCell = $(document.createElement("td"))
+							.html(e.fullname)
+							.attr("data-userid",e.userid);
+	
+				actionButton = $(document.createElement("button")).addClass("btn btn-mini cellInfo");
+	
+			if(e.pending == 1){
+				actionButton.html("Approve")
+							.addClass("btn btn-mini btn-info cellInfo")
+							.click(function(){
+								approveShopper($(this).closest('td').attr("data-userid"));
+							});
+			}else{
+				actionButton.html("Remove")
+							.addClass("btn-danger")
+							.click(function(){
+								disapproveShopper($(this).closest('td').attr("data-userid"));
+							});
+			}
+
+			shopForMeCell.append(actionButton);			
+			shopForMeRow.append(shopForMeCell);
+			shopForMeTable.append(shopForMeRow);	
+		});
+
+	},"json");	
+}
 
 
 

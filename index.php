@@ -2,13 +2,20 @@
 session_start();
 //	print_r($_SESSION);
 
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+define("VERSION","0.65");
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+?>
+<!DOCTYPE html>
+
+<html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<!-- These are the responsive tags, here so I can flip the switch later. -->
+<!--
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+-->
 
 	<title>Wishlist</title>
 
@@ -20,6 +27,7 @@ session_start();
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
+	<script src="bootstrap/js/bootstrap-typeahead.js"></script>	
 
 	<link href="style.css" rel="stylesheet">
 	
@@ -201,7 +209,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				$("#itemIdForImage").val(forItemId);
 			});
 
-
+			displayShopForMeList();
+			setupUserSearch();
+			
+			
 <?php
 	//admin-only javascript load calls;
 	if($_SESSION['admin'] == 1){
@@ -438,16 +449,34 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			Shopping List
 		</div>
 		<div id="manage" class="section">
-			
-			
-			User Settings
-			<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>
-			
-						
-
-			
+			<h2>User Settings</h2>
 			<div class="row">
 				<div class="span8">
+					<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>					
+				</div>
+			</div>
+			<div class="row">
+				<div class="span4">			
+
+					<p>People Shopping for me.</p>
+					<table id="shoppingForMe" class="table table-striped table-bordered table-condensed">
+						
+					</table>
+				</div>
+				<div class="span4">			
+
+					
+					<p>People I'm Shopping For:</p>
+					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
+						
+					</table>
+					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">					
+				</div>
+			</div>			
+			<div class="row">
+				<div class="span8">
+					
+					
 					<?php if($_SESSION['admin'] == 1){ ?>
 					This Section visible only to Admins.
 
@@ -577,9 +606,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<h2>About Do-Want</h2>
 		  </div>
 		  <div class="modal-body">
-			<h2>Do-want version 0.5</h2>
+			<h2>Do-want</h2> 
+			<h4>Version <?php print VERSION; ?></h4>
 			<p>Do-want is a wishlist management system that helps families and friends organize gift exchanges.</p>
 			<p>Do-Want is released under a GPL 2.0 License</p>
+			<p>For more information, visit <a href="http://code.google.com/p/do-want/" target="_blank">http://code.google.com/p/do-want/</a></p>
 		  </div>
 		  <div class="modal-footer">
 		  </div>
@@ -587,6 +618,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 </div>
 
-<a href="#" id="versionNumber">v0.6</a>
+<a href="#" id="versionNumber"><?php print VERSION; ?></a>
 </body>
 </html>

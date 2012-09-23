@@ -97,4 +97,10 @@ th{
 
 .tool{
 	margin-right:3px;
+	float:right;
+}
+
+
+.cellInfo{
+	float:right;
 }
