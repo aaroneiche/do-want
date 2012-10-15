@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.65");
+define("VERSION","0.75");
 
 ?>
 <!DOCTYPE html>
@@ -107,7 +107,7 @@ define("VERSION","0.65");
 			"sortFunctions":[]
 		});
 		
-
+		storedData.modalTree = [];
 
 		$(document).ready(function(){
 			$("#tabSetContainer a")
@@ -118,6 +118,7 @@ define("VERSION","0.65");
 				clearManageItemForm();
 				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
 				$('#manageItemFormBlock').modal();
+				//swapModal("#manageItemFormBlock");
 			});
 			
 			
@@ -192,6 +193,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				manageItem();
 			});
 			
+			jQuery("#itemSourceSubmit").click(function(){
+				manageItemSource();
+			});
+			
 			$("#openManageUserForm").click(function(){
 				$("#manageUserSaveButton").html("Update Account");				
 				populateManageUserForm(userId);
@@ -211,7 +216,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 			displayShopForMeList();
 			setupUserSearch();
-			
+			getMessagesForUser(userId,0);
 			
 <?php
 	//admin-only javascript load calls;
@@ -257,9 +262,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="itemSourcesEdit">Sources:</label>
-				<div class="controls">
-					<select id="itemSourcesEdit" multiple="multiple"></select>
-				</div>
+				<table id="itemSourcesEdit" class="controls table-striped table-bordered table-condensed">
+					
+				</table>
 			</div>
 			<div class="control-group">
 				<div class="controls">
@@ -322,27 +327,48 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 </div>
 
 <div class="modal hide fade" id="itemSourceFormBlock">
-	<form id="itemSourceForm" class="form-horizontal" onsubmit="return false;">
-	  <div class="modal-header">
+	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
-		<h2>Manage Source</h2>
-	  </div>
-	  <div class="modal-body">
-		<input type="hidden" id="itemId" />
-		<input type="hidden" id="sourceId" />
-		<div><label for="sourceName">Source Name:</label><input id="sourceName"/></div>
-		<div><label for="sourceUrl">Source URL:</label><input id="sourceUrl"/></div>
-		<div><label for="sourcePrice">Source Price:</label><input id="sourcePrice"/></div>
-		<div>
-			<label for="sourceComments">Source Comments:</label>
-			<textarea id="sourceComments"></textarea>
-		</div>
-	  </div>
-	  <div class="modal-footer">
+		<h2>Manage Sources</h2>
+	</div>
+	<div class="modal-body"> 
+		<form id="itemSourceForm" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="itemId" />
+			<input type="hidden" id="sourceId" />
+		
+			<div class="control-group">
+				<label class="control-label" for="sourceName">Source Name:</label>
+				<div class="controls">
+					<input type="text" id="sourceName"/>
+				</div>
+			</div>
+		
+			<div class="control-group">
+				<label class="control-label" for="sourceUrl">Source URL:</label>
+				<div class="controls">
+					<input type="text" id="sourceUrl"/>
+				</div>				
+			</div>
+		
+			<div class="control-group">
+				<label class="control-label" for="sourcePrice">Source Price:</label>
+				<div class="controls">
+					<input type="text" id="sourcePrice"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="sourceComments">Comments:</label>
+				<div class="controls">
+					<textarea type="text" id="sourceComments"></textarea>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
-		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
-	  </div>
-  </form>
+		<a href="#" id="itemSourceSubmit" class="btn btn-primary">Save changes</a>
+	</div>
 </div>
 
 <div class="modal hide fade" id="itemImagesFormBlock">
@@ -416,7 +442,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	<div id="pageBlock" class="span8 offset2">
 		<div id="myList" class="section">
 			<h2>My Wishlist</h2>
-			<button id="addItems" class="btn">Add Item</button>
+			<button id="addItems" class="btn btn-primary">Add Item</button>
 
 			<div id="userWishlistBlock" class="tableBlock">
 				<table id="userWishlist" class="table table-striped table-bordered table-condensed">
@@ -451,14 +477,20 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="manage" class="section">
 			<h2>User Settings</h2>
 			<div class="row">
-				<div class="span8">
+				<div class="span4">
 					<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>					
 				</div>
+				<div class="span4">
+					<h3>Messages</h3>
+					<table id="userMessages" class="table table-striped table-bordered table-condensed">
+						
+					</table>
+				</div>				
 			</div>
 			<div class="row">
 				<div class="span4">			
 
-					<p>People Shopping for me.</p>
+					<h3>People Shopping for me.</h3>
 					<table id="shoppingForMe" class="table table-striped table-bordered table-condensed">
 						
 					</table>
@@ -466,29 +498,32 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div class="span4">			
 
 					
-					<p>People I'm Shopping For:</p>
+					<h3>People I'm Shopping For:</h3>
 					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
 					</table>
 					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">					
 				</div>
 			</div>			
+			<?php if($_SESSION['admin'] == 1){ ?>
 			<div class="row">
 				<div class="span8">
-					
-					
-					<?php if($_SESSION['admin'] == 1){ ?>
-					This Section visible only to Admins.
-
+					<h3>Users</h3>
 					<table id="adminUserList" class="table table-striped table-bordered table-condensed">
 
 					</table>
-					List of Categories
-
-					List of Ratings
-					<?php } ?>				
 				</div>
 			</div>			
+			<div class="row">
+				<div class="span4">
+					<h3>Categories</h3>
+					
+				</div>
+				<div class="span4">
+					<h3>Ratings</h3>					
+				</div>				
+			</div>
+			<?php } ?>							
 		</div>
 	</div>
 
@@ -575,6 +610,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 						<span class="help-inline"></span>					
 					</div>
 				</div>
+				<div class="control-group">
+					<label class="control-label" for="emailMessages">Email messages</label>
+					<div class="controls">
+						<input type="checkbox" id="emailMessages"/>
+						<span class="help-inline"></span>						
+					</div>
+				</div>				
 				<?php if($_SESSION['admin'] == 1){ ?>
 					<div class="control-group">
 						<label class="control-label" for="userApproved">User is Approved</label>
@@ -614,10 +656,24 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		  </div>
 		  <div class="modal-footer">
 		  </div>
-	</div>			
+	</div>
+				
+	<div class="modal hide fade" id="message">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h2>Message</h2>
+		  </div>
+		  <div class="modal-body">
+			
+		  </div>
+		  <div class="modal-footer">
+		  </div>
+	</div>
+
+
 
 </div>
 
-<a href="#" id="versionNumber"><?php print VERSION; ?></a>
+<a href="#" id="versionNumber">v<?php print VERSION; ?></a>
 </body>
 </html>

@@ -72,7 +72,41 @@ class db{
 	function __deconstruct(){
 		$this->dbDisconnect();
 	}
+
+	/*
+		Method sendMessage
+		Sends a message from the current user to another user in the system.
+		Because both user and wishlist classes need access to this method, it's being defined here.
+	*/
+	function sendMessage($args){
+		$cleanSenderId = $this->dbEscape($args['senderId']);
+		$cleanReceiverId = $this->dbEscape($args['receiverId']);
+		$cleanMessage = $this->dbEscape($args['message']);
+		
+		$emailQuery = "select {$this->options["table_prefix"]}users.*, (select {$this->options["table_prefix"]}users.fullname from {$this->options["table_prefix"]}users where {$this->options["table_prefix"]}users.userid = $cleanSenderId) as senderFullname from {$this->options["table_prefix"]}users where userid = $cleanReceiverId";
+		
+		$usersResult = $this->dbAssoc($this->dbQuery($emailQuery));
+
+		$query = "insert into {$this->options["table_prefix"]}messages(sender,recipient,message,created) values($cleanSenderId,$cleanReceiverId,\"$cleanMessage\",NOW())";
+		$result = $this->dbQuery($query);
+		
+		$subject = "New message from the Wishlist!";	
+		
+		if($usersResult['email_msgs'] == 1){
+			$mailresult = mail($usersResult['email'],$subject,$cleanMessage);
+		}	
+	}
+	
+	function markMessageRead($messageId){
+		$query = "update {$this->options["table_prefix"]}messages set isread = 1 where messageid = $messageId";
+		$result = $this->dbQuery($query);
+		return $result;
+	}
 	
 }
+
+
+
+
 
 ?>

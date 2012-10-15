@@ -368,13 +368,13 @@ class wishlist extends db{
 		
 		int @itemid - The itemid that this source is for
 		string @itemSourceAction - What action to take: add, edit, delete
+		int @sourceid - The id of the source for editing or deleting
 		string @source - The name of the source: A store or website
 		string @sourceurl - The URL for the source
 		string @sourceprice - The price for the source
 		int @addedByUserId - The userId who provided the source. - other users can offer sources for products.
 	*/
 	function manageItemSource($args){
-
 		switch($args['itemSourceAction']){
 			case 'add':
 				$query = "insert into itemsources(itemid,source,sourceurl,sourceprice,sourcecomments,addedByUserId)
@@ -399,7 +399,7 @@ class wishlist extends db{
 				";
 			break;
 			case 'delete':
-				$query = "delete from itemsources where sourceid = {$args['sourceid']}";
+				$query = "delete from itemsources where sourceid = {$this->dbEscape($args['sourceid'])}";
 			break;
 		}
 		
@@ -620,7 +620,7 @@ class wishlist extends db{
 					break;
 						
 					case 'alloc':
-						$itemDetails['allocs'][] = $line;					
+							$itemDetails['allocs'][] = $line;
 					break;									
 				}
 			}
@@ -651,7 +651,23 @@ class wishlist extends db{
 		
 		return $this->dbAssoc($imageResult);
 	}
+
+	/*
+		Method: getSourceDetails
+		Gets the source information for a source for an item.
+		
+		int @sourceId - The id of the source information for an item.
+	*/
+	function getSourceDetails($args){
+		$query = "select * from itemsources where sourceid = {$this->dbEscape($args['sourceId'])}";
+		$sourceResult = $this->dbQuery($query);
+		
+		return $this->dbAssoc($sourceResult);
+	}
+
 }
+
+
 
 	
 

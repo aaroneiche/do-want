@@ -156,7 +156,6 @@ function displayItemsDetails(itemInfo){
 	$("#itemDetailsModal").modal('show');
 }
 
-/* --------------------- This break separates functions that were made after the move to bootstrap. -------------------------------------*/
 
 function login(){
 
@@ -518,15 +517,7 @@ function renderItemTools(itemObject, toolInfo){
 	
 	switch(toolInfo){
 		
-		case "edit":
-			
-			/*		
-			//Old icons using images. Not sure how I feel about the Glyph Icons.
-			
-			itemReceive = $(document.createElement("img")).attr("src","images/refresh_nav.gif");
-			itemEdit = $(document.createElement("img")).attr("src","images/write_obj.gif");
-			itemDelete = $(document.createElement("img")).attr("src","images/cross.png");		
-			*/				
+		case "edit":		
 			itemDelete = $(document.createElement("i"))
 							.addClass("icon-trash tool")
 							.attr("title","Delete Item");
@@ -614,6 +605,31 @@ function renderItemTools(itemObject, toolInfo){
 					});
 			toolBox.append(itemCopy);
 
+		break;
+		case "sourceEdit":
+		
+			sourceDelete = $(document.createElement("i"))
+							.addClass("icon-trash tool")
+							.attr("title","Delete Source");
+						
+			sourceEdit = $(document.createElement("i"))
+							.addClass("icon-pencil tool")
+							.attr("title","Edit Source");
+
+			sourceEdit.click(function(){
+				populateItemSourceForm($(this).closest("tr").attr("data-itemSourceId"));
+			});
+
+			sourceDelete.click(function(){
+				deleteItemSource(
+					$("input#itemId").val(),
+					$(this).closest("tr").attr("data-itemSourceId")
+				);
+			});
+
+			toolBox.append(sourceEdit);
+			toolBox.append(sourceDelete);							
+		
 		break;		
 	}
 	
@@ -836,33 +852,135 @@ function populateManageItemForm(itemId){
 		//Sources Data
 		if(response.sources != undefined){
 			jQuery(response.sources).each(function(i,e){
-			
-				sourceOption = jQuery(document.createElement('option'))
-								.html(e.itemSource)
-								.dblclick(function(){
-									$("#manageItemFormBlock").modal('hide');
-									$("#itemSourceFormBlock").modal('show');
-								})
 				
+				sourceCell = jQuery(document.createElement('td'))
+								.html(e.itemSource);
+
+				
+				sourceEditTools = jQuery(document.createElement('td'))
+										.append(renderItemTools(e.itemSource,"sourceEdit"));
+									
+								
+				sourceOption = jQuery(document.createElement('tr'))
+									.append(sourceCell)
+									.append(sourceEditTools)
+									.attr("data-itemSourceId",e.itemSourceId);
+		
 				jQuery("#itemSourcesEdit").append(sourceOption);
 			});
 		
-		}else{
-			jQuery('#itemDetailSourcesTable').html("No Stores/Shops have been provided for this item.");
 		}		
+		
+		var addSourceButton = jQuery(document.createElement('button'))
+								.addClass("btn btn-primary btn-mini tool")
+								.append("Add Source")
+								.click(function(){
+									clearItemSourceForm();
+									$("#itemSourceFormBlock #itemId").val(itemId);
+									$("#manageItemFormBlock").modal("hide");
+									$("#itemSourceFormBlock").modal("show");
+									//swapModal("#itemSourceFormBlock")
+								});
+								
+		var addSourceCell = jQuery(document.createElement('td')).attr("colspan","2").append(addSourceButton);
+		var addSourceRow = jQuery(document.createElement('tr')).append(addSourceCell);
+
+		jQuery("#itemSourcesEdit").append(addSourceRow);
+		
 		
 		
 		$('#manageItemFormBlock').modal('show');
 	},"json");
 }
 
+/* Method clearItemSourceForm
+	Clears the values in the Item Source Form
+*/
+function clearItemSourceForm(){
+	
+	$("#itemSourceForm #itemId").val("");
+	$("#itemSourceForm #sourceId").val("");
+	$("#itemSourceForm #sourceName").val("");
+	$("#itemSourceForm #sourceUrl").val("");
+	$("#itemSourceForm #sourcePrice").val("");
+	$("#itemSourceForm #sourceComments").val("");
+	
+}
+
+
 
 /* Method populateItemSourceForm
 	Gets itemSource details and puts them into the #itemSourceForm form, then calls teh modal to display.
 */
 function populateItemSourceForm(sourceId){
-// Note to developer: This should probably also get the name of the related item, so it's available to the user for context.
+	// Note to developer: This should probably also get the name of the related item, so it's available to the user for context.
+	data = {
+		interact:'wishlist',
+		action:'getSourceDetails',
+		args:{'sourceId':sourceId}
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		$("#itemSourceForm #itemId").val(response.itemid);
+		$("#itemSourceForm #sourceId").val(response.sourceid);
+		$("#itemSourceForm #sourceName").val(response.source);
+		$("#itemSourceForm #sourceUrl").val(response.sourceurl);
+		$("#itemSourceForm #sourcePrice").val(response.sourceprice);
+		$("#itemSourceForm #sourceComments").val(response.sourcecomments);										
+		
+		$('#manageItemFormBlock').modal('hide');
+		$("#itemSourceFormBlock").modal("show");
+	
+	},"json");	
+}
 
+
+
+/* Method: manageItemSource
+	Adds or Updates an item source.
+
+*/
+function manageItemSource(){
+	
+	args = {};
+	
+	args.itemid = $("#itemSourceForm #itemId").val();
+	args.sourceid = $("#itemSourceForm #sourceId").val();
+	args.source = $("#itemSourceForm #sourceName").val();
+	args.sourceurl = $("#itemSourceForm #sourceUrl").val();
+	args.sourceprice = $("#itemSourceForm #sourcePrice").val();
+	args.sourcecomments = $("#itemSourceForm #sourceComments").val();
+	args.itemSourceAction = (args.sourceid.length == 0)?"add":"edit";
+
+	data = {
+		interact:'wishlist',
+		action:'manageItemSource',
+		"args":args
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		if(response){
+			getCurrentUserList();
+		}
+	},"json");
+	
+}
+
+
+/* Method: deleteItemSource
+	removes a source from an item
+*/
+function deleteItemSource(itemId,sourceId){
+	data = {
+		interact:'wishlist',
+		action:'manageItemSource',
+		args:{'sourceid':sourceId,
+			'itemSourceAction':'delete'}
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		populateManageItemForm(itemId);
+	});	
 }
 
 
@@ -1256,6 +1374,113 @@ function displayShopForMeList(){
 
 	},"json");	
 }
+
+/*
+	Method getMessagesForUser
+	Gets a list of messages for the given user and displays them in the 
+		@userId - The ID of the user
+	
+*/
+function getMessagesForUser(userId,readStatus){
+	data = {
+		interact:'user',
+		action:'getMessages',
+		args:{
+			"userid":userId,
+			"readStatus":readStatus
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		table = $("#userMessages");
+		table.empty();
+		
+		if(response != null){
+			//Adds a message count to the tab control - there are issues with clicking on the badge itself, so holding off for now.
+			//messageCount = $(document.createElement("span")).addClass("badge badge-important").append(response.length);
+			//$("#manageTab").append(messageCount);
+			
+			$(response).each(function(i,e){
+			
+				messageRow = $(document.createElement('tr'));
+				messageCell = $(document.createElement('td'));
+				trimmedMessage = e.message.substring(0,40);
+				fullMessage = $(document.createElement('span'))
+								.attr("id","message_"+e.messageid)
+								.addClass("fullMessage")
+								.append(e.message);
+			
+				messageCell.append(trimmedMessage+"...");
+				messageCell.append(fullMessage);
+				messageRow.append(messageCell);
+				messageCell.click(function(ev){
+					displayMessage($(this).children("span.fullMessage").html());
+					markMessageRead(e.messageid);
+				});
+
+				table.append(messageRow);
+			})
+		}else{
+			messageRow = $(document.createElement('tr'));
+			messageCell = $(document.createElement('td')).append("No messages at this time");
+			messageRow.append(messageCell);
+			table.append(messageRow);			
+		}
+	},"json");
+}
+
+/*
+	Method displayMessage
+	Displays a message from a message list in a modal.
+	
+	@messageBody - The body of the message you'd like displayed.
+*/
+function displayMessage(messageBody){
+	$("#message div.modal-body").html(messageBody);
+	$("#message").modal('show');	
+}
+/*
+	Method markMessageRead
+	Sets a message's status to read. Affects how it will be displayed in interface.
+*/
+function markMessageRead(messageId){
+	data = {
+		interact:'user',
+		action:'markMessageRead',
+		args:{
+			"messageId":messageId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		getMessagesForUser(userId,0);
+	},"json");
+}
+
+
+/*
+	Method swapModal
+	Swaps the current modal for the next or the previous. Previous modal is held in a global variable.
+
+	string @modal - optional, provides the jQuery-compatible-selector modal you'd like to go to. If left blank, will take you back to the previous modal.
+
+*/
+function swapModal(modal){
+	if(modal != undefined){
+			
+		if(storedData.modalTree.length > 0){
+			$(storedData.modalTree[storedData.modalTree.length-1]).modal('hide');
+		}
+		$(modal).modal("show");
+		storedData.modalTree.push(modal);
+	}else{
+		$(storedData.modalTree.pop()).modal('hide');
+
+		if(storedData.modalTree.length > 0){
+			$(storedData.modalTree[storedData.modalTree.length-1]).modal('show');
+		}
+	}
+}
+
+
 
 
 

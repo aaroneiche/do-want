@@ -104,3 +104,11 @@ th{
 .cellInfo{
 	float:right;
 }
+
+.fullMessage{
+	display:none;
+}
+
+#itemSourcesEdit{
+	width:220px;
+}

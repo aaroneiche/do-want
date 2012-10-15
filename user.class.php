@@ -78,6 +78,20 @@ class user extends db{
 	function requestShopForUser($args){
 		$query = "insert into shoppers(shopper,mayshopfor,pending) values({$args['shopperId']},{$args['shopForUserId']},1)";
 		$result = $this->dbQuery($query);
+		
+		if($result){
+			$message = "____ has requested to be added to your list of people who may shop for you. Please log into Do Want to approve them.";
+			
+//			$senderId, $receiverId, $message
+			
+			$messageData = array(
+							'senderId'=>0,
+							'receiverId'=> $args['shopForUserId'],
+							'message'=>$message);
+							
+			$this->sendMessage($messageData);
+		}
+		
 		return $result;
 	}
 
@@ -222,10 +236,39 @@ class user extends db{
 		$result = $this->dbQuery($query);
 		return $this->dbAssoc($result);
 	}
+
+
+/*
+	Method: getMessages
+	Returns an array of user's messages
+
+	@userid - The id of the user whom you want to get messages for
+	@readStatus - messages that have been read or not: 
+		0 = not read
+		1 = read
+		2 = all
+
+*/
+		function getMessages($args){
+			$readStatusQuery = ($args['readStatus'] == 2)? "":" and isread = ".$args['readStatus'];
+			$query = "select * from messages where recipient = {$args['userid']} ".$readStatusQuery;
+
+			$result = $this->dbQuery($query);
+			return $this->dbAssoc($result,true);
+		}
+
+
+/*
+	Method: markMessageRead
+		Sets the "isRead" flag in the table as read.
+		@messageId - The message to be marked read.
+*/
+	function markMessageRead($args){
+		$query = "update messages set isread = 1 where messageid = {$args['messageId']}";
+		$result = $this->dbQuery($query);
+
+	 	return $this->dbAssoc($result);
+	}
+	
 }
-
-
-
-
-
 ?>
