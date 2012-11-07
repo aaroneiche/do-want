@@ -164,6 +164,14 @@ define("VERSION","0.75");
 	
 </head>
 <body>
+
+<div id="loading" class="popover">
+	<div class="popover-inner">
+		<div class="popover-title"><h5>Loading</h5></div>
+		<div class="popover-content"><img src='images/ajax-loader.gif'></div>
+	</div>
+</div>
+
 <!--  -->
 <div class="container">
 
@@ -554,12 +562,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 	</div>
 	<div class="row" id="alertLocation">
-		<!--
 		<div id="displayAlert" class="span4 offset4 alert">
 			<span id="loginAlertMessage"></span>
 			<a class="close" data-dismiss="alert" href="#">&times;</a>
 		</div>
-		-->
 	</div>	
 <?php 
 }
@@ -669,9 +675,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		  <div class="modal-footer">
 		  </div>
 	</div>
-
-
-
 </div>
 
 <a href="#" id="versionNumber">v<?php print VERSION; ?></a>

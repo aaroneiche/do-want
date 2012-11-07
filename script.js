@@ -174,8 +174,12 @@ function login(){
 		password: passVal
 	}
 	
+	$("div.popover#loading").fadeIn();
+	
 	jQuery.post('ajaxCalls.php',data,function(response){
-		
+
+		$("div.popover#loading").fadeOut();
+
 		if(response == "true"){
 			window.location.reload();
 		}else{

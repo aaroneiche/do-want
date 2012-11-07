@@ -112,3 +112,24 @@ th{
 #itemSourcesEdit{
 	width:220px;
 }
+
+
+div.popover#loading{
+/* 	display:block; */
+	right:0;
+	left:0;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:100px;
+	width:80px;
+}
+
+div.popover#loading div.popover-inner{
+	width:inherit;
+}
+
+
+
+
+
+
