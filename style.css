@@ -65,6 +65,10 @@ th{
 	overflow:hidden;
 }
 
+#itemDetailImageCarousel a.right{
+	float:right;
+}
+
 .alert{
 	display:none;
 }
@@ -128,7 +132,9 @@ div.popover#loading div.popover-inner{
 	width:inherit;
 }
 
-
+span#messageIndicator{
+	display:none;
+}
 
 
 

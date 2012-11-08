@@ -309,8 +309,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div id="itemDetailImageCarousel" class="carousel slide">
 					<div class="carousel-inner">
 					</div>
-					 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-arrow-left"></i></a>
-					 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-arrow-right"></i></a>
+					 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-chevron-left"></i></a>
+					 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-chevron-right"></i></a>
 				</div>
 			</td>
 		</tr>
@@ -434,16 +434,16 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</form>
 </div>
 
-
-
 <div class="row">
 	<div id="tabSetContainer" class="span8 offset2">		
 		<div class="btn-group" data-toggle="buttons-radio">
 			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
 			<a href="#" class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</a>
 			<a href="#" class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</a>
-			<a href="#" class="btn" id="manageTab" data-section="manage">Manage</a>
-		</div>		
+			<a href="#" class="btn" id="manageTab" data-section="manage">
+				Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
+			</a>
+		</div>
 	</div>
 </div>
 <div class="row">
@@ -465,11 +465,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<h2>People I'm shopping for.</h2>
 					Click on a User to see their wishlist.
 					<table id="listOfUsersTable" class="table table-striped table-bordered table-condensed">
-					</table>					
+					</table>
 				</div>
 				<div class="item">
 					<h2>Wishlist:</h2>
-					<a class="btn" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left"></i> Back to Users</a>
+					<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left icon-white"></i> Back to Users</a>
 					<div id="otherUserWishlistBlock" class="tableBlock">
 						<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
 						</table>

@@ -41,6 +41,24 @@ function createAlert(message,type){
 
 }
 
+
+/*
+	Function showLoadingIndicator
+		Displays the "loading" indicator. Useful for indicating to the user that something is happening.
+*/
+function showLoadingIndicator(){
+	$("div.popover#loading").fadeIn();
+}
+
+/*
+	Function hideLoadingIndicator
+		Displays the "loading" indicator. Useful for indicating to the user that something is happening.
+*/
+function hideLoadingIndicator(){
+	$("div.popover#loading").fadeOut();
+}
+
+
 /*
 	Function showSection
 		Displays the related section on the page when a tab has been clicked. The click binding is done in the index document
@@ -50,7 +68,7 @@ function createAlert(message,type){
 
 function showSection(eventOb){
 	$(".section").hide();
-	$("#"+eventOb.target.getAttribute("data-section")).show();
+	$("#"+$(eventOb.target).closest("a.btn").attr("data-section")).show();
 }
 
 
@@ -174,11 +192,11 @@ function login(){
 		password: passVal
 	}
 	
-	$("div.popover#loading").fadeIn();
+	showLoadingIndicator();
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 
-		$("div.popover#loading").fadeOut();
+		hideLoadingIndicator();
 
 		if(response == "true"){
 			window.location.reload();
@@ -208,7 +226,7 @@ function getCurrentUserList(){
 		interact:'wishlist',
 		action:'getCurrentUserWishlist'
 	}
-	
+	showLoadingIndicator()
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		storedData.userWishlist = response;
@@ -223,7 +241,7 @@ function getCurrentUserList(){
 		wishlistData.columns = storedData.columns;
 
 		displayWishlist(wishlistData);
-				
+		hideLoadingIndicator();		
 	},"json");
 }
 
@@ -240,6 +258,7 @@ function getUserWishlist(forUserId){
 		action:'getShoppingForList',
 		args:{shopForId:forUserId}
 	}
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		if(response.responseType != undefined && response.responseType == "error"){
@@ -257,6 +276,7 @@ function getUserWishlist(forUserId){
 
 			displayWishlist(wishlistData);
 		}			
+		hideLoadingIndicator();
 	},"json");	
 }
 
@@ -381,6 +401,7 @@ function getItemDetailInfo(itemId){
 		action:'getItemDetails',
 		args:{itemid:itemId}
 	}
+	showLoadingIndicator();
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
@@ -459,7 +480,7 @@ function getItemDetailInfo(itemId){
 		
 		$("#itemDetailsModal").modal();
 		
-		
+		hideLoadingIndicator();
 	},"json");	
 	
 }
@@ -841,7 +862,7 @@ function populateManageItemForm(itemId){
 		action:'getItemDetails',
 		args:{itemid:itemId}
 	}
-	
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		debug = response;
 		
@@ -894,6 +915,7 @@ function populateManageItemForm(itemId){
 		
 		
 		$('#manageItemFormBlock').modal('show');
+		hideLoadingIndicator();
 	},"json");
 }
 
@@ -1400,8 +1422,10 @@ function getMessagesForUser(userId,readStatus){
 		
 		if(response != null){
 			//Adds a message count to the tab control - there are issues with clicking on the badge itself, so holding off for now.
-			//messageCount = $(document.createElement("span")).addClass("badge badge-important").append(response.length);
-			//$("#manageTab").append(messageCount);
+			/*
+			messageCount = $(document.createElement("span")).attr("id","messageIcon").addClass("badge badge-important").append('<i class="icon-envelope icon-white"></i>');
+			$("#manageTab").append("&nbsp;").append(messageCount);
+			*/
 			
 			$(response).each(function(i,e){
 			
@@ -1423,11 +1447,13 @@ function getMessagesForUser(userId,readStatus){
 
 				table.append(messageRow);
 			})
+			$("#messageIndicator").show();
 		}else{
 			messageRow = $(document.createElement('tr'));
 			messageCell = $(document.createElement('td')).append("No messages at this time");
 			messageRow.append(messageCell);
-			table.append(messageRow);			
+			table.append(messageRow);	
+			$("#messageIndicator").hide();
 		}
 	},"json");
 }
