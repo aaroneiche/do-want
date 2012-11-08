@@ -467,13 +467,14 @@ class wishlist extends db{
 	}
 	
 	/*
-		Method: getItemDetails
+		Method: getItemDetails Deprecated
+		OLD - do not use. Use the newer "getItemDetails method below
 		Fetches the item details for a particular item and returns them in a associative array.
 		returns an associative array containing item info, images, sources, and alloc data.
 		
 		int @itemid - The item to request details about.
 	*/
-	function getItemDetails($args){
+	function getItemDetails_deprecated($args){
 		
 		
 		$query = "
@@ -620,6 +621,7 @@ class wishlist extends db{
 					break;
 						
 					case 'alloc':
+//						if($_REQUEST['userId'] == ){}
 							$itemDetails['allocs'][] = $line;
 					break;									
 				}
@@ -627,7 +629,86 @@ class wishlist extends db{
 			
 		return $itemDetails;
 	}
+	
+	/*
+	Method: getItemDetails
+	Fetches the item details for a particular item and returns them in a associative array.
+	returns an associative array containing item info, images, sources, and alloc data.
+	
+	int @itemid - The item to request details about.
+	*/
+	
+	function getItemDetails($args){
+		$itemQuery = "select
+			items.itemid,
+			items.description as itemDescription,
+			items.userid as itemOwner,
+			items.ranking as itemRanking,
+			items.category as itemCategory,
+			items.comment as itemComment,
+			items.quantity as itemQuantity,
+			items.addedByUserId as itemAddedByUserId
+			
+			from items where itemid = '{$args['itemid']}'";
 
+		$itemResult = $this->dbQuery($itemQuery);
+		$itemDetailArray = $this->dbAssoc($itemResult,true);		
+		
+		$itemIsForUser = ($itemDetailArray[0]['itemOwner'] == $_SESSION['userid']);
+					
+		$sourcesQuery = "select
+			itemsources.sourceid as itemSourceId,
+			itemsources.source as itemSource,
+			itemsources.sourceurl as itemSourceUrl,
+			itemsources.sourceprice as itemSourcePrice,
+			itemsources.sourcecomments as itemSourceComments
+
+			from itemsources where itemsources.itemid = '{$args['itemid']}'";
+
+		
+		$sourcesResult = $this->dbQuery($sourcesQuery);
+
+		$sourcesDetailArray = ($this->dbRowCount($sourcesResult) > 0 ) ? $this->dbAssoc($sourcesResult,true) : "none";
+
+		$imagesQuery = "select
+			itemimages.imageid as itemImageId,
+			itemimages.filename as itemImageFilename
+
+			from itemimages where itemimages.itemid = '{$args['itemid']}'";
+
+		$imagesResult = $this->dbQuery($imagesQuery);
+		$imagesDetailArray = ($this->dbRowCount($imagesResult) > 0 ) ? $this->dbAssoc($imagesResult,true) : "none";
+
+		$allocQuery = "select
+			allocs.itemid,
+			allocs.userid as itemAllocUserId,
+			users.fullname as itemAllocUserName,
+			allocs.bought as itemAllocBought,
+			allocs.quantity as itemAllocQuantity
+
+			from allocs,users 
+			where 
+				allocs.itemid = '{$args['itemid']}' and
+				users.userid = allocs.userid";
+
+		$allocResult = $this->dbQuery($allocQuery);
+		
+		if($itemIsForUser == false){
+			$allocDetailArray = ($this->dbRowCount($allocResult) > 0) ? $this->dbAssoc($allocResult): null;
+			
+		}else{
+			$allocDetailArray = "currentUser";
+		}
+
+		$item = $itemDetailArray[0];
+		$item['sources'] = $sourcesDetailArray;
+		$item['images'] = $imagesDetailArray;
+		$item['allocs'] = $allocDetailArray;
+		
+		
+		return $item;
+	}
+	
 	/*
 		Method: getCategories
 		Fetches a list of categories with IDs and names

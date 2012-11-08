@@ -467,13 +467,17 @@ function getItemDetailInfo(itemId){
 		//Alloc Section
 		allocElement = jQuery(document.createElement("div"));
 		
-		if(response.allocs != undefined){
+
+		console.log(response.allocs);
+
+		
+		if(response.allocs != null &&  response.allocs != "currentUser"){
 			jQuery(response.allocs).each(function(i,e){
 				message = e.itemAllocUserName+" has reserved "+e.itemAllocQuantity+" of this item";
 				allocElement.append($(document.createElement('div')).html(message));				
 			});
-		}else{
-			allocElement.html("This item has not be reserved yet.");
+		}else if(response.allocs == null){
+		    allocElement.html("This item has not be reserved yet.");
 		}
 
 		jQuery("#itemDetailAlloc").html(allocElement);
