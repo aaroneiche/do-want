@@ -84,7 +84,8 @@ define("VERSION","0.75");
 				"sortFunctions":[
 					sortByPriceAsc,
 					sortByPriceDesc
-				]
+				],
+				"displayStyles":"floatRight"
 			},
 			{
 				"columnName":"Category",

@@ -621,7 +621,6 @@ class wishlist extends db{
 					break;
 						
 					case 'alloc':
-//						if($_REQUEST['userId'] == ){}
 							$itemDetails['allocs'][] = $line;
 					break;									
 				}
@@ -668,7 +667,7 @@ class wishlist extends db{
 		
 		$sourcesResult = $this->dbQuery($sourcesQuery);
 
-		$sourcesDetailArray = ($this->dbRowCount($sourcesResult) > 0 ) ? $this->dbAssoc($sourcesResult,true) : "none";
+		$sourcesDetailArray = ($this->dbRowCount($sourcesResult) > 0 ) ? $this->dbAssoc($sourcesResult,true) : null;
 
 		$imagesQuery = "select
 			itemimages.imageid as itemImageId,
@@ -677,7 +676,7 @@ class wishlist extends db{
 			from itemimages where itemimages.itemid = '{$args['itemid']}'";
 
 		$imagesResult = $this->dbQuery($imagesQuery);
-		$imagesDetailArray = ($this->dbRowCount($imagesResult) > 0 ) ? $this->dbAssoc($imagesResult,true) : "none";
+		$imagesDetailArray = ($this->dbRowCount($imagesResult) > 0 ) ? $this->dbAssoc($imagesResult,true) : null;
 
 		$allocQuery = "select
 			allocs.itemid,

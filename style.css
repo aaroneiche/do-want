@@ -136,6 +136,8 @@ span#messageIndicator{
 	display:none;
 }
 
-
+td.floatRight{
+	text-align:right;
+}
 
 

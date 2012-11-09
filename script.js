@@ -41,6 +41,14 @@ function createAlert(message,type){
 
 }
 
+/*
+	Function escapeData
+		Removes escape characters from data so that they display properly
+*/
+function escapeData(inputData){
+	return inputData.replace(/\\./g, '$1');
+}
+
 
 /*
 	Function showLoadingIndicator
@@ -143,15 +151,21 @@ function displayWishlist(displayData){
 			
 			displayVal = e[colToDisplay];
 			
-			if(displayVal == null){ 
+			if(displayVal == null || displayVal == undefined){ 
 				displayVal = e[colDisplayAlt];
 			}			
-
-
+			
+			
+			
 			var cell =	$(document.createElement("td"))
 						.append(displayVal)
-						.attr("id","item_"+e.itemid+"_"+e[colToDisplay])
-						.addClass("item_"+e[colToDisplay]);
+						.attr("id","item_"+e.itemid+"_"+displayData.columns[column].columnName)
+						.addClass("item_"+displayData.columns[column].columnName);
+		
+			if(displayData.columns[column].displayStyles != undefined){
+				cell.addClass(displayData.columns[column].displayStyles);
+			}
+			
 
 			if(displayData.columns[column].columnName != "Tools"){
 				cell.click(function(){
@@ -284,7 +298,7 @@ function getUserWishlist(forUserId){
 Javascript sort functions
 */
 
-function sortByDescriptionDesc(){	
+function sortByDescriptionDesc(){
 	wishlistData.list.sort(function(a,b){
 			if(a.description > b.description){
 				return -1;
@@ -325,14 +339,14 @@ function sortByRankingAsc(){
 	displayWishlist(wishlistData);	
 }
 
-function sortByPriceDesc(wishlistObject){
-	wishlistData.list.sort(function(a,b){return a.price - b.price});
+function sortByPriceDesc(){
+	wishlistData.list.sort(function(a,b){return a.minprice - b.minprice});
 	wishlistData.skipHeader = true;
 	displayWishlist(wishlistData);
 }
 
-function sortByPriceAsc(wishlistObject){
-	wishlistData.list.sort(function(a,b){return b.price - a.price});
+function sortByPriceAsc(){
+	wishlistData.list.sort(function(a,b){return b.minprice - a.minprice});
 	wishlistData.skipHeader = true;
 	displayWishlist(wishlistData);	
 }
@@ -412,7 +426,7 @@ function getItemDetailInfo(itemId){
 		
 		
 		//Sources Section
-		if(response.sources != undefined){
+		if(response.sources != null && response.sources != undefined){
 			jQuery("#itemDetailSourcesTable").html("");
 		
 			jQuery(response.sources).each(function(i,e){
@@ -444,7 +458,7 @@ function getItemDetailInfo(itemId){
 		}
 
 		//Images Section
-		if(response.images != undefined){
+		if(response.images != undefined && response.images != null){
 			
 			//Clears out previous carousel items
 			jQuery('#itemDetailImageCarousel div.carousel-inner').empty();
@@ -499,6 +513,9 @@ Function: renderRanking
 */
 function renderRanking(rankValue){
 	var rankReturn = "";
+	
+	
+	
 	while(rankValue > 0){
 		rankReturn +="*";
 		rankValue--;
