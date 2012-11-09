@@ -111,14 +111,19 @@ function displayWishlist(displayData){
 		hRow = $(document.createElement("tr"));
 		
 		$(displayData.columns).each(function(i,e){
-
-				hRow.append(
-					$(document.createElement("th")).append(e.columnName)
-					.toggle(
-						e.sortFunctions[0],
-						e.sortFunctions[1]
+				var th = $(document.createElement("th")).append(e.columnName)
+				if(e.sortFunctions[0] != undefined){
+					th.toggle(
+						function() {
+							e.sortFunctions[0](displayData)							
+						},
+						function(){
+							e.sortFunctions[1](displayData)
+						}
 					)
-				);
+				}
+				hRow.append(th);
+				
 		});
 		
 		table.append(hRow);		
@@ -279,17 +284,17 @@ function getUserWishlist(forUserId){
 			errorMessage(response);
 			//return false;
 		}else{
-			wishlistData = {};
-			wishlistData.isCurrentUser = false;
-			wishlistData.forUserId = forUserId;
-			wishlistData.toolset = "shop";
-			wishlistData.list = response;		
-			wishlistData.skipHeader = false;			
-			wishlistData.targetTable = "otherUserWishlist";
-			wishlistData.columns = storedData.columns2;
+			userWishlistData = {};
+			userWishlistData.isCurrentUser = false;
+			userWishlistData.forUserId = forUserId;
+			userWishlistData.toolset = "shop";
+			userWishlistData.list = response;		
+			userWishlistData.skipHeader = false;			
+			userWishlistData.targetTable = "otherUserWishlist";
+			userWishlistData.columns = storedData.columns2;
 
-			displayWishlist(wishlistData);
-		}			
+			displayWishlist(userWishlistData);
+		}		
 		hideLoadingIndicator();
 	},"json");	
 }
@@ -298,8 +303,21 @@ function getUserWishlist(forUserId){
 Javascript sort functions
 */
 
-function sortByDescriptionDesc(){
-	wishlistData.list.sort(function(a,b){
+function sortByPriceDesc(listObject){
+	listObject.list.sort(function(a,b){return a.minprice - b.minprice});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
+}
+
+function sortByPriceAsc(listObject){
+	listObject.list.sort(function(a,b){return b.minprice - a.minprice});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);	
+}
+
+
+function sortByDescriptionDesc(listObject){
+	listObject.list.sort(function(a,b){
 			if(a.description > b.description){
 				return -1;
 			}else if(a.description < b.description) {
@@ -308,13 +326,13 @@ function sortByDescriptionDesc(){
 				return 0;
 			}
 		});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
 
 }
 
-function sortByDescriptionAsc(){	
-	wishlistData.list.sort(function(a,b){
+function sortByDescriptionAsc(listObject){	
+	listObject.list.sort(function(a,b){
 		if(a.description > b.description){
 			return 1;
 		}else if(a.description < b.description) {
@@ -323,32 +341,20 @@ function sortByDescriptionAsc(){
 			return 0;
 		}
 	});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
 }
 
-function sortByRankingDesc(){	
-	wishlistData.list.sort(function(a,b){return a.ranking - b.ranking});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);
+function sortByRankingDesc(listObject){	
+	listObject.list.sort(function(a,b){return a.ranking - b.ranking});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
 }
 
-function sortByRankingAsc(){
-	wishlistData.list.sort(function(a,b){return b.ranking - a.ranking});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);	
-}
-
-function sortByPriceDesc(){
-	wishlistData.list.sort(function(a,b){return a.minprice - b.minprice});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);
-}
-
-function sortByPriceAsc(){
-	wishlistData.list.sort(function(a,b){return b.minprice - a.minprice});
-	wishlistData.skipHeader = true;
-	displayWishlist(wishlistData);	
+function sortByRankingAsc(listObject){
+	listObject.list.sort(function(a,b){return b.ranking - a.ranking});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);	
 }
 
 
