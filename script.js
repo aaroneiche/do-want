@@ -115,7 +115,7 @@ function displayWishlist(displayData){
 				if(e.sortFunctions[0] != undefined){
 					th.toggle(
 						function() {
-							e.sortFunctions[0](displayData)							
+							e.sortFunctions[0](displayData)
 						},
 						function(){
 							e.sortFunctions[1](displayData)
@@ -240,10 +240,11 @@ function logout(){
 	
 }
 
-function getCurrentUserList(){
+function getCurrentUserList(includeReceived){
 	data = {
 		interact:'wishlist',
-		action:'getCurrentUserWishlist'
+		action:'getCurrentUserWishlist',
+		args:{'includeReceived':includeReceived}
 	}
 	showLoadingIndicator()
 	jQuery.post('ajaxCalls.php',data,function(response){
@@ -557,7 +558,7 @@ function renderCategory(categoryId){
 */
 
 /*
-Function renderItemToolss
+Function renderItemTools
 	Produces HTML buttons/icons for interacting with the item in the row.
 	
 	JS Object @itemObject - A Javascript object returned from the wishlist system.
@@ -585,8 +586,11 @@ function renderItemTools(itemObject, toolInfo){
 			//data-itemId is stored on the row element: tool->div->td->tr
 
 			itemReceive.click(function(){
+				markItemReceived($(this).closest("tr").attr("data-itemId"));
+				/*
 				alert("Marked Received: "+
 				$(this).closest("tr").attr("data-itemId"))
+				*/
 			});
 
 			itemEdit.click(function(){
@@ -823,11 +827,37 @@ function deleteItem(itemId){
 	//Get the Categories.
 	jQuery.post('ajaxCalls.php',data,function(response){
 		if(response){
-			getCurrentUserList();
+			getCurrentUserList(listReceived);
 		}
 		
 	});
 }
+
+/*
+	Method: markItemReceived
+		Marks an item as received
+		
+		int @itemId - The id of the item to delete.
+*/
+function markItemReceived(itemId){
+	
+	data = {
+		interact:'wishlist',
+		action:'markItemReceived',
+		args:{
+			itemid:itemId
+		}
+	}
+	
+	//Get the Categories.
+	jQuery.post('ajaxCalls.php',data,function(response){
+		if(response){
+			getCurrentUserList(listReceived);
+		}
+		
+	});
+}
+
 
 
 /*	Method: manageItem
@@ -855,12 +885,12 @@ function manageItem(){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		getCurrentUserList();
+		getCurrentUserList(listReceived);
 		$("#manageItemFormBlock").modal('hide');
 	});	
 }
 
-/* Method: clearMangeItemForm
+/* Method: clearManageItemForm
 	Clears unique inputs on manageItemForm
 	
 */
@@ -1013,7 +1043,7 @@ function manageItemSource(){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		if(response){
-			getCurrentUserList();
+			getCurrentUserList(listReceived);
 		}
 	},"json");
 	

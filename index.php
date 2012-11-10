@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.75");
+define("VERSION","0.80");
 
 ?>
 <!DOCTYPE html>
@@ -43,6 +43,7 @@ define("VERSION","0.75");
 		 all db calls check session IDs, so messing with this value won't get you very far.*/
 		
 		userId = "<?php if(isset($_SESSION['userid'])) print $_SESSION['userid'] ?>";
+		listReceived = 0;
 		storedData = {};
 		
 		/* This is really hacky, but it's the easiest way to call this and not break the existing methodology.*/
@@ -109,7 +110,8 @@ define("VERSION","0.75");
 		});
 		
 		storedData.modalTree = [];
-
+		storedData.currencySymbol = "$";
+		
 		$(document).ready(function(){
 			$("#tabSetContainer a")
 				.click(function(e){showSection(e);})
@@ -168,7 +170,7 @@ define("VERSION","0.75");
 
 <div id="loading" class="popover">
 	<div class="popover-inner">
-		<div class="popover-title"><h5>Loading</h5></div>
+		<!-- <div class="popover-title"><h5>Loading</h5></div> -->
 		<div class="popover-content"><img src='images/ajax-loader.gif'></div>
 	</div>
 </div>
@@ -511,7 +513,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
 					</table>
-					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">					
+					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">	<button class="btn btn-primary btn-mini">Add User</button>
 				</div>
 			</div>			
 			<?php if($_SESSION['admin'] == 1){ ?>

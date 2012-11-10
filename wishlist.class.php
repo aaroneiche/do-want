@@ -9,14 +9,20 @@ class wishlist extends db{
 		
 	*/
 
-	function getCurrentUserWishlist(){
+	function getCurrentUserWishlist($args){
 			// "select * from {$this->options['table_prefix']}items where userid = '{$_SESSION['userid']}'";
+		if($args['includeReceived'] != 1){
+			$received = "and items.received = 0";
+		}else{
+			$received = "";
+		}
+			
 		$query ="select 
 					items.*, 
 					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice, 
 					categories.category as displayCategory 
 				from items,categories where userid = '{$_SESSION['userid']}'
-					and categories.categoryid = items.category";
+					and categories.categoryid = items.category $received";
 		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
@@ -353,7 +359,6 @@ class wishlist extends db{
 		}
 
 		$result = $this->dbQuery($query);
-		error_log($result);
 		
 		if($args['itemAction'] == 'add'){
 			return $this->dbLastInsertId($result);
@@ -454,6 +459,21 @@ class wishlist extends db{
 		
 		return $resultArray;
 	}
+	
+	/*
+		Method: markItemReceived
+		Sets an item's "received" flag to 1.
+	*/
+	function markItemReceived($args){
+		$query = "update items set 
+			received = 1
+		where
+			itemid = {$this->dbEscape($args['itemid'])}";
+
+		$result = $this->dbQuery($query);
+		return $result;
+	}
+	
 	
 	/*
 		Method: addItem
