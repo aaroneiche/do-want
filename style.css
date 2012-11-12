@@ -141,3 +141,30 @@ td.floatRight{
 }
 
 
+span#clearShopFor{
+	font-size:1.5em;
+	margin-left:-25px;
+	margin-right:20px;
+	cursor:pointer;
+}
+
+div.rank.one{
+	width:15px;
+}
+div.rank.two{
+	width:30px;	
+}
+div.rank.three{
+	width:45px;
+}
+div.rank.four{
+	width:60px;
+}
+div.rank.five{
+	width:75px;	
+}
+
+div.rank{
+	background: url("images/star_on.gif") repeat-x;
+	height:15px;
+}

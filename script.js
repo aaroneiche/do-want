@@ -79,6 +79,14 @@ function showSection(eventOb){
 	$("#"+$(eventOb.target).closest("a.btn").attr("data-section")).show();
 }
 
+function showSection2(eventOb){
+	$(".section").hide();
+	var navElement = $("#"+eventOb.target.id);
+	$("ul.nav li.active").removeClass("active");
+	
+	$(navElement).closest("li").addClass("active");
+	$("#"+$(eventOb.target).closest("a").attr("data-section")).show();
+}
 
 /*
 	Method: displayWishlist
@@ -488,9 +496,6 @@ function getItemDetailInfo(itemId){
 		//Alloc Section
 		allocElement = jQuery(document.createElement("div"));
 		
-
-		console.log(response.allocs);
-
 		
 		if(response.allocs != null &&  response.allocs != "currentUser"){
 			jQuery(response.allocs).each(function(i,e){
@@ -519,14 +524,31 @@ Function: renderRanking
 	int @rankValue - The ranking of an item as a number.
 */
 function renderRanking(rankValue){
-	var rankReturn = "";
+	var rankReturn = $(document.createElement('div')).addClass('rank');
+	var myClass = "";
 	
-	
-	
-	while(rankValue > 0){
-		rankReturn +="*";
-		rankValue--;
+	switch(rankValue){
+		case "1":
+			myClass = "one";
+		break;
+		case "2":
+			myClass = "two";		
+		break;
+		case "3":
+			myClass = "three";		
+		break;
+		case "4":
+			myClass = "four";		
+		break;
+		case "5":
+			myClass = "five";
+		break;
+		default:
+			console.log(typeof rankValue);
+		break;								
 	}
+	
+	rankReturn.addClass(myClass);
 	return rankReturn;
 }
 
@@ -800,12 +822,15 @@ function buildCategorySelect(categoryObject,parentElement){
 */
 function buildRankSelect(rankCount,parentElement){
 	var rankOptionsList = "";
-	
+
 	for(var i = 1; i <= rankCount; i++){
-		var rankOption = '<option value="'+i+'">'+renderRanking(i)+'</option>';
-		jQuery(parentElement).append(rankOption);
+	        var rankOption = '<option value="'+i+'">'+i+'</option>';
+	        jQuery(parentElement).append(rankOption);
 	}
+
 }
+
+
 
 /*
 	Method: deleteItem
@@ -920,6 +945,7 @@ function populateManageItemForm(itemId){
 		args:{itemid:itemId}
 	}
 	showLoadingIndicator();
+
 	jQuery.post('ajaxCalls.php',data,function(response){
 		debug = response;
 		
@@ -1113,7 +1139,7 @@ function populateManageUserForm(userId){
 		action:'getUser',
 		args:{"userid":userId}
 	}
-	
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		
@@ -1133,6 +1159,8 @@ function populateManageUserForm(userId){
 		$("#userIsAdmin").prop("checked",userAdmin);
 		
 		$("#userFormBlock").modal();
+		
+		hideLoadingIndicator();
 		
 	},"json");
 	
@@ -1329,11 +1357,17 @@ function setupUserSearch(){
 		
 		$('#shopForSearch').typeahead({
 			source:storedData.userlist,
-		    onselect: function(obj){requestToShopFor(userId,obj.userid)},
+		    onselect: function(obj){
+				//requestToShopFor(userId,obj.userid)
+				$("input#userToRequest").val(obj.userid);
+			},
 			property:'fullname'
 		});		
 	},"json");	
 }
+
+
+
 
 /*
 	Method requestToShopFor
@@ -1350,7 +1384,9 @@ function requestToShopFor(userId,shopForId){
 			'shopForUserId':shopForId
 		}
 	}
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){	
+		hideLoadingIndicator();
 		buildShopForSet();
 	},"json");
 }

@@ -76,13 +76,13 @@ class user extends db{
 	@shopForUserId - The user whom they would like to shop for.
 */
 	function requestShopForUser($args){
-		$query = "insert into shoppers(shopper,mayshopfor,pending) values({$args['shopperId']},{$args['shopForUserId']},1)";
+		$query = "insert into {$this->options["table_prefix"]}shoppers(shopper,mayshopfor,pending) values({$args['shopperId']},{$args['shopForUserId']},1)";
 		$result = $this->dbQuery($query);
 		
+		$name = $this->dbValue($this->dbQuery("select {$this->options["table_prefix"]}users.fullname from {$this->options["table_prefix"]}users where {$this->options["table_prefix"]}users.userid = '{$args['shopperId']}'"));
+		
 		if($result){
-			$message = "____ has requested to be added to your list of people who may shop for you. Please log into Do Want to approve them.";
-			
-//			$senderId, $receiverId, $message
+			$message = "$name has requested to be added to your list of people who may shop for you. Please log into Do Want to approve them.";
 			
 			$messageData = array(
 							'senderId'=>0,
@@ -237,6 +237,20 @@ class user extends db{
 		return $this->dbAssoc($result);
 	}
 
+	/*
+		Method: getListOfNonShopUsers
+		Returns a list of users for whom the current user is not approved. 
+
+	*//*
+		function getListOfUsers($args){
+			$args['shopperId'];
+			
+			$query = "select userid, username, fullname, email from users";
+
+			$result = $this->dbQuery($query);
+			return $this->dbAssoc($result);
+		}
+		*/
 
 /*
 	Method: getMessages

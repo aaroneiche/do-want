@@ -12,10 +12,8 @@ define("VERSION","0.80");
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 <!-- These are the responsive tags, here so I can flip the switch later. -->
-<!--
+
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
--->
 
 	<title>Wishlist</title>
 
@@ -116,6 +114,10 @@ define("VERSION","0.80");
 			$("#tabSetContainer a")
 				.click(function(e){showSection(e);})
 				.button();
+
+			$("ul.nav li a.navLink")
+				.click(function(e){showSection2(e);});
+
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
@@ -225,6 +227,17 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				$("#itemIdForImage").val(forItemId);
 			});
 
+			$("#requestShopForButton").click(function(){
+				requestToShopFor(userId,$("input#userToRequest").val());
+				$("#userToRequest").val("");
+				$("#shopForSearch").val("");
+			});
+
+			$("#clearShopFor").click(function(){
+				$("#userToRequest").val("");
+				$("#shopForSearch").val("");
+			});
+
 			displayShopForMeList();
 			setupUserSearch();
 			getMessagesForUser(userId,0);
@@ -251,7 +264,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</script>
 <?php /* print_r($_SESSION); */?>
 
-	<button class="btn" onclick="logout();">Logout</button>
 
 <div class="modal hide fade" id="manageItemFormBlock">
 	  <div class="modal-header">
@@ -438,6 +450,35 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 </div>
 
 <div class="row">
+	<div class="span8 offset2">
+		
+		<div class="navbar">
+		  <div class="navbar-inner">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>	
+			<div class="nav-collapse collapse">	
+			    <ul class="nav">			
+					<li><a href="#" id="myListTab" class="navLink" data-section="myList">My Wishlist</a></li>
+					<li><a href="#" id="otherListsTab" class="navLink" data-section="otherLists">Other People's Lists</a></li>
+					<li><a href="#" id="shoppingListTab" class="navLink" data-section="shoppingList">My Shopping List</a></li>
+					<li><a href="#" id="manageTab" class="navLink" data-section="manage">
+						Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
+					</a></li>
+			    </ul>
+			    <ul class="nav pull-right">			
+					<li><a href="#" onclick="logout();" id="logoutButton">Logout</a></li>
+					<!-- <li><a href="#" id="helpButton">?</a></li> -->
+				</ul>
+			</div>
+		  </div>
+		</div>		
+	</div>
+</div>
+<!--
+<div class="row">
 	<div id="tabSetContainer" class="span8 offset2">		
 		<div class="btn-group" data-toggle="buttons-radio">
 			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
@@ -449,6 +490,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 	</div>
 </div>
+-->
 <div class="row">
 	<div id="pageBlock" class="span8 offset2">
 		<div id="myList" class="section">
@@ -494,8 +536,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div class="span4">
 					<h3>Messages</h3>
 					<table id="userMessages" class="table table-striped table-bordered table-condensed">
-						
 					</table>
+					<button class="btn btn-primary btn-mini" disabled>Send a Message</button>
 				</div>				
 			</div>
 			<div class="row">
@@ -507,13 +549,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</table>
 				</div>
 				<div class="span4">			
-
-					
 					<h3>People I'm Shopping For:</h3>
 					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
 					</table>
-					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">	<button class="btn btn-primary btn-mini">Add User</button>
+					<input type="hidden" id="userToRequest">
+					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">
+					<span id="clearShopFor">&times;</span>
+					<button id="requestShopForButton" class="btn btn-primary btn-mini">Add User</button>
 				</div>
 			</div>			
 			<?php if($_SESSION['admin'] == 1){ ?>
