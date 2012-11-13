@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.8.1");
+define("VERSION","0.9.0");
 
 ?>
 <!DOCTYPE html>

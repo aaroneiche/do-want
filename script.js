@@ -684,8 +684,7 @@ function renderItemTools(itemObject, toolInfo){
 					.addClass("icon-tags tool")
 					.attr("title","Copy Item")
 					.click(function(){
-						alert("Copy ItemId "+$(this).closest("tr").attr("data-itemId")+" - not implemented yet.");
-						//this.parentNode.parentNode.parentNode.getAttribute("data-itemId");
+						copyItem($(this).closest("tr").attr("data-itemId"));
 					});
 			toolBox.append(itemCopy);
 
@@ -890,6 +889,34 @@ function markItemReceived(itemId){
 		}
 		
 	});
+}
+
+
+
+
+/*
+	Method: copyItem
+	Copies an item to a particular user.
+	
+	int @itemid - The ID of the item to be copied.
+*/
+function copyItem(itemId){
+	data = {
+		interact:'wishlist',
+		action:'copyItem',
+		args:{
+			"itemid":itemId,
+			"userid":userId
+		}
+	}
+		showLoadingIndicator();
+	jQuery.post('ajaxCalls.php',data,function(response){
+		hideLoadingIndicator();
+		
+		getCurrentUserList(listReceived);
+	},"json");	
+	
+	
 }
 
 

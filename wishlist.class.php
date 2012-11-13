@@ -361,7 +361,8 @@ class wishlist extends db{
 		$result = $this->dbQuery($query);
 		
 		if($args['itemAction'] == 'add'){
-			return $this->dbLastInsertId($result);
+			//$result
+			return $this->dbLastInsertId();
 		}else{
 			return $result;
 		}
@@ -472,6 +473,74 @@ class wishlist extends db{
 
 		$result = $this->dbQuery($query);
 		return $result;
+	}
+	
+	/*
+		Method: copyItem
+		Copies an item to a particular user.
+		
+		int @userid - The ID of the user to copy the item to.
+		int @itemid - The ID of the item to be copied.
+		
+	*/
+	function copyItem($args){
+		$itemQuery = "select 
+						{$this->options["table_prefix"]}items.description, 
+						{$this->options["table_prefix"]}items.ranking, 
+						{$this->options["table_prefix"]}items.category 
+					from 
+						{$this->options["table_prefix"]}items 
+					where 
+						{$this->options["table_prefix"]}items.itemid = {$args['itemid']}";
+		
+		$itemImagesQuery = "select {$this->options["table_prefix"]}itemimages.* 
+								from
+									{$this->options["table_prefix"]}itemimages 
+								where 
+									{$this->options["table_prefix"]}itemimages.itemid = {$args['itemid']}";
+									
+		$itemSourcesQuery = "select {$this->options["table_prefix"]}itemsources.* 
+								from {$this->options["table_prefix"]}itemsources 
+								where {$this->options["table_prefix"]}itemsources.itemid = {$args['itemid']}";
+		
+		
+		$item = $this->dbAssoc($this->dbQuery($itemQuery));
+		$itemImages = $this->dbAssoc($this->dbQuery($itemImagesQuery));
+		$itemSources = $this->dbAssoc($this->dbQuery($itemSourcesQuery));
+		
+		
+		$itemInsertQuery = "insert into {$this->options["table_prefix"]}items(userid,description,ranking,category) 
+								values('{$args['userid']}','{$item['description']}','{$item['ranking']}','{$item['category']}')";
+		
+		$copyResult = $this->dbQuery($itemInsertQuery);
+		$copyItemId = $this->dbLastInsertId();
+
+		
+		if(count($itemImages) > 0){
+			$imagesInsertQuery = "insert into {$this->options["table_prefix"]}itemimages(itemid, filename) values";
+			foreach($itemImages as $num => $image){
+				$imagesInsertQuery .= "('$copyItemId','{$image['filename']}')";
+				if($num+1 < count($itemImages)){
+					$imagesInsertQuery .=",";
+				}
+			}
+			
+			$copyImagesResult = $this->dbQuery($imagesInsertQuery);
+		}
+		
+		if(count($itemSources) > 0){
+			$sourcesInsertQuery = "insert into {$this->options["table_prefix"]}itemsources(itemid, source, sourceurl, sourceprice, sourcecomments) values";
+			foreach($itemSources as $num => $source){
+				$sourcesInsertQuery .= "('$copyItemId','{$source['source']}','{$source['sourceurl']}','{$source['sourceprice']}','{$source['sourcecomments']}')";
+				if($num+1 < count($itemSources)){
+					$sourcesInsertQuery .=",";
+				}
+			}
+
+			$copySourcesResult = $this->dbQuery($sourcesInsertQuery);
+		}		
+		
+		
 	}
 	
 	
