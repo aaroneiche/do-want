@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.80");
+define("VERSION","0.8.1");
 
 ?>
 <!DOCTYPE html>
@@ -21,7 +21,8 @@ define("VERSION","0.80");
 	<script src="script.js"></script>
 	<!-- <script src="galleria/galleria-1.2.5.min.js"></script> -->
 
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <!-- <link href="bootstrap/css/bootstrap.css" rel="stylesheet"> -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
@@ -57,7 +58,8 @@ define("VERSION","0.80");
 		/*
 			Eventually we'll store this information in the DB somewhere so it can be changed at a whim.
 		*/
-
+		storedData.currencySymbol = "$";
+		
 		storedData.columns = [
 			{
 				"columnName":"Description",
@@ -84,7 +86,8 @@ define("VERSION","0.80");
 					sortByPriceAsc,
 					sortByPriceDesc
 				],
-				"displayStyles":"floatRight"
+				"displayStyles":"floatRight",
+				"prepend":storedData.currencySymbol
 			},
 			{
 				"columnName":"Category",
@@ -108,7 +111,7 @@ define("VERSION","0.80");
 		});
 		
 		storedData.modalTree = [];
-		storedData.currencySymbol = "$";
+		
 		
 		$(document).ready(function(){
 			$("#tabSetContainer a")

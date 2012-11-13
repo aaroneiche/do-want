@@ -87,7 +87,7 @@ th{
 }
 
 #versionNumber{
-	position:absolute;
+	position:fixed;
 	bottom:0px;
 	right:0px;
 	margin:5px;
@@ -102,6 +102,7 @@ th{
 .tool{
 	margin-right:3px;
 	float:right;
+	cursor:pointer;
 }
 
 
@@ -167,4 +168,8 @@ div.rank.five{
 div.rank{
 	background: url("images/star_on.gif") repeat-x;
 	height:15px;
+}
+
+td.pointer{
+	cursor:pointer;
 }

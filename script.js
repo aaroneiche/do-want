@@ -171,9 +171,15 @@ function displayWishlist(displayData){
 			
 			
 			var cell =	$(document.createElement("td"))
-						.append(displayVal)
 						.attr("id","item_"+e.itemid+"_"+displayData.columns[column].columnName)
 						.addClass("item_"+displayData.columns[column].columnName);
+		
+			if(displayVal != undefined && displayVal.length > 0){
+				cell.append(displayData.columns[column].prepend)
+				.append(displayVal)
+			}else{
+				cell.append(displayData.columns[column].altDisplay);
+			}
 		
 			if(displayData.columns[column].displayStyles != undefined){
 				cell.addClass(displayData.columns[column].displayStyles);
@@ -183,7 +189,7 @@ function displayWishlist(displayData){
 			if(displayData.columns[column].columnName != "Tools"){
 				cell.click(function(){
 					getItemDetailInfo(e.itemid);
-				});
+				}).addClass("pointer");
 			}
 
 			row.append(cell);
@@ -848,9 +854,11 @@ function deleteItem(itemId){
 			itemid:itemId
 		}
 	}
+	showLoadingIndicator();
 	
 	//Get the Categories.
 	jQuery.post('ajaxCalls.php',data,function(response){
+		hideLoadingIndicator();
 		if(response){
 			getCurrentUserList(listReceived);
 		}
@@ -873,9 +881,10 @@ function markItemReceived(itemId){
 			itemid:itemId
 		}
 	}
-	
+	showLoadingIndicator();
 	//Get the Categories.
 	jQuery.post('ajaxCalls.php',data,function(response){
+		hideLoadingIndicator();
 		if(response){
 			getCurrentUserList(listReceived);
 		}
@@ -1321,6 +1330,7 @@ function displaySystemUsers(){
 		manages calls to allocating Methods on backend.
 */
 function allocateHandler(itemId,userId,action,forUserId){
+	console.log("Allocation Handler is called");
 	
 	arguments = {
 		"userid":userId,
@@ -1334,8 +1344,9 @@ function allocateHandler(itemId,userId,action,forUserId){
 		action:'adjustReservedItem',
 		"args":arguments
 	}
-	
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
+		hideLoadingIndicator();
 		getUserWishlist(forUserId);
 	});
 }
