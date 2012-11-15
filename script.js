@@ -961,7 +961,11 @@ function clearManageItemForm(){
 	jQuery('#itemQuantityInput').val("");
 	jQuery('#itemRankInput').val("1");
 	jQuery('#itemCategoryInput').val("1");
-	jQuery('#itemSourcesEdit').html("");
+	
+	//jQuery('#itemSourcesEdit').html("");
+	
+	jQuery('#itemSourcesEdit tr.sourceRow').remove();
+	
 	jQuery('#itemCommentInput').val("");	
 	jQuery('#openAddImageForm').attr("data-forItemId","");	
 	
@@ -1008,30 +1012,13 @@ function populateManageItemForm(itemId){
 				sourceOption = jQuery(document.createElement('tr'))
 									.append(sourceCell)
 									.append(sourceEditTools)
-									.attr("data-itemSourceId",e.itemSourceId);
+									.attr("data-itemSourceId",e.itemSourceId)
+									.addClass("sourceRow");
 		
-				jQuery("#itemSourcesEdit").append(sourceOption);
+				jQuery("tr#addSourceRow").before(sourceOption);
 			});
 		
 		}		
-		
-		var addSourceButton = jQuery(document.createElement('button'))
-								.addClass("btn btn-primary btn-mini tool")
-								.append("Add Source")
-								.click(function(){
-									clearItemSourceForm();
-									$("#itemSourceFormBlock #itemId").val(itemId);
-									$("#manageItemFormBlock").modal("hide");
-									$("#itemSourceFormBlock").modal("show");
-									//swapModal("#itemSourceFormBlock")
-								});
-								
-		var addSourceCell = jQuery(document.createElement('td')).attr("colspan","2").append(addSourceButton);
-		var addSourceRow = jQuery(document.createElement('tr')).append(addSourceCell);
-
-		jQuery("#itemSourcesEdit").append(addSourceRow);
-		
-		
 		
 		$('#manageItemFormBlock').modal('show');
 		hideLoadingIndicator();
@@ -1055,7 +1042,7 @@ function clearItemSourceForm(){
 
 
 /* Method populateItemSourceForm
-	Gets itemSource details and puts them into the #itemSourceForm form, then calls teh modal to display.
+	Gets itemSource details and puts them into the #itemSourceForm form, then calls the modal to display.
 */
 function populateItemSourceForm(sourceId){
 	// Note to developer: This should probably also get the name of the related item, so it's available to the user for context.
@@ -1064,6 +1051,7 @@ function populateItemSourceForm(sourceId){
 		action:'getSourceDetails',
 		args:{'sourceId':sourceId}
 	}
+	showLoadingIndicator();
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		$("#itemSourceForm #itemId").val(response.itemid);
@@ -1073,8 +1061,12 @@ function populateItemSourceForm(sourceId){
 		$("#itemSourceForm #sourcePrice").val(response.sourceprice);
 		$("#itemSourceForm #sourceComments").val(response.sourcecomments);										
 		
+		hideLoadingIndicator();
+		
 		$('#manageItemFormBlock').modal('hide');
-		$("#itemSourceFormBlock").modal("show");
+		$("#itemSourceFormBlock").modal("show").on('hide',function(){
+			$("#manageItemFormBlock").modal('show');
+		});
 	
 	},"json");	
 }
@@ -1615,34 +1607,3 @@ function markMessageRead(messageId){
 		getMessagesForUser(userId,0);
 	},"json");
 }
-
-
-/*
-	Method swapModal
-	Swaps the current modal for the next or the previous. Previous modal is held in a global variable.
-
-	string @modal - optional, provides the jQuery-compatible-selector modal you'd like to go to. If left blank, will take you back to the previous modal.
-
-*/
-function swapModal(modal){
-	if(modal != undefined){
-			
-		if(storedData.modalTree.length > 0){
-			$(storedData.modalTree[storedData.modalTree.length-1]).modal('hide');
-		}
-		$(modal).modal("show");
-		storedData.modalTree.push(modal);
-	}else{
-		$(storedData.modalTree.pop()).modal('hide');
-
-		if(storedData.modalTree.length > 0){
-			$(storedData.modalTree[storedData.modalTree.length-1]).modal('show');
-		}
-	}
-}
-
-
-
-
-
-

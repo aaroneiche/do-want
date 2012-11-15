@@ -503,11 +503,18 @@ class wishlist extends db{
 								from {$this->options["table_prefix"]}itemsources 
 								where {$this->options["table_prefix"]}itemsources.itemid = {$args['itemid']}";
 		
+//		error_log($itemQuery);
+//		error_log($itemImagesQuery);
+//		error_log($itemSourcesQuery);
+		
 		
 		$item = $this->dbAssoc($this->dbQuery($itemQuery));
 		$itemImages = $this->dbAssoc($this->dbQuery($itemImagesQuery));
 		$itemSources = $this->dbAssoc($this->dbQuery($itemSourcesQuery));
 		
+//		error_log(print_r($item,true));
+//		error_log(print_r($itemImages,true));
+//		error_log(print_r($itemSources,true));				
 		
 		$itemInsertQuery = "insert into {$this->options["table_prefix"]}items(userid,description,ranking,category) 
 								values('{$args['userid']}','{$item['description']}','{$item['ranking']}','{$item['category']}')";

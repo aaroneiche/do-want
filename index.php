@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.0");
+define("VERSION","0.9.1");
 
 ?>
 <!DOCTYPE html>
@@ -224,7 +224,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				populateImagesOnForm(forItemId);
 				
 				$("#manageItemFormBlock").modal('hide');
-				$('#itemImagesFormBlock').modal('show');
+				$('#itemImagesFormBlock').modal('show').on('hide',function(){
+					$("#manageItemFormBlock").modal('show');
+				});
 
 				//Sets the itemIdForImage to the ID we're editing.
 				$("#itemIdForImage").val(forItemId);
@@ -239,6 +241,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#clearShopFor").click(function(){
 				$("#userToRequest").val("");
 				$("#shopForSearch").val("");
+			});
+
+			$("#addSourceButton").click(function(){
+				clearItemSourceForm();
+				$("#itemSourceFormBlock #itemId").val(itemId);
+				$("#manageItemFormBlock").modal("hide");
+				$("#itemSourceFormBlock").modal("show").on('hide',function(){
+					$("#manageItemFormBlock").modal('show');
+				});
 			});
 
 			displayShopForMeList();
@@ -289,7 +300,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="control-group">
 				<label class="control-label" for="itemSourcesEdit">Sources:</label>
 				<table id="itemSourcesEdit" class="controls table-striped table-bordered table-condensed">
-					
+					<tr id="addSourceRow"><td colspan="2"><button id="addSourceButton" class="btn btn-primary btn-mini tool">Add Source</button></td></tr>
 				</table>
 			</div>
 			<div class="control-group">

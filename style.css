@@ -125,8 +125,9 @@ div.popover#loading{
 	left:0;
 	margin-left:auto;
 	margin-right:auto;
-	margin-top:100px;
+	margin-top:25%;
 	width:60px;
+	z-index:2000;
 }
 
 div.popover#loading div.popover-inner{
