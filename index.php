@@ -148,6 +148,12 @@ define("VERSION","0.9.2");
 				updateUserData();
 			});			
 			
+			$("#alertInfo button.close").click(function(){
+				$("#alertInfo").fadeOut();
+				$("#alertInfo li").remove();
+			});
+			
+			
 			
 			//binds firing the update images event to the loading of the relevant iframe.
 			//Most of this should be rewritten into a method on script.js
@@ -179,6 +185,11 @@ define("VERSION","0.9.2");
 		<div class="popover-content"><img src='images/ajax-loader.gif'></div>
 	</div>
 </div>
+
+<div id="alertInfo" class="alert alert-error">
+	<button type="button" class="close">×</button>
+</div>
+
 
 <!--  -->
 <div class="container">

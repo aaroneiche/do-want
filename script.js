@@ -10,6 +10,7 @@ debug = {}; /* This object is here to bring whatever you want out into the globa
 	@type - error, info, success
 	returns - HTML element
 */
+/*
 function createAlert(message,type){
 
 	var alertMessage = $(document.createElement('span'))
@@ -30,16 +31,24 @@ function createAlert(message,type){
 		.append(alertMessage)
 		.append(alertClose);
 	
-	return alertContainer;
-							
-/*
-<div id="displayAlert" class="span4 offset4 alert">
-	<span id="loginAlertMessage"></span>
-	<a class="close" data-dismiss="alert" href="#">&times;</a>
-</div>
+	return alertContainer;							
+}
 */
 
+/*
+	Function displayAlert
+	Displays information to the user to be acted upon.
+	
+*/
+
+function displayAlert(messageToAppend){
+	
+	var message = $(document.createElement('li')).append(messageToAppend);
+	$("#alertInfo").append(message).fadeIn();	
 }
+
+
+
 
 /*
 	Function escapeData
@@ -224,7 +233,7 @@ function login(){
 	passVal = jQuery("#password").val();
 
 	if(userVal == null || userVal.length == 0 || passVal == null || passVal.length == 0){
-		$("#alertLocation").append(createAlert("You must enter a username and password","error"));
+		displayAlert("You must enter a username and password");
 		return false;
 	}
 
@@ -244,7 +253,7 @@ function login(){
 		if(response == "true"){
 			window.location.reload();
 		}else{
-			$("#alertLocation").append(createAlert("Incorrect login.","error"));
+			displayAlert("Incorrect login");
 		}
 	});
 }
