@@ -11,8 +11,18 @@ switch($_SERVER['HTTP_HOST']){
 	break;
 }
 
-$options['table_prefix'] = ''; // table prefixes if you need them.
-$options['password_hasher'] = 'MD5'; //What algorithm to use to hashpasswords. 
-$options['filepath'] = 'uploads/'; //Where to upload files to
-$options['logErrors'] = true; //Outputs error information where available to a log if true.
+// table prefixes if you need them.
+$options['table_prefix'] = '';
+
+//What algorithm to use to hashpasswords. 
+// 'NoHash' for no password hasher
+// 'MD5Hasher' for MD5
+// More to come in the future.
+$options['password_hasher'] = 'MD5Hasher';
+ 
+//Where to upload files to. Make sure this path is writable by your server!
+$options['filepath'] = 'uploads/'; 
+
+//Outputs error information where available to a log if true. Not fully implemented.
+$options['logErrors'] = true; 
 ?>

@@ -24,6 +24,8 @@ class wishlist extends db{
 				from items,categories where userid = '{$_SESSION['userid']}'
 					and categories.categoryid = items.category $received";
 		
+		error_log($query);
+		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
 	
@@ -73,24 +75,24 @@ class wishlist extends db{
 			
 			$list = $this->dbAssoc($result);
 
+			if($list != null){
+				foreach($list as &$listItem){
 
-			foreach($list as &$listItem){
+					if($listItem['reservedByThisUser'] == null){
+						$listItem['reservedByThisUser'] = 0;
+					}
 
-				if($listItem['reservedByThisUser'] == null){
-					$listItem['reservedByThisUser'] = 0;
-				}
-
-				if($listItem['boughtByThisUser'] == null){
-					$listItem['boughtByThisUser'] = 0;
-				}
+					if($listItem['boughtByThisUser'] == null){
+						$listItem['boughtByThisUser'] = 0;
+					}
 				
-				if($listItem['available'] == null){
-					$listItem['available'] = $listItem['quantity'];
-				}
+					if($listItem['available'] == null){
+						$listItem['available'] = $listItem['quantity'];
+					}
 				
+				}
+				return $list;
 			}
-
-			return $list;
 		}
 	}
 	

@@ -3,7 +3,7 @@
 This script handles ajax calls for the server.
 */
 
-sleep(2); //just for testing...
+//sleep(2); //just for testing...
 
 function __autoload($class_name) {
     require_once strtolower($class_name . '.class.php');

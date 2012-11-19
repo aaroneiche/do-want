@@ -121,6 +121,7 @@ th{
 
 div.popover#loading{
 /* 	display:block; */
+	position:fixed;
 	right:0;
 	left:0;
 	margin-left:auto;
@@ -140,6 +141,10 @@ span#messageIndicator{
 
 td.floatRight{
 	text-align:right;
+}
+
+td.item_Tools{
+	min-width:60px;
 }
 
 

@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.1");
+define("VERSION","0.9.2");
 
 ?>
 <!DOCTYPE html>
@@ -477,10 +477,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			    <ul class="nav">			
 					<li><a href="#" id="myListTab" class="navLink" data-section="myList">My Wishlist</a></li>
 					<li><a href="#" id="otherListsTab" class="navLink" data-section="otherLists">Other People's Lists</a></li>
-					<li><a href="#" id="shoppingListTab" class="navLink" data-section="shoppingList">My Shopping List</a></li>
+					<!-- <li><a href="#" id="shoppingListTab" class="navLink" data-section="shoppingList">My Shopping List</a></li> -->
 					<li><a href="#" id="manageTab" class="navLink" data-section="manage">
 						Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
 					</a></li>
+
 			    </ul>
 			    <ul class="nav pull-right">			
 					<li><a href="#" onclick="logout();" id="logoutButton">Logout</a></li>

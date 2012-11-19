@@ -14,8 +14,10 @@ class user extends db{
 		
 		$cleanUsername = $this->dbEscape($_REQUEST['username']); 
 		$cleanPassword = $this->dbEscape($_REQUEST['password']);
-		
-		$query = "SELECT userid, fullname, admin FROM {$this->options["table_prefix"]}users WHERE username = '$cleanUsername' AND password = {$this->options["password_hasher"]}('$cleanPassword') AND approved = 1";
+
+		$hashedResult = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
+
+		$query = "SELECT userid, fullname, admin FROM {$this->options["table_prefix"]}users WHERE username = '$cleanUsername' AND password = '".$hashedResult."' AND approved = 1";
 		$userInfoResult = $this->dbQuery($query);
 		
 		if($this->dbRowCount($userInfoResult) > 0){
@@ -43,6 +45,24 @@ class user extends db{
 		session_destroy();
 		
 		return true;		
+	}
+
+
+
+/*
+	Method MD5Hasher
+	Returns an MD5 hash of a string
+*/
+	function MD5Hasher($stringToHash){
+		return md5($stringToHash);
+	}
+
+/*
+	Method NoHash
+	A hack solution for no password hashing (not recommended for security's sake)
+*/
+	function NoHash($stringToHash){
+		return $stringToHash;
 	}
 
 /*

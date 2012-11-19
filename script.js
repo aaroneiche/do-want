@@ -114,8 +114,7 @@ function displayWishlist(displayData){
 		jQuery("#"+displayData.targetTable+" tr.itemRow").remove();
 		
 	}else{
-		table.html("");	
-		
+		table.html("");
 		hRow = $(document.createElement("tr"));
 		
 		$(displayData.columns).each(function(i,e){
@@ -138,65 +137,76 @@ function displayWishlist(displayData){
 	}
 
 	//Loop through each item on the user list and add it to a row, which is then added to the table.
+	
+	if(displayData.list != null){
+		$(displayData.list).each(function(i,e){
+			row = $(document.createElement("tr"))
+				.attr("data-itemId",e.itemid)
+				.attr("id","item_"+e.itemid+"_row")
+				.attr("data-toggle","collapse")
+				.attr("data-target","detail"+i)
+				.addClass("itemRow");
+		
+			//Generates any needed display versions of properties. Builds display-specific items depending on toolset value.
+			e.toolset = displayData.toolset;
+			e = generateDisplayElements(e);
+		
+			/*
+			This loops through our table structure and puts the data in the right order. Allows users
+			to change the column order, or add/remove columns if they care to without resorting to the
+			code. There will need to be a tool to change column order to make this valuable.
+			*/	
+		
+			for(column in displayData.columns){
+			
+				colToDisplay = displayData.columns[column].displayColumn;
+				colDisplayAlt = displayData.columns[column].displayAlt;
+			
+				displayVal = e[colToDisplay];
+			
+				if(displayVal == null || displayVal == undefined){ 
+					displayVal = e[colDisplayAlt];
+				}			
+			
+				var cell =	$(document.createElement("td"))
+							.attr("id","item_"+e.itemid+"_"+displayData.columns[column].columnName)
+							.addClass("item_"+displayData.columns[column].columnName);
+			
+				//Adds anything to the front of the cell content: Such as currency symbols.
+				if(displayVal != undefined && displayVal.length > 0){
+					cell.append(displayData.columns[column].prepend)
+					.append(displayVal)
+				}else{
+					cell.append(displayData.columns[column].altDisplay);
+				}
+		
+				// Add any important or relevant styles to the cell
+				if(displayData.columns[column].displayStyles != undefined){
+					cell.addClass(displayData.columns[column].displayStyles);
+				}
 
-	$(displayData.list).each(function(i,e){
-		row = $(document.createElement("tr"))
-			.attr("data-itemId",e.itemid)
-			.attr("id","item_"+e.itemid+"_row")
-			.attr("data-toggle","collapse")
-			.attr("data-target","detail"+i)
-			.addClass("itemRow");
-		
-		//Generates any needed display versions of properties. Builds display-specific items depending on toolset value.
-		e.toolset = displayData.toolset;
-		e = generateDisplayElements(e);
-		
-		/*
-		This loops through our table structure and puts the data in the right order. Allows users
-		to change the column order, or add/remove columns if they care to without resorting to the
-		code. There will need to be a tool to change column order to make this valuable.
-		*/	
-		
-		for(column in displayData.columns){
-			
-			colToDisplay = displayData.columns[column].displayColumn;
-			colDisplayAlt = displayData.columns[column].displayAlt;
-			
-			displayVal = e[colToDisplay];
-			
-			if(displayVal == null || displayVal == undefined){ 
-				displayVal = e[colDisplayAlt];
-			}			
-			
-			
-			
-			var cell =	$(document.createElement("td"))
-						.attr("id","item_"+e.itemid+"_"+displayData.columns[column].columnName)
-						.addClass("item_"+displayData.columns[column].columnName);
-		
-			if(displayVal != undefined && displayVal.length > 0){
-				cell.append(displayData.columns[column].prepend)
-				.append(displayVal)
-			}else{
-				cell.append(displayData.columns[column].altDisplay);
-			}
-		
-			if(displayData.columns[column].displayStyles != undefined){
-				cell.addClass(displayData.columns[column].displayStyles);
-			}
-			
+				if(displayData.columns[column].columnName != "Tools"){
+					cell.click(function(){
+						getItemDetailInfo(e.itemid);
+					}).addClass("pointer");
+				}
 
-			if(displayData.columns[column].columnName != "Tools"){
-				cell.click(function(){
-					getItemDetailInfo(e.itemid);
-				}).addClass("pointer");
-			}
-
-			row.append(cell);
+				row.append(cell);
 			
 			}
+	
 			table.append(row);								
 		});	
+	}else{
+		
+		var row = $(document.createElement('tr'));
+		var td = $(document.createElement('td'))
+					.append("No items were found for this list")
+					.attr("colspan",displayData.columns.length);
+		row.append(td);
+		
+		table.append(row);
+	}
 }
 
 function displayItemsDetails(itemInfo){
@@ -294,12 +304,26 @@ function getUserWishlist(forUserId){
 	}
 	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
+
+		userWishlistData = {};
+		userWishlistData.list = "";
 		
-		if(response.responseType != undefined && response.responseType == "error"){
+		/*
+		if(response == null){
+			var row = $(document.createElement('tr'));
+			var td = $(document.createElement('td')).append("No items were found for this list");
+			row.append(td);
+			
+			$("#otherUserWishlist").append(row);
+			
+		}else
+		*/
+		
+		if(response != null && response.responseType != undefined && response.responseType == "error"){
 			errorMessage(response);
 			//return false;
 		}else{
-			userWishlistData = {};
+
 			userWishlistData.isCurrentUser = false;
 			userWishlistData.forUserId = forUserId;
 			userWishlistData.toolset = "shop";
@@ -1349,8 +1373,7 @@ function displaySystemUsers(){
 		manages calls to allocating Methods on backend.
 */
 function allocateHandler(itemId,userId,action,forUserId){
-	console.log("Allocation Handler is called");
-	
+
 	arguments = {
 		"userid":userId,
 		"itemid":itemId,
