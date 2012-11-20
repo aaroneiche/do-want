@@ -20,8 +20,14 @@ $options['table_prefix'] = '';
 // More to come in the future.
 $options['password_hasher'] = 'MD5Hasher';
  
-//Where to upload files to. Make sure this path is writable by your server!
+//Relative path where to upload files to. Include a trailing slash. Make sure this path is writable by your server!
 $options['filepath'] = 'uploads/'; 
+
+//Where to upload files to. Make sure this path is writable by your server!
+$options['currency_symbol'] = '$';
+
+//Switch to large icons
+$options['large-icons'] = true;
 
 //Outputs error information where available to a log if true. Not fully implemented.
 $options['logErrors'] = true; 

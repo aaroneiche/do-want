@@ -4,6 +4,7 @@ session_start();
 
 define("VERSION","0.9.2");
 
+include 'config.php';
 ?>
 <!DOCTYPE html>
 
@@ -24,6 +25,9 @@ define("VERSION","0.9.2");
     <!-- <link href="bootstrap/css/bootstrap.css" rel="stylesheet"> -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	
+	<link href="bootstrap/css/bootstrap.icon-large.min.css" rel="stylesheet">
+	
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
 	<script src="bootstrap/js/bootstrap-typeahead.js"></script>	
@@ -58,7 +62,10 @@ define("VERSION","0.9.2");
 		/*
 			Eventually we'll store this information in the DB somewhere so it can be changed at a whim.
 		*/
-		storedData.currencySymbol = "$";
+		//storedData.currencySymbol = "$";
+		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
+		storedData.filepath = "<?php print $options['filepath'] ?>";
+		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
 		
 		storedData.columns = [
 			{

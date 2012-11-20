@@ -519,7 +519,7 @@ function getItemDetailInfo(itemId){
 			
 			//Generates carousel images & containers.
 			jQuery(response.images).each(function(i,e){
-				img = $(document.createElement('img')).attr('src',"uploads/"+e.itemImageFilename);
+				img = $(document.createElement('img')).attr('src',storedData.filepath+e.itemImageFilename);
 				itemImageDiv = $(document.createElement('div')).addClass("item").append(img);
 				if(i == 0)itemImageDiv.addClass("active");
 				jQuery('#itemDetailImageCarousel div.carousel-inner').append(itemImageDiv);
@@ -644,7 +644,13 @@ function renderItemTools(itemObject, toolInfo){
 							.addClass("icon-pencil tool")
 							.attr("title","Edit Item");
 			
-			//data-itemId is stored on the row element: tool->div->td->tr
+			
+			if(storedData.largeIcons){
+				itemDelete.addClass("icon-large");
+				itemReceive.addClass("icon-large");
+				itemEdit.addClass("icon-large");
+			}
+			
 
 			itemReceive.click(function(){
 				markItemReceived($(this).closest("tr").attr("data-itemId"));
@@ -677,6 +683,11 @@ function renderItemTools(itemObject, toolInfo){
 						.click(function(){
 							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"reserve", $(this).closest("table").attr("data-listOwner"));
 						});
+				
+				if(storedData.largeIcons){
+					itemReserve.addClass("icon-large");
+				}			
+						
 				toolBox.append(itemReserve);
 			}
 		
@@ -688,6 +699,9 @@ function renderItemTools(itemObject, toolInfo){
 						.click(function(){
 							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"release", $(this).closest("table").attr("data-listOwner"));
 						});
+				if(storedData.largeIcons){
+					itemRelease.addClass("icon-large");
+				}							
 				toolBox.append(itemRelease);
 
 				//Purchase
@@ -697,7 +711,11 @@ function renderItemTools(itemObject, toolInfo){
 						.click(function(){
 							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"purchase", $(this).closest("table").attr("data-listOwner"));
 						});
+				if(storedData.largeIcons){
+					itemBuy.addClass("icon-large");
+				}	
 				toolBox.append(itemBuy);
+				
 			}
 			
 			//Return
@@ -708,6 +726,10 @@ function renderItemTools(itemObject, toolInfo){
 						.click(function(){
 							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"return", $(this).closest("table").attr("data-listOwner"));
 						});
+				if(storedData.largeIcons){
+					itemReturn.removeClass("icon-share").addClass("icon-large icon-unlock");
+				}
+				
 				toolBox.append(itemReturn);
 			}
 			
@@ -719,6 +741,10 @@ function renderItemTools(itemObject, toolInfo){
 					.click(function(){
 						copyItem($(this).closest("tr").attr("data-itemId"));
 					});
+					
+			if(storedData.largeIcons){
+				itemCopy.addClass("icon-large");
+			}							
 			toolBox.append(itemCopy);
 
 		break;
@@ -732,6 +758,11 @@ function renderItemTools(itemObject, toolInfo){
 							.addClass("icon-pencil tool")
 							.attr("title","Edit Source");
 
+			if(storedData.largeIcons){
+				sourceDelete.addClass("icon-large");
+				sourceEdit.addClass("icon-large");
+			}					
+							
 			sourceEdit.click(function(){
 				populateItemSourceForm($(this).closest("tr").attr("data-itemSourceId"));
 			});
