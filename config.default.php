@@ -27,7 +27,7 @@ $options['filepath'] = 'uploads/';
 $options['currency_symbol'] = '$';
 
 //Switch to large icons
-$options['large-icons'] = true;
+$options['large-icons'] = true; 
 
 //Outputs error information where available to a log if true. Not fully implemented.
 $options['logErrors'] = true; 
