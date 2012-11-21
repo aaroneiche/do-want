@@ -662,7 +662,6 @@ function renderItemTools(itemObject, toolInfo){
 
 			itemEdit.click(function(){
 				populateManageItemForm($(this).closest("tr").attr("data-itemId"));
-				$("#openAddImageForm").removeClass("disabled").prop("disabled","");
 			});
 
 			itemDelete.click(function(){
@@ -701,6 +700,7 @@ function renderItemTools(itemObject, toolInfo){
 						});
 				if(storedData.largeIcons){
 					itemRelease.addClass("icon-large");
+					itemRelease.removeClass("icon-hand-left").addClass("icon-unlock");
 				}							
 				toolBox.append(itemRelease);
 
@@ -722,12 +722,12 @@ function renderItemTools(itemObject, toolInfo){
 			if(itemObject.boughtByThisUser > 0){
 				itemReturn = $(document.createElement("i"))
 						.addClass("icon-share tool")
-						.attr("title","Buy Item")
+						.attr("title","Return Item")
 						.click(function(){
 							allocateHandler($(this).closest("tr").attr("data-itemId"),userId,"return", $(this).closest("table").attr("data-listOwner"));
 						});
 				if(storedData.largeIcons){
-					itemReturn.removeClass("icon-share").addClass("icon-large icon-unlock");
+					itemReturn.addClass("icon-large icon-cart-out").removeClass("icon-share");
 				}
 				
 				toolBox.append(itemReturn);
@@ -1051,9 +1051,8 @@ function populateManageItemForm(itemId){
 	showLoadingIndicator();
 
 	jQuery.post('ajaxCalls.php',data,function(response){
-		debug = response;
-		
-		jQuery('#itemId').val(itemId);
+	
+		jQuery('#sourceItemId').val(itemId);
 		jQuery('#itemDescriptionInput').val(response.itemDescription);
 		jQuery('#itemQuantityInput').val(response.itemQuantity);
 		jQuery('#itemRankInput').val(response.itemRanking);
@@ -1082,7 +1081,10 @@ function populateManageItemForm(itemId){
 				jQuery("tr#addSourceRow").before(sourceOption);
 			});
 		
-		}		
+		}
+
+		$("#openAddImageForm").removeClass("disabled").prop("disabled","");
+		$("#addSourceButton").removeClass("disabled").prop("disabled","");
 		
 		$('#manageItemFormBlock').modal('show');
 		hideLoadingIndicator();
@@ -1145,7 +1147,7 @@ function manageItemSource(){
 	
 	args = {};
 	
-	args.itemid = $("#itemSourceForm #itemId").val();
+	args.itemid = $("#itemSourceForm #sourceItemId").val();
 	args.sourceid = $("#itemSourceForm #sourceId").val();
 	args.source = $("#itemSourceForm #sourceName").val();
 	args.sourceurl = $("#itemSourceForm #sourceUrl").val();
@@ -1161,7 +1163,10 @@ function manageItemSource(){
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
 		if(response){
+			$("#itemSourceFormBlock").modal("hide");
 			getCurrentUserList(listReceived);
+			populateManageItemForm(args.itemid);
+			
 		}
 	},"json");
 	
@@ -1195,7 +1200,7 @@ function populateImagesOnForm(itemId){
 		$("#currentImagesBlock").empty();
 		
 		$(response).each(function(i,e){
-			var img = $(document.createElement('img')).attr('src',"uploads/"+e.filename);
+			var img = $(document.createElement('img')).attr('src',storedData.filepath+e.filename);
 			var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
 			var removeImageControl =  $(document.createElement('a')).append("×").addClass("close").click(function(){
 				

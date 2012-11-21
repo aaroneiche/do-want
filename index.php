@@ -131,6 +131,7 @@ include 'config.php';
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
+				$('#addSourceButton').addClass('disabled').prop("disabled","disabled");
 				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
 				$('#manageItemFormBlock').modal();
 				//swapModal("#manageItemFormBlock");
@@ -263,7 +264,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 			$("#addSourceButton").click(function(){
 				clearItemSourceForm();
-				$("#itemSourceFormBlock #itemId").val(itemId);
+//				$("#itemSourceFormBlock #itemId").val($("form#manageItemForm input#itemId").val());
+
 				$("#manageItemFormBlock").modal("hide");
 				$("#itemSourceFormBlock").modal("show").on('hide',function(){
 					$("#manageItemFormBlock").modal('show');
@@ -388,7 +390,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</div>
 	<div class="modal-body"> 
 		<form id="itemSourceForm" class="form-horizontal" onsubmit="return false;">
-			<input type="hidden" id="itemId" />
+			<input type="hidden" id="sourceItemId" />
 			<input type="hidden" id="sourceId" />
 		
 			<div class="control-group">
@@ -738,6 +740,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<p>Do-want is a wishlist management system that helps families and friends organize gift exchanges.</p>
 			<p>Do-Want is released under a GPL 2.0 License</p>
 			<p>For more information, visit <a href="http://code.google.com/p/do-want/" target="_blank">http://code.google.com/p/do-want/</a></p>
+			<p><b>Do Want!</b> uses <a href="http://www.glyphicons.com/" target="_blank">GlyphIcons</a> by  Jan Kovařík  under the <a href="http://creativecommons.org/licenses/by/3.0/deed.en" target="_blank">CC-BY 3.0 license</a></p>
 		  </div>
 		  <div class="modal-footer">
 		  </div>

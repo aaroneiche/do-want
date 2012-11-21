@@ -410,7 +410,7 @@ class wishlist extends db{
 				$query = "delete from itemsources where sourceid = {$this->dbEscape($args['sourceid'])}";
 			break;
 		}
-		
+		error_log($query);
 		$result = $this->dbQuery($query);
 		return $result;
 	}
