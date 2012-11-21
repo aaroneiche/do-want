@@ -25,9 +25,8 @@ include 'config.php';
     <!-- <link href="bootstrap/css/bootstrap.css" rel="stylesheet"> -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-	
-	<link href="bootstrap/css/bootstrap.icon-large.min.css" rel="stylesheet">
-	
+	<link href="bootstrap/css/bootstrap.icons-large.css" rel="stylesheet">
+
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
 	<script src="bootstrap/js/bootstrap-typeahead.js"></script>	

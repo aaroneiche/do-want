@@ -736,7 +736,7 @@ function renderItemTools(itemObject, toolInfo){
 
 			//There are no limitations on copying an item. 
 			itemCopy = $(document.createElement("i"))
-					.addClass("icon-tags tool")
+					.addClass("icon-more-items tool")
 					.attr("title","Copy Item")
 					.click(function(){
 						copyItem($(this).closest("tr").attr("data-itemId"));
