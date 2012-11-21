@@ -24,7 +24,6 @@ class wishlist extends db{
 				from items,categories where userid = '{$_SESSION['userid']}'
 					and categories.categoryid = items.category $received";
 		
-		error_log($query);
 		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
@@ -410,7 +409,7 @@ class wishlist extends db{
 				$query = "delete from itemsources where sourceid = {$this->dbEscape($args['sourceid'])}";
 			break;
 		}
-		error_log($query);
+
 		$result = $this->dbQuery($query);
 		return $result;
 	}
@@ -504,19 +503,10 @@ class wishlist extends db{
 		$itemSourcesQuery = "select {$this->options["table_prefix"]}itemsources.* 
 								from {$this->options["table_prefix"]}itemsources 
 								where {$this->options["table_prefix"]}itemsources.itemid = {$args['itemid']}";
-		
-//		error_log($itemQuery);
-//		error_log($itemImagesQuery);
-//		error_log($itemSourcesQuery);
-		
-		
+				
 		$item = $this->dbAssoc($this->dbQuery($itemQuery));
 		$itemImages = $this->dbAssoc($this->dbQuery($itemImagesQuery));
 		$itemSources = $this->dbAssoc($this->dbQuery($itemSourcesQuery));
-		
-//		error_log(print_r($item,true));
-//		error_log(print_r($itemImages,true));
-//		error_log(print_r($itemSources,true));				
 		
 		$itemInsertQuery = "insert into {$this->options["table_prefix"]}items(userid,description,ranking,category) 
 								values('{$args['userid']}','{$item['description']}','{$item['ranking']}','{$item['category']}')";

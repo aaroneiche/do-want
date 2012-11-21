@@ -150,7 +150,7 @@ function displayWishlist(displayData){
 	if(displayData.list != null){
 		$(displayData.list).each(function(i,e){
 			row = $(document.createElement("tr"))
-				.attr("data-itemId",e.itemid)
+				.attr("data-itemid",e.itemid)
 				.attr("id","item_"+e.itemid+"_row")
 				.attr("data-toggle","collapse")
 				.attr("data-target","detail"+i)
@@ -499,7 +499,7 @@ function getItemDetailInfo(itemId){
 			}
 			
 			sourceNameCell.append(sourceName);
-			sourcePriceCell.append(e.itemSourcePrice);
+			sourcePriceCell.append(storedData.currencySymbol+e.itemSourcePrice);
 			
 			sourceRow.append(sourceNameCell)
 					.append(sourcePriceCell);
@@ -1052,7 +1052,7 @@ function populateManageItemForm(itemId){
 
 	jQuery.post('ajaxCalls.php',data,function(response){
 	
-		jQuery('#sourceItemId').val(itemId);
+		jQuery('#itemId').val(itemId);
 		jQuery('#itemDescriptionInput').val(response.itemDescription);
 		jQuery('#itemQuantityInput').val(response.itemQuantity);
 		jQuery('#itemRankInput').val(response.itemRanking);
@@ -1120,7 +1120,9 @@ function populateItemSourceForm(sourceId){
 	showLoadingIndicator();
 	
 	jQuery.post('ajaxCalls.php',data,function(response){
-		$("#itemSourceForm #itemId").val(response.itemid);
+		debug = response;
+		
+		$("#itemSourceForm #sourceItemId").val(response.itemid);
 		$("#itemSourceForm #sourceId").val(response.sourceid);
 		$("#itemSourceForm #sourceName").val(response.source);
 		$("#itemSourceForm #sourceUrl").val(response.sourceurl);

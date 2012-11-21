@@ -82,6 +82,7 @@ class db{
 		$cleanSenderId = $this->dbEscape($args['senderId']);
 		$cleanReceiverId = $this->dbEscape($args['receiverId']);
 		$cleanMessage = $this->dbEscape($args['message']);
+		$cleanForceEmail = $this->dbEscape($args['forceEmail']);
 		
 		$emailQuery = "select {$this->options["table_prefix"]}users.*, (select {$this->options["table_prefix"]}users.fullname from {$this->options["table_prefix"]}users where {$this->options["table_prefix"]}users.userid = $cleanSenderId) as senderFullname from {$this->options["table_prefix"]}users where userid = $cleanReceiverId";
 		
@@ -92,9 +93,9 @@ class db{
 		
 		$subject = "New message from the Wishlist!";	
 		
-		if($usersResult['email_msgs'] == 1){
+		if($usersResult['email_msgs'] == 1 || $cleanForceEmail == 1){
 			$mailresult = mail($usersResult['email'],$subject,$cleanMessage);
-		}	
+		}
 	}
 	
 	function markMessageRead($messageId){

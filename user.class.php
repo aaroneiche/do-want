@@ -212,23 +212,27 @@ class user extends db{
 		$cleanPassword = $this->dbEscape($args['password']);
 		$cleanFullname = $this->dbEscape($args['fullname']);
 		$cleanEmail = $this->dbEscape($args['email']);
-		$cleanApproved = ($this->dbEscape($args['approved']) == 1)?1:0; //$this->dbEscape($args['approved']);
+		$cleanApproved = ($this->dbEscape($args['approved']) == 1)?1:0; 
 		$cleanAdmin = ($this->dbEscape($args['admin']) == 1)?1:0;
 		
 		switch($cleanAction){
 			case 'add':
-				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) VALUES('$cleanUsername',{$this->options["password_hasher"]}('$cleanPassword'),'$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";			
+			
+				$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
+				
+				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";
+				
 			break;
 			case 'edit':
 		
 				if(strlen($cleanPassword) > 0){
-					//Now we know we have a password to update.
-					//We're going to want to move this to an external function from SQL.
-					$passwordSQL = "password={$this->options["password_hasher"]}('$cleanPassword'), ";
+					$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
+				
+					$passwordSQL = "password='$hashedPassword', ";
 				}else{
 					$passwordSQL = "";
 				}
-
+				
 				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', $passwordSQL
 							approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserId}'";			
 			break;
@@ -243,6 +247,34 @@ class user extends db{
 	}
 	
 
+/*
+	Method: resetUserPassword
+	Randomizes and sets a new password for a user, returns temporary password.
+	
+	@userid - The id of the user who's password should be reset.
+*/
+	function resetUserPassword($args){
+
+		$userid = $this->dbEscape($args['userid']);
+
+		//we have to dbEscape this value to match the same input as will come from login.
+		$randomPass = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
+		$escapedPass = $this->dbEscape($randomPass);
+
+		//Gives us the same hash as will happen on login.
+		$hashedResult = call_user_func_array(array($this,$this->options["password_hasher"]), array($randomPass));
+		
+		$query = "update {$this->options["table_prefix"]}users set password = '$hashedResult' where userid = $userid";
+		error_log($query);
+		
+		$result = $this->dbQuery($query);
+		if($result){
+			return $escapedPass;
+		}else{
+			return false;
+		}
+
+	}
 	
 
 /*
