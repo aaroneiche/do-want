@@ -275,7 +275,56 @@ class user extends db{
 		}
 
 	}
+
+/*
+	Method: requestPasswordReset
+	Takes an email address and either resets the user password and sends an email, or returns unfound email error.
 	
+	@emailAddress - The email address of the account to reset.
+	
+*/
+	function requestPasswordReset($args){
+		$response = array();
+		
+		$cleanEmail = $this->dbEscape($args['emailAddress']);
+		
+		$query = "select userid, email from {$this->options["table_prefix"]}users where email = '$cleanEmail'";
+		$result = $this->dbQuery($query);
+		
+		if($this->dbRowCount($result) > 0){
+			$user = $this->dbAssoc($result);
+			$newPass = $this->resetUserPassword(array('userid'=>$user['userid']));
+			
+			if($newPass != false){
+				$msgArgs = array(
+					'senderId' => 0,
+					'receiverId' =>$user['userid'],
+					'message'=> "A request has been made to reset your account's password.\nThe temporary password is:\n\n".$newPass."\n\n Please login to the wishlist site, login, and create a new password.",
+ 					'forceEmail' => true
+				);
+				
+				$msg = $this->sendMessage($msgArgs);
+				if($msg){
+					$response['responseType'] = 'success';
+					$response['message'] = 'Your password has been reset and sent to your email address.';
+				}else{
+					$response['responseType'] = 'error';
+					$response['message'] = "We had trouble sending the message. Please contact the system administrator";
+				}
+				error_log($msg);
+				
+			}else{
+				$response['responseType'] = 'error';
+				$response['message'] = "There was a problem . Please contact the system administrator";
+			}
+			return $response;
+		}else{
+			$response['responseType'] = 'error';
+			$response['message'] = "We could not find a user account with that email address. Check for typos or contact the system administrator.";
+			return $response;
+		}
+	}
+
 
 /*
 	Method: getListOfUsers

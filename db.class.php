@@ -77,6 +77,12 @@ class db{
 		Method sendMessage
 		Sends a message from the current user to another user in the system.
 		Because both user and wishlist classes need access to this method, it's being defined here.
+		
+		senderId
+		receiverId
+		message
+		forceEmail
+		
 	*/
 	function sendMessage($args){
 		$cleanSenderId = $this->dbEscape($args['senderId']);
@@ -94,8 +100,10 @@ class db{
 		$subject = "New message from the Wishlist!";	
 		
 		if($usersResult['email_msgs'] == 1 || $cleanForceEmail == 1){
-			$mailresult = mail($usersResult['email'],$subject,$cleanMessage);
+			$mailresult = mail($usersResult['email'],$subject,stripslashes($args['message']));
+			return $mailresult;
 		}
+		return $result;
 	}
 	
 	function markMessageRead($messageId){

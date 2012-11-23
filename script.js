@@ -1,7 +1,7 @@
-debug = {}; /* This object is here to bring whatever you want out into the global space to look at.
+/* This object is here to bring whatever you want out into the global space to look at.
 	There are probably more elegant ways to do it, but meh.
 */
-
+debug = {};
 
 /*
 	Creates an alert element with the message and specified type.
@@ -9,30 +9,6 @@ debug = {}; /* This object is here to bring whatever you want out into the globa
 	@messge - The message you'd like to display in the alert
 	@type - error, info, success
 	returns - HTML element
-*/
-/*
-function createAlert(message,type){
-
-	var alertMessage = $(document.createElement('span'))
-						.attr("id","loginAlertMessage")
-						.html(message);
-						
-	var alertClose = $(document.createElement('a'))
-						.addClass("close")
-						.attr('data-dismiss','alert')
-						.attr("href","#")
-						.append("&times;");
-						
-	var alertContainer = $(document.createElement('div'))
-							.addClass("span4 offset4 alert alert-"+type);
-
-							
-	alertContainer
-		.append(alertMessage)
-		.append(alertClose);
-	
-	return alertContainer;							
-}
 */
 
 /*
@@ -46,8 +22,6 @@ function displayAlert(messageToAppend){
 	var message = $(document.createElement('li')).append(messageToAppend);
 	$("#alertInfo").append(message).fadeIn();	
 }
-
-
 
 
 /*
@@ -273,13 +247,40 @@ function logout(){
 	
 }
 
+/*
+	Method: requestResetPassword
+	Sends a request to the system to reset the password and send an email to the user's email address
+	
+	@emailAddress - The email address to search for to reset the password.
+	
+*/
+function requestResetPassword(emailAddress){
+	data = {
+		interact:'user',
+		action:'requestPasswordReset',
+		args:{'emailAddress':emailAddress}
+	}
+	showLoadingIndicator();
+		
+	jQuery.post('ajaxCalls.php',data,function(response){
+			hideLoadingIndicator();
+			if(response.responseType){
+				$("#passwordRecovery").modal('hide');
+				displayAlert(response.message);
+			}
+	},"json");
+}
+
+
+
+
 function getCurrentUserList(includeReceived){
 	data = {
 		interact:'wishlist',
 		action:'getCurrentUserWishlist',
 		args:{'includeReceived':includeReceived}
 	}
-	showLoadingIndicator()
+	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		storedData.userWishlist = response;

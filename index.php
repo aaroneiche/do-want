@@ -161,6 +161,17 @@ include 'config.php';
 			});
 			
 			
+			$("#forgotPassword").click(function(){
+				$("#passwordRecovery").modal("show");
+			});
+			
+			$("#passwordRecoverySubmit").click(function(){
+				var email = $("#recoveryEmailAddress").val();
+				if(email.length > 0){
+					requestResetPassword(email);
+				}
+			})
+			
 			
 			//binds firing the update images event to the loading of the relevant iframe.
 			//Most of this should be rewritten into a method on script.js
@@ -638,7 +649,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	<div class="row" id="additionalInfo">
 		<!-- A great place for extra buttons, messages, etc. -->
 		<div class="span4 offset4">
-			<button id="requestAccount" type="button" class="btn btn-small">Request an Account</button> <button type="button" class="btn btn-small disabled" disabled>I Forgot my password</button>
+			<button id="requestAccount" type="button" class="btn btn-small">Request an Account</button> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button>
 		</div>
 	</div>
 	<div class="row" id="alertLocation">
@@ -756,6 +767,31 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		  <div class="modal-footer">
 		  </div>
 	</div>
+
+	<div class="modal hide fade" id="passwordRecovery">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h2>Password Recovery</h2>
+		  </div>
+		  <div class="modal-body">
+			<p>Type your email address into the field below and press the "Request Password Reset" button to reset your password.</p>
+			<form class="form-horizontal">
+				<div class="control-group">
+					<label class="control-label" for="recoveryEmailAddress">Email Address</label>
+					<div class="controls">
+						<input class="input-medium" type="text" id="recoveryEmailAddress"/>
+						<span class="help-inline"></span>
+					</div>
+				</div>
+			</form>
+		  </div>
+		  <div class="modal-footer">
+			    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+				<a href="#" id="passwordRecoverySubmit" class="btn btn-primary">Request Password Reset</a>				
+		  </div>
+	</div>	
+
+
 </div>
 
 <a href="#" id="versionNumber">v<?php print VERSION; ?></a>
