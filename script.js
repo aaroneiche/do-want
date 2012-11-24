@@ -654,7 +654,9 @@ function renderItemTools(itemObject, toolInfo){
 			
 
 			itemReceive.click(function(){
-				markItemReceived($(this).closest("tr").attr("data-itemId"));
+				//markItemReceived($(this).closest("tr").attr("data-itemId"));
+				displayConfirmScreen($(this).closest("tr").attr("data-itemId"),"item","markReceived")
+				
 				/*
 				alert("Marked Received: "+
 				$(this).closest("tr").attr("data-itemId"))
@@ -666,12 +668,14 @@ function renderItemTools(itemObject, toolInfo){
 			});
 
 			itemDelete.click(function(){
-				deleteItem($(this).closest("tr").attr("data-itemId"));
+				displayConfirmScreen($(this).closest("tr").attr("data-itemId"),"item","deleteItem")				
+				//$("#confirmActivityBlock").modal('show');
+				//deleteItem($(this).closest("tr").attr("data-itemId"));
 			});
 
-			toolBox.append(itemReceive);
+			toolBox.append(itemDelete);	
 			toolBox.append(itemEdit);
-			toolBox.append(itemDelete);				
+			toolBox.append(itemReceive);			
 		break;
 		case "shop":
 
@@ -800,6 +804,9 @@ function buildShopForSet(){
 		listOfUsersTable = $("#listOfUsersTable");
 		shopForTable = $("#currentShopFor");
 		
+		var messageRecipients = $("select#messageRecipient");
+		messageRecipients.empty();
+		
 		shopForTable.empty();
 		
 		$(response).each(function(i,e){
@@ -818,12 +825,9 @@ function buildShopForSet(){
 							});				
 			}
 			shopForCell.append(shoppingForState);
-			
 						
 			shopForRow.append(shopForCell);
 			shopForTable.append(shopForRow);			
-
-
 
 			if(e.pending == 0){
 				userRow = $(document.createElement("tr"));
@@ -832,12 +836,7 @@ function buildShopForSet(){
 							.attr("data-userid",e.userid)
 							.attr("id","listRowUser-"+e.userid);
 			
-				//I was using the extend method of jQuery here to simply duplicate the object
-				//but it was causing problems in terms of one table or the other.
-
-
 				nameCell.click(function(e){
-				
 					getUserWishlist($(e.target).attr("data-userid"));
 
 					//Sets the request to fire the slideshow transition onclick.
@@ -847,6 +846,10 @@ function buildShopForSet(){
 				userRow.append(nameCell);			
 				listOfUsersTable.append(userRow);
 			}
+			
+			var recipient = $(document.createElement("option")).val(e.userid).html(e.fullname);
+			messageRecipients.append(recipient);
+			
 		});
 		
 		
@@ -925,6 +928,7 @@ function deleteItem(itemId){
 		hideLoadingIndicator();
 		if(response){
 			getCurrentUserList(listReceived);
+			$("#confirmActivityBlock").modal('hide');
 		}
 		
 	});
@@ -951,6 +955,7 @@ function markItemReceived(itemId){
 		hideLoadingIndicator();
 		if(response){
 			getCurrentUserList(listReceived);
+			$("#confirmActivityBlock").modal('hide');
 		}
 		
 	});
@@ -1353,8 +1358,10 @@ function deleteUserFromSystem(userId){
 		
 	}
 	jQuery.post('ajaxCalls.php',data,function(response){
-		$("#deleteConfirmBlock").modal('hide');
-		displaySystemUsers();
+		if(response){
+			$("#confirmActivityBlock").modal('hide');
+			displaySystemUsers();
+		}
 	});
 }
 
@@ -1394,8 +1401,8 @@ function displaySystemUsers(){
 										.append("Delete user")
 										.click(function(){
 											//Set the form delete ID to the userId provided and show the warning Modal.
-											$("#deleteObjectForm #deleteObjectId").val($(this).closest("tr").attr("data-userId"))
-											$("#deleteConfirmBlock").modal('show');
+											$("#deleteObjectForm #deleteObjectId").val($(this).closest("tr").attr("data-userId"));
+											displayConfirmScreen($(this).closest("tr").attr("data-userid"),"user","deleteUser");
 										});
 									
 									
@@ -1526,7 +1533,9 @@ function approveShopper(shopperId){
 			'shopperId':shopperId
 		}
 	}
-	jQuery.post('ajaxCalls.php',data,function(response){	
+	showLoadingIndicator();
+	jQuery.post('ajaxCalls.php',data,function(response){
+		hideLoadingIndicator();
 		displayShopForMeList();
 	},"json");
 }
@@ -1678,3 +1687,66 @@ function markMessageRead(messageId){
 		getMessagesForUser(userId,0);
 	},"json");
 }
+
+
+/*
+	Method displayConfirmScreen
+	Displays confirmation screen for marking an item received, delete an item or deleting a user.
+	
+*/
+function displayConfirmScreen(objectId,objectType,action){
+	$("a.confirmButton").hide();
+
+	$("#confirmObjectId").val("").val(objectId);
+	$("#confirmType").val("").val(objectType);
+	
+	switch(action){
+		case "deleteItem":
+			$("#deleteSubmit").show();
+			$("#confirmWarningMessage").html("Are you sure you want to delete this item? This cannot be undone.");		
+		break;
+		case "markReceived":
+			$("#receivedSubmit").show();
+			$("#confirmWarningMessage").html("Are you sure you want to mark this item as received? You may mark it as not-received in the manage screen later.");
+		break;
+		case "deleteUser":
+			$("#deleteUserSubmit").show();
+			$("#confirmWarningMessage").html("Warning! You are deleting a user on the system. If you continue, they will not be able to log in or access any of their items. A Deleted user cannot be recovered!");
+		break;
+	}
+	$("#confirmActivityBlock").modal('show');
+}
+
+/*
+	Method sendMessage
+	Sends a message to a given recipient.
+*/
+
+function sendMessage(){
+	var msgText = $("#messageText").val();
+	var msgRecipient = $("#messageRecipient").val();
+	
+	data = {
+		interact:'db',
+		action:'sendMessage',
+		args:{
+			"senderId":userId,
+			"receiverId":msgRecipient,
+			"message":msgText,
+			"forceEmail":false
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){
+		$("#sendMessageBlock").modal("hide");
+		
+	},"json");
+}
+
+
+
+
+
+
+
+
+

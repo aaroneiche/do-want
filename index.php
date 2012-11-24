@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.2");
+define("VERSION","0.9.4");
 
 include 'config.php';
 ?>
@@ -282,6 +282,26 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				});
 			});
 
+			$("a#receivedSubmit").click(function(){
+				markItemReceived($("#confirmObjectForm #confirmObjectId").val());
+			});
+
+			$("a#deleteSubmit").click(function(){
+				deleteItem($("#confirmObjectForm #confirmObjectId").val());
+			});			
+
+			$("a#deleteUserSubmit").click(function(){
+				deleteUserFromSystem($("#confirmObjectForm #confirmObjectId").val());
+			});			
+
+			$("#sendAMessage").click(function(){
+				$("#sendMessageBlock").modal("show");
+			})
+			
+			$("#messageSubmit").click(function(){
+				sendMessage();
+			});
+
 			displayShopForMeList();
 			setupUserSearch();
 			getMessagesForUser(userId,0);
@@ -419,7 +439,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		
 			<div class="control-group">
 				<label class="control-label" for="sourcePrice">Source Price:</label>
-				<div class="controls">
+				<div class="controls input-prepend">
+					<span class="add-on">$</span>
 					<input type="text" id="sourcePrice"/>
 				</div>
 			</div>
@@ -472,27 +493,56 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  </div>
 </div>
 
-<div class="modal hide fade" id="deleteConfirmBlock">
-	<form id="deleteObjectForm">
+<div class="modal hide fade" id="confirmActivityBlock">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Are you Sure?</h2>
+	</div>
+	<div class="modal-body">	
+		<p id="confirmWarningMessage"></p>
+	</div>
+	<div class="modal-footer">
+		<form id="confirmObjectForm">
+			<input type="hidden" id="confirmObjectId" />
+			<input type="hidden" id="confirmType" />
+			<input type="hidden" id="confirmAction" />
+
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+			<a href="#" id="deleteSubmit" class="confirmButton btn btn-danger">Yes, Delete Item</a>
+			<a href="#" id="receivedSubmit" class="confirmButton btn btn-success">Yes, Mark Received</a>
+			<a href="#" id="deleteUserSubmit" class="confirmButton btn btn-danger">Yes, Delete This User</a>
+		</form>		
+	</div>
+</div>
+
+<div class="modal hide fade" id="sendMessageBlock">
+	<form class="form-horizontal">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h2>Are you Sure?</h2>
+			<h2>Send a Message</h2>
 		</div>
 		<div class="modal-body">
-			<input type="hidden" id="deleteObjectId" />
-			<input type="hidden" id="deleteType" />
-			<p id="deleteWarningMessage">
-				Warning! You are deleting a user on the system. If you continue, they will not be able to log in or access any of their items.
-				A Deleted user cannot be recovered!
-			</p>
+			<div class="control-group">
+				<label class="control-label" for="">Recipient</label>
+				<div class="controls">
+					<select id="messageRecipient">
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="messageText">Message Text</label>
+				<div class="controls">
+					<textarea id="messageText">
+					</textarea>
+				</div>
+			</div>						
 		</div>
 		<div class="modal-footer">
-			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
-			<a href="#" id="deleteSubmit" class="btn btn-danger">Yes, Delete</a>
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>			
+			<a href="#" id="messageSubmit" class="btn btn-info">Send Message</a>
 		</div>
 	</form>
 </div>
-
 <div class="row">
 	<div class="span8 offset2">
 		
@@ -522,20 +572,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>		
 	</div>
 </div>
-<!--
-<div class="row">
-	<div id="tabSetContainer" class="span8 offset2">		
-		<div class="btn-group" data-toggle="buttons-radio">
-			<a href="#" class="btn" id="myListTab" data-section="myList">My Wishlist</a>
-			<a href="#" class="btn" id="otherListsTab" data-section="otherLists">Other People's Lists</a>
-			<a href="#" class="btn" id="shoppingListTab" data-section="shoppingList">My Shopping List</a>
-			<a href="#" class="btn" id="manageTab" data-section="manage">
-				Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
-			</a>
-		</div>
-	</div>
-</div>
--->
 <div class="row">
 	<div id="pageBlock" class="span8 offset2">
 		<div id="myList" class="section">
@@ -582,7 +618,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<h3>Messages</h3>
 					<table id="userMessages" class="table table-striped table-bordered table-condensed">
 					</table>
-					<button class="btn btn-primary btn-mini" disabled>Send a Message</button>
+					<button id="sendAMessage" class="btn btn-primary btn-mini">Send a Message</button>
 				</div>				
 			</div>
 			<div class="row">
@@ -598,12 +634,16 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
 					</table>
-					<input type="hidden" id="userToRequest">
-					Search for a user to add: <input type="text" id="shopForSearch" class="typeahead">
-					<span id="clearShopFor">&times;</span>
-					<button id="requestShopForButton" class="btn btn-primary btn-mini">Add User</button>
-				</div>
-			</div>			
+					<div class="input-append">
+						<form class="form-search" onsubmit="return false;">
+							<input type="hidden" id="userToRequest">							
+							<input type="text" id="shopForSearch" class="typeahead" placeholder="Search for a User">
+							<button id="clearShopFor" class="btn">&times;</button>	
+							<button id="requestShopForButton" class="btn btn-primary search-query" type="submit">Add User</button>
+						</form>							
+					</div>					
+				</div>				
+			</div>	
 			<?php if($_SESSION['admin'] == 1){ ?>
 			<div class="row">
 				<div class="span8">

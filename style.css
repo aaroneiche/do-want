@@ -19,11 +19,6 @@ body{
 	display:none;
 }
 
-#pageContainer{
-	border:solid black 1px;
-	margin-bottom: 10px;
-}
-
 .expandButton{
 	float:right;
 }
@@ -191,5 +186,10 @@ div#alertInfo{
 	position: fixed;
 }
 
+form#confirmObjectForm{
+	margin:0px;
+}
 
-
+input.typeahead#shopForSearch{
+	margin-top:0px;
+}
