@@ -78,10 +78,10 @@ class db{
 		Sends a message from the current user to another user in the system.
 		Because both user and wishlist classes need access to this method, it's being defined here.
 		
-		senderId
-		receiverId
-		message
-		forceEmail
+		senderId - The id of the Sender
+		receiverId - The id of the receiver
+		message - The Text of the Message
+		forceEmail - If this is true, email will be sent regardless of preference.
 		
 	*/
 	function sendMessage($args){
@@ -90,7 +90,21 @@ class db{
 		$cleanMessage = $this->dbEscape($args['message']);
 		$cleanForceEmail = $this->dbEscape($args['forceEmail']);
 		
+		
 		$emailQuery = "select {$this->options["table_prefix"]}users.*, (select {$this->options["table_prefix"]}users.fullname from {$this->options["table_prefix"]}users where {$this->options["table_prefix"]}users.userid = $cleanSenderId) as senderFullname from {$this->options["table_prefix"]}users where userid = $cleanReceiverId";
+		
+		/*
+		//This should be a compatible table prefix version of the above query. Kept here for later.
+		
+		$emailQuery = "Select u.*, 
+			(select u.fullname 
+				from {$this->options["table_prefix"]}users as u 
+				where u.userid = $cleanSenderId) 
+			as senderFullname
+		from 
+			{$this->options["table_prefix"]}users as u
+		where u.userid = $cleanReceiverId";
+		*/
 		
 		$usersResult = $this->dbAssoc($this->dbQuery($emailQuery));
 

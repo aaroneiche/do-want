@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.4");
+define("VERSION","0.9.5");
 
 include 'config.php';
 ?>
@@ -108,14 +108,13 @@ include 'config.php';
 			},
 		];
 
-
 		storedData.columns2 = storedData.columns.slice(0);
 		storedData.columns2.splice(4,0,{
 			"columnName":"Status",
 			"displayColumn":"displayStatus",
 			"sortFunctions":[]
 		});
-		
+	
 		storedData.modalTree = [];
 		
 		
@@ -123,6 +122,11 @@ include 'config.php';
 			$("#tabSetContainer a")
 				.click(function(e){showSection(e);})
 				.button();
+
+			$("a#shoppingListTab").click(function(){
+				getShoppingList();				
+			})
+
 
 			$("ul.nav li a.navLink")
 				.click(function(e){showSection2(e);});
@@ -225,7 +229,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			getCurrentUserList();
 			buildShopForSet();
 						
-			buildRankSelect(5,"#itemRankInput");
+			buildRankSelect("#itemRankInput");
 			buildCategorySelect(storedData.categories,"#itemCategoryInput");
 
 			jQuery("#myCarousel").carousel('pause');
@@ -274,8 +278,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 			$("#addSourceButton").click(function(){
 				clearItemSourceForm();
-//				$("#itemSourceFormBlock #itemId").val($("form#manageItemForm input#itemId").val());
 
+				//Set the itemID to get info for.
+				$("#itemSourceForm #sourceItemId").val($("form#manageItemForm input#itemId").val());
+				
 				$("#manageItemFormBlock").modal("hide");
 				$("#itemSourceFormBlock").modal("show").on('hide',function(){
 					$("#manageItemFormBlock").modal('show');
@@ -337,10 +343,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  <div class="modal-body">
 		<form id="manageItemForm" class="form-horizontal" onsubmit="return false;">
 			<input type="hidden" id="itemId" />
-			<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input id="itemDescriptionInput"/></div></div>
+			<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input type="text" id="itemDescriptionInput"/></div></div>
 			<div class="control-group"><label class="control-label" for="itemRankingInput">Item Rank:</label><div class="controls"><select id="itemRankInput"></select></div></div>				
 			<div class="control-group"><label class="control-label" for="itemCategoryInput">Item Category:</label><div class="controls"><select id="itemCategoryInput"></select></div></div>
-			<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input id="itemQuantityInput" class="input-mini"/></div></div>
+			<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input type="text" id="itemQuantityInput" class="input-mini"/></div></div>
 			<div class="control-group">
 				<label class="control-label" for="itemCommentInput">Item Comment:</label>
 				<div class="controls">
@@ -440,7 +446,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="control-group">
 				<label class="control-label" for="sourcePrice">Source Price:</label>
 				<div class="controls input-prepend">
-					<span class="add-on">$</span>
+					<span class="add-on"><?php echo $options['currency_symbol']?></span>
 					<input type="text" id="sourcePrice"/>
 				</div>
 			</div>
@@ -543,6 +549,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		</div>
 	</form>
 </div>
+
 <div class="row">
 	<div class="span8 offset2">
 		
@@ -557,7 +564,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			    <ul class="nav">			
 					<li><a href="#" id="myListTab" class="navLink" data-section="myList">My Wishlist</a></li>
 					<li><a href="#" id="otherListsTab" class="navLink" data-section="otherLists">Other People's Lists</a></li>
-					<!-- <li><a href="#" id="shoppingListTab" class="navLink" data-section="shoppingList">My Shopping List</a></li> -->
+					<li><a href="#" id="shoppingListTab" class="navLink" data-section="shoppingList">My Shopping List</a></li>
 					<li><a href="#" id="manageTab" class="navLink" data-section="manage">
 						Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
 					</a></li>
@@ -565,7 +572,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			    </ul>
 			    <ul class="nav pull-right">			
 					<li><a href="#" onclick="logout();" id="logoutButton">Logout</a></li>
-					<!-- <li><a href="#" id="helpButton">?</a></li> -->
+					<!-- <li><a href="#" id="helpButton"><span class="badge badge-inverted">?</span></a></li> -->
 				</ul>
 			</div>
 		  </div>
@@ -594,7 +601,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</table>
 				</div>
 				<div class="item">
-					<h2>Wishlist:</h2>
+					<h2 id="otherWishlistTitle">Wishlist:</h2>
 					<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left icon-white"></i> Back to Users</a>
 					<div id="otherUserWishlistBlock" class="tableBlock">
 						<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
@@ -606,7 +613,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 		</div>
 		<div id="shoppingList" class="section">
-			Shopping List
+			<h2>My Shopping List</h2>
+			<div class="row">
+				<div class="span8">
+					<table id="shoppingListTable" class="table table-striped table-bordered table-condensed">
+					</table>
+				</div>
+			</div>
 		</div>
 		<div id="manage" class="section">
 			<h2>User Settings</h2>
@@ -637,9 +650,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<div class="input-append">
 						<form class="form-search" onsubmit="return false;">
 							<input type="hidden" id="userToRequest">							
-							<input type="text" id="shopForSearch" class="typeahead" placeholder="Search for a User">
-							<button id="clearShopFor" class="btn">&times;</button>	
+							<input type="text" id="shopForSearch" class="typeahead input-medium" placeholder="Search for a User">
 							<button id="requestShopForButton" class="btn btn-primary search-query" type="submit">Add User</button>
+							<button id="clearShopFor" class="btn">&times;</button>							
 						</form>							
 					</div>					
 				</div>				

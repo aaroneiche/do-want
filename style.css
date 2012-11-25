@@ -139,7 +139,7 @@ td.floatRight{
 }
 
 td.item_Tools{
-	min-width:60px;
+	min-width:130px;
 }
 
 
@@ -193,3 +193,24 @@ form#confirmObjectForm{
 input.typeahead#shopForSearch{
 	margin-top:0px;
 }
+
+li a#helpButton{
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+li a#helpButton span{
+	padding-left:2px;
+	padding-right:3px;
+	text-shadow:none;
+	color:white;
+}
+
+td.currency{
+	text-align:right;
+}
+
+td.bold{
+	font-weight:bold;
+}
+

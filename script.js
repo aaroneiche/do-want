@@ -893,13 +893,24 @@ function buildCategorySelect(categoryObject,parentElement){
 		array @rankObject - a javascript array of objects that contain category names and ids.
 		string @parentElement - the element where these items should be appened to.
 */
-function buildRankSelect(rankCount,parentElement){
+function buildRankSelect(parentElement){
 	var rankOptionsList = "";
-
-	for(var i = 1; i <= rankCount; i++){
-	        var rankOption = '<option value="'+i+'">'+i+'</option>';
-	        jQuery(parentElement).append(rankOption);
+	
+	data = {
+		interact:'wishlist',
+		action:'getRanks'
 	}
+	
+	//Get the Categories.
+	jQuery.post('ajaxCalls.php',data,function(response){
+		var select = $(parentElement);
+		
+		$(response).each(function(i,e){
+			 var rankOption = $(document.createElement('option')).val(e.ranking).html(e.title);
+			 select.append(rankOption);
+		});
+	
+	},"json");
 
 }
 
@@ -1259,9 +1270,12 @@ function populateManageUserForm(userId){
 		//We need some logic for these when the logged in user is not an Admin, and these elements don't exist.
 		var userApproved = (response.approved == 1)?true:false;
 		var userAdmin = (response.admin == 1)?true:false;
+		var userEmailMsg = (response.email_msgs == 1)?true:false;
+		
 		
 		$("#userApproved").prop("checked",userApproved);
 		$("#userIsAdmin").prop("checked",userAdmin);
+		$("#emailMessages").prop("checked",userEmailMsg);
 		
 		$("#userFormBlock").modal();
 		
@@ -1291,9 +1305,12 @@ function updateUserData(){
 	for(fieldName in fields){
 		args[fieldName] = $(fields[fieldName]).val();
 	}
+
+	var emailCheck = $("#manageUser #emailMessages:checked");
 	
 	var approvedCheck = $("#manageUser #userApproved:checked");
 	var adminCheck = $("#manageUser #userIsAdmin:checked");
+
 
 	for(field in args){
 		if(args[field].length == 0){
@@ -1303,7 +1320,11 @@ function updateUserData(){
 			return false;	
 		}
 	}
-	
+
+	if(emailCheck != undefined && emailCheck.length > 0){
+		args.emailMsg = 1;
+	}	
+		
 	if(approvedCheck != undefined && approvedCheck.length > 0){
 		args.approved = 1;
 	}
@@ -1742,7 +1763,45 @@ function sendMessage(){
 	},"json");
 }
 
+/*
+	Method getShoppingList()
+	Gets all items which have not yet been purchased by the user.
+	
+	@userid - the user id of the user for the requested shopping list.
 
+*/
+
+function getShoppingList(){
+	data = {
+		interact:'wishlist',
+		action:'getShoppingList',
+		args:{
+			"userid":userId
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		var shoppingListTable = $("#shoppingListTable").empty();
+		var listTotal = 0;
+		
+		$(response).each(function(i,e){
+			var itemDesc = $(document.createElement("td")).append(e.description);
+			var forName = $(document.createElement("td")).append(e.fullname);
+			var quantity = $(document.createElement("td")).append(e.quantity);
+			var bestPrice = $(document.createElement("td")).append(storedData.currencySymbol+e.bestPrice).addClass("currency");
+			
+			var row = $(document.createElement("tr")).append(itemDesc,forName,quantity,bestPrice);
+			listTotal = Number(e.bestPrice)+Number(listTotal);
+			
+			shoppingListTable.append(row);
+		});
+		
+		var cellName = $(document.createElement("td")).append("Total:").attr("colspan","3").addClass("bold");
+		var cellTotal = $(document.createElement("td")).append(storedData.currencySymbol+listTotal).addClass("currency bold");
+		var totalRow = $(document.createElement("tr")).append(cellName,cellTotal);
+		shoppingListTable.append(totalRow);
+		
+	},"json");
+}
 
 
 

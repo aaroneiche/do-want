@@ -48,7 +48,7 @@ class wishlist extends db{
 				
 		}else{
 	
-	
+			$list = array();
 		$query = "select 
 			   items.itemid,
 			   items.description,
@@ -69,31 +69,75 @@ class wishlist extends db{
 				join {$this->options['table_prefix']}shoppers on shopper = '{$_SESSION['userid']}' and mayshopfor = '{$args['shopForId']}'
 				left join {$this->options['table_prefix']}allocs on allocs.itemid = items.itemid and allocs.userid = '{$_SESSION['userid']}'
 				where items.`userid` = '{$args['shopForId']}'";
+				
+//		error_log($query);
+
 			$result = $this->dbQuery($query);
-			
-			
-			$list = $this->dbAssoc($result);
+			$list = $this->dbAssoc($result,true);
 
 			if($list != null){
-				foreach($list as &$listItem){
 
-					if($listItem['reservedByThisUser'] == null){
-						$listItem['reservedByThisUser'] = 0;
-					}
+				foreach($list as $index => $listItem){
+					
+						if(!isset($listItem['reservedByThisUser'])){
+							$list[$index]['reservedByThisUser'] = 0;
+						}
 
-					if($listItem['boughtByThisUser'] == null){
-						$listItem['boughtByThisUser'] = 0;
-					}
+						if(!isset($listItem['boughtByThisUser'])){		
+							$list[$index]['boughtByThisUser'] = 0;
+						}
 				
-					if($listItem['available'] == null){
-						$listItem['available'] = $listItem['quantity'];
-					}
+						if(!isset($listItem['available'])){
+							$list[$index]['available'] = $listItem['quantity'];							
+						}
 				
-				}
+					}
 				return $list;
 			}
 		}
 	}
+	
+	
+	/*
+	Method: getShoppingList
+		Gets a list of items which the current user has reserved.
+		
+		@userid - The ID of the user to get the list for.
+	*/
+	function getShoppingList($args){
+		
+		$cleanUserId = $this->dbEscape($args['userid']);
+
+		/*		
+		$query = "select {$this->options['table_prefix']}items.* from {$this->options['table_prefix']}items, {$this->options['table_prefix']}allocs where {$this->options['table_prefix']}items.itemid = {$this->options['table_prefix']}allocs.itemid and {$this->options['table_prefix']}allocs.`bought` != 1 and {$this->options['table_prefix']}allocs.`quantity` > 0 and allocs.userid = $cleanUserId";
+		*/
+
+		$query ="select 
+			i.description, 
+			u.fullname, 
+			a.quantity, 
+			(select min(sis.sourceprice)
+				from itemsources as sis, items as si
+				where sis.itemid = i.itemid) as bestPrice
+		from 
+			{$this->options['table_prefix']}items as i, 
+			{$this->options['table_prefix']}allocs as a, 
+			{$this->options['table_prefix']}users as u 
+		where 
+			i.itemid = a.itemid and 
+			a.quantity > a.`bought` and 
+			a.`quantity` > 0 and 
+			a.userid = $cleanUserId and 
+			u.userid = i.userid";
+
+		$result = $this->dbQuery($query);
+		if($this->dbRowCount($result) > 0){
+			$shoppingList = $this->dbAssoc($result,true);
+			
+			return $shoppingList;
+		}
+	}
+	
 	
 	/*
 	Method: getCurrentCount	
@@ -833,9 +877,18 @@ class wishlist extends db{
 		return $this->dbAssoc($sourceResult);
 	}
 
+	/*
+		Method getRanks
+		Fetches a list of Ranks, Rank titles.
+	*/
+	function getRanks(){
+		$query = "select r.* from {$this->options['table_prefix']}ranks as r";
+		return $this->dbAssoc($this->dbQuery($query));
+	}
+
 }
 
-
+	
 
 	
 

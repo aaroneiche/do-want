@@ -180,7 +180,7 @@ class user extends db{
 	function getUser($args){
 		if($_SESSION['userid'] == $args['userid'] || $_SESSION['admin'] == 1){
 			$cleanUserId = $this->dbEscape($args["userid"]);
-			$query = "select username, fullname, userid, email, admin, approved from users where userid = '{$cleanUserId}'";
+			$query = "select username, fullname, userid, email, email_msgs, admin, approved from users where userid = '{$cleanUserId}'";
 		
 			$result = $this->dbQuery($query);
 			return $this->dbAssoc($result);
@@ -212,6 +212,7 @@ class user extends db{
 		$cleanPassword = $this->dbEscape($args['password']);
 		$cleanFullname = $this->dbEscape($args['fullname']);
 		$cleanEmail = $this->dbEscape($args['email']);
+		$cleanEmailMsg = $this->dbEscape($args['emailMsg']);
 		$cleanApproved = ($this->dbEscape($args['approved']) == 1)?1:0; 
 		$cleanAdmin = ($this->dbEscape($args['admin']) == 1)?1:0;
 		
@@ -220,7 +221,7 @@ class user extends db{
 			
 				$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
 				
-				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail',$cleanApproved,$cleanAdmin)";
+				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail','$cleanEmailMsg',$cleanApproved,$cleanAdmin)";
 				
 			break;
 			case 'edit':
@@ -233,8 +234,7 @@ class user extends db{
 					$passwordSQL = "";
 				}
 				
-				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', $passwordSQL
-							approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserId}'";			
+				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', email_msgs='{$cleanEmailMsg}' ,$passwordSQL approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserId}'";			
 			break;
 			case 'delete':
 				$query = "DELETE FROM {$this->options["table_prefix"]}users WHERE userid = '{$cleanUserId}'";
