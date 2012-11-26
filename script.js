@@ -200,6 +200,15 @@ function displayItemsDetails(itemInfo){
 	$("#itemDetailsModal").modal('show');
 }
 
+/*
+	Method: displayRanks
+	
+	Gets the list of ranks from the server and displays them on the manage tab.
+	
+*/
+function displayRanks(){
+	
+}
 
 function login(){
 
@@ -583,9 +592,6 @@ function renderRanking(rankValue){
 		case "5":
 			myClass = "five";
 		break;
-		default:
-			console.log(typeof rankValue);
-		break;								
 	}
 	
 	rankReturn.addClass(myClass);
@@ -868,7 +874,7 @@ function buildShopForSet(){
 		array @categoryObject - a javascript array of objects that contain category names and ids.
 		string @parentElement - the element where these items should be appened to.
 */
-function buildCategorySelect(categoryObject,parentElement){
+function buildCategorySelect(){
 
 	//Set these to defaults if they're not defined in the call
 	//I don't think these are necessary any longer because this is no longer generated on the fly.
@@ -876,14 +882,53 @@ function buildCategorySelect(categoryObject,parentElement){
 //	categoryObject = (categoryObject == undefined)? storedData.categories: categoryObject;
 //	parentElement = (parentElement == undefined)?".categorySelect": parentElement;
 
-	jQuery(categoryObject).each(function(i,e){
+	var table = $("table#categoriesTable").empty();
+
+	jQuery(storedData.categories).each(function(i,e){
 		var option =  jQuery(document.createElement("option"))
 							.attr("value",e.categoryid)
 							.html(e.category);
-		jQuery(parentElement).append(option);
+		jQuery("select#itemCategoryInput").append(option);
+				
+		var editCategory = $(document.createElement('button'))
+								.append("edit")
+								.addClass("btn btn-mini pull-right")
+								.click(function(){
+									$("input#categoryId").val(e.categoryid);
+									$("input#categoryName").val(e.category);
+									$('div#manageCategoryFormBlock').modal('show');
+								});
+								
+		var catTd = $(document.createElement('td'))
+						.append(e.category,editCategory);
+
+		var row = $(document.createElement('tr'))
+						.append(catTd);	
+		
+		table.append(row);
+		
 	});
 		
 }
+
+/*
+	Method: remoteBuildCategorySelect
+	Allows for the remote update of categories object and then update of categories listings.
+*/
+
+function remoteBuildCategorySelect(){
+	data = {
+		interact:'wishlist',
+		action:'getCategories'
+	}
+	
+	//Get the Categories.
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		storedData.categories = response;
+		buildCategorySelect();
+	},"json");
+}
+
 
 
 /*
@@ -893,7 +938,7 @@ function buildCategorySelect(categoryObject,parentElement){
 		array @rankObject - a javascript array of objects that contain category names and ids.
 		string @parentElement - the element where these items should be appened to.
 */
-function buildRankSelect(parentElement){
+function buildRankSelect(){
 	var rankOptionsList = "";
 	
 	data = {
@@ -903,13 +948,28 @@ function buildRankSelect(parentElement){
 	
 	//Get the Categories.
 	jQuery.post('ajaxCalls.php',data,function(response){
-		var select = $(parentElement);
+		var select = $("select#itemRankInput");
+		var table = $("table#rankingsTable").empty();
 		
 		$(response).each(function(i,e){
 			 var rankOption = $(document.createElement('option')).val(e.ranking).html(e.title);
 			 select.append(rankOption);
+			
+			var editRank = $(document.createElement('button'))
+								.append("edit")
+								.addClass("btn btn-mini pull-right")
+								.click(function(){
+									$("input#rankId").val(e.ranking);
+									$("input#rankTitle").val(e.title);
+									$('div#manageRankFormBlock').modal('show');
+								});
+								
+			var rankTd = $(document.createElement('td')).append(e.title,editRank);
+			var row = $(document.createElement('tr')).append(rankTd);	
+			
+			table.append(row);
 		});
-	
+					
 	},"json");
 
 }
@@ -1410,7 +1470,7 @@ function displaySystemUsers(){
 			
 			//We should probably expand on tool construction above - but barring that here are some quick tools for management.
 			var editUserButton = $(document.createElement("button"))
-									.addClass("btn btn-info btn-mini")
+									.addClass("btn btn-info btn-mini pull-right")
 									.append("Edit user")
 									.click(function(){
 										
@@ -1418,7 +1478,7 @@ function displaySystemUsers(){
 									});
 									
 			var deleteUserButton = $(document.createElement("button"))
-										.addClass("btn btn-danger btn-mini")
+										.addClass("btn btn-danger btn-mini pull-right")
 										.append("Delete user")
 										.click(function(){
 											//Set the form delete ID to the userId provided and show the warning Modal.
@@ -1430,8 +1490,8 @@ function displaySystemUsers(){
 									
 			
 			var userTools = $(document.createElement("td")).append();
-			userTools.append(editUserButton)
-					.append(deleteUserButton);
+			userTools.append(deleteUserButton)
+						.append(editUserButton);
 			
 			row.append(name)
 				.append(userName)
@@ -1803,6 +1863,52 @@ function getShoppingList(){
 	},"json");
 }
 
+/*
+	Method: manageRank
+	
+*/
+function manageRank(){
+	var rankId = $("input#rankId").val();
+	var rankTitle = $("input#rankTitle").val();
+	
+	var data = {
+		interact:'wishlist',
+		action:'manageRank',
+		args:{
+			"rankid":rankId,
+			"rankTitle":rankTitle
+		}
+	}
+
+	jQuery.post('ajaxCalls.php',data,function(response){
+		if(response){
+			buildRankSelect();
+		}
+		$('#manageRankFormBlock').modal('hide');
+	},"json");
+}
+
+/*
+	Method: manageCategory
+	
+*/
+function manageCategory(){
+	var catId = $("input#categoryId").val();
+	var catName = $("input#categoryName").val();
+	
+	data = {
+		interact:'wishlist',
+		action:'manageCategory',
+		args:{
+			"categoryid":catId,
+			"category":catName
+		}
+	}
+	jQuery.post('ajaxCalls.php',data,function(response){	
+		$('#manageCategoryFormBlock').modal('hide');
+			remoteBuildCategorySelect();
+	},"json");	
+}
 
 
 

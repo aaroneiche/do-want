@@ -400,14 +400,36 @@ class wishlist extends db{
 			case 'delete':
 				$query = "delete from items where itemid = {$this->dbEscape($args['itemid'])}";
 				
+				$reserveQuery = "select a.userid, u.fullname, i.`description` from {$this->options['table_prefix']}allocs as a, {$this->options['table_prefix']}users as u, {$this->options['table_prefix']}items as i where a.itemid = {$this->dbEscape($args['itemid'])} and i.itemid = a.itemid and u.userid = i.userid";
+				
 			break;			
 		}
 
-		$result = $this->dbQuery($query);
+
 		
 		if($args['itemAction'] == 'add'){
-			//$result
+			$result = $this->dbQuery($query);
 			return $this->dbLastInsertId();
+			
+		}else if($args['itemAction'] == 'delete'){
+
+			$reserveResult = $this->dbQuery($reserveQuery);
+				if($this->dbRowCount($reserveResult) > 0){
+					$reservations = $this->dbAssoc($reserveResult,true);
+															
+					foreach($reservations as $user){
+						$messageArgs = array(
+							"senderId" => 0,
+							"receiverId" => $user['userid'],
+							"message" => "This email was sent to notify you that ".$user['fullname']." has deleted ".$user['description']." from his/her list. ",
+							"forceEmail" => false);	
+						$this->sendMessage($messageArgs);
+					}
+				}
+				
+			//Last, we delete the item itself.	
+			$result = $this->dbQuery($query);
+			return $result;		
 		}else{
 			return $result;
 		}
@@ -878,12 +900,46 @@ class wishlist extends db{
 	}
 
 	/*
-		Method getRanks
+		Method: getRanks
 		Fetches a list of Ranks, Rank titles.
 	*/
 	function getRanks(){
 		$query = "select r.* from {$this->options['table_prefix']}ranks as r";
 		return $this->dbAssoc($this->dbQuery($query));
+	}
+
+	/*
+		Method: manageRank
+		Updates a Rank
+		TODO: Add in support for "renderedHTML" or similar solution
+		
+		@rankid - The ranking to use. This is also the sortColumn.
+		@rankTitle - The display title of the rank.
+	*/
+	function manageRank($args){
+		$cleanId = $this->dbEscape($args['rankid']); 
+		$cleanRank = $this->dbEscape($args['rankTitle']);
+		
+		$query = "update {$this->options['table_prefix']}ranks set title = '$cleanRank' where ranking = '$cleanId'";
+		$result = $this->dbQuery($query);
+		return $result;		
+	}
+
+	/*
+		Method: manageCategory
+		Updates a Category
+		
+		@categoryid - The ID of the category to display
+		@category - The display name of the category.
+		
+	*/
+	function manageCategory($args){
+		$cleanId = $this->dbEscape($args['categoryid']); 
+		$cleanCat = $this->dbEscape($args['category']);
+		
+		$query = "update {$this->options['table_prefix']}categories set category = '$cleanCat' where categoryid = '$cleanId'";
+		$result = $this->dbQuery($query);
+		return $result;
 	}
 
 }

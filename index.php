@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.5");
+define("VERSION","0.9.6");
 
 include 'config.php';
 ?>
@@ -11,9 +11,6 @@ include 'config.php';
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-<!-- These are the responsive tags, here so I can flip the switch later. -->
-
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<title>Wishlist</title>
@@ -141,7 +138,7 @@ include 'config.php';
 			});
 			
 			
-			$("#requestAccount").click(function(){
+			$("#requestAccount, #addUserButton").click(function(){
 				$("#manageUser input#userId").val("");
 				$("#manageUser input#userAction").val("add");
 				$("#manageUserSaveButton").html("Request Account");
@@ -229,8 +226,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			getCurrentUserList();
 			buildShopForSet();
 						
-			buildRankSelect("#itemRankInput");
-			buildCategorySelect(storedData.categories,"#itemCategoryInput");
+			buildRankSelect(); //"#itemRankInput"
+			buildCategorySelect(); //storedData.categories,"#itemCategoryInput"
 
 			jQuery("#myCarousel").carousel('pause');
 
@@ -306,6 +303,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			
 			$("#messageSubmit").click(function(){
 				sendMessage();
+			});
+
+			$("#saveRank").click(function(){
+				manageRank();
+			});
+
+			$("#saveCategory").click(function(){
+				manageCategory();
 			});
 
 			displayShopForMeList();
@@ -550,6 +555,52 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</form>
 </div>
 
+<div class="modal hide fade" id="manageRankFormBlock">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage Rank</h2>
+	</div>
+	<div class="modal-body"> 
+		<form id="manageRankForm" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="rankId" />
+			<div class="control-group">
+				<label class="control-label" for="rankTitle">Rank Title</label>
+				<div class="controls">
+					<input type="text" id="rankTitle"/>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="saveRank" class="btn btn-primary">Save changes</a>
+	</div>
+</div>
+
+<div class="modal hide fade" id="manageCategoryFormBlock">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h2>Manage Category</h2>
+	</div>
+	<div class="modal-body"> 
+		<form id="manageCategoryForm" class="form-horizontal" onsubmit="return false;">
+			<input type="hidden" id="categoryId" />
+			<div class="control-group">
+				<label class="control-label" for="categoryName">Category Title</label>
+				<div class="controls">
+					<input type="text" id="categoryName"/>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="saveCategory" class="btn btn-primary">Save changes</a>
+	</div>
+</div>
+
+
+
 <div class="row">
 	<div class="span8 offset2">
 		
@@ -651,7 +702,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 						<form class="form-search" onsubmit="return false;">
 							<input type="hidden" id="userToRequest">							
 							<input type="text" id="shopForSearch" class="typeahead input-medium" placeholder="Search for a User">
-							<button id="requestShopForButton" class="btn btn-primary search-query" type="submit">Add User</button>
+							<button id="requestShopForButton" class="btn btn-primary search-query" type="submit">Shop For User</button>
 							<button id="clearShopFor" class="btn">&times;</button>							
 						</form>							
 					</div>					
@@ -661,6 +712,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="row">
 				<div class="span8">
 					<h3>Users</h3>
+					<button id="addUserButton" class="btn btn-primary">Add User</button>					
 					<table id="adminUserList" class="table table-striped table-bordered table-condensed">
 
 					</table>
@@ -669,10 +721,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="row">
 				<div class="span4">
 					<h3>Categories</h3>
-					
+					<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
+						
+					</table>
 				</div>
 				<div class="span4">
-					<h3>Ratings</h3>					
+					<h3>Rankings</h3>					
+					<table id="rankingsTable" class="table table-striped table-bordered table-condensed">
+						
+					</table>					
 				</div>				
 			</div>
 			<?php } ?>							
@@ -803,7 +860,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<p>Do-want is a wishlist management system that helps families and friends organize gift exchanges.</p>
 			<p>Do-Want is released under a GPL 2.0 License</p>
 			<p>For more information, visit <a href="http://code.google.com/p/do-want/" target="_blank">http://code.google.com/p/do-want/</a></p>
-			<p><b>Do Want!</b> uses <a href="http://www.glyphicons.com/" target="_blank">GlyphIcons</a> by  Jan Kovařík  under the <a href="http://creativecommons.org/licenses/by/3.0/deed.en" target="_blank">CC-BY 3.0 license</a></p>
+			<p><b>Do Want!</b> was developed by Aaron Eiche and uses <a href="http://www.glyphicons.com/" target="_blank">GlyphIcons</a> by  Jan Kovařík  under the <a href="http://creativecommons.org/licenses/by/3.0/deed.en" target="_blank">CC-BY 3.0 license</a></p>
 		  </div>
 		  <div class="modal-footer">
 		  </div>
