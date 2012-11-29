@@ -30,5 +30,5 @@ $options['currency_symbol'] = '$';
 $options['large-icons'] = true; 
 
 //Outputs error information where available to a log if true. Not fully implemented.
-$options['logErrors'] = true; 
+$options['logErrors'] = false; 
 ?>

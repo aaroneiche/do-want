@@ -58,7 +58,6 @@ include 'config.php';
 		/*
 			Eventually we'll store this information in the DB somewhere so it can be changed at a whim.
 		*/
-		//storedData.currencySymbol = "$";
 		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
 		storedData.filepath = "<?php print $options['filepath'] ?>";
 		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
@@ -69,8 +68,8 @@ include 'config.php';
 				"displayColumn":"displayDescription",
 				"altDisplay":"--",
 				"sortFunctions":[
-					sortByDescriptionDesc,
-					sortByDescriptionAsc
+					sortByDescriptionAsc,
+					sortByDescriptionDesc
 				]
 			},
 			{
@@ -96,7 +95,10 @@ include 'config.php';
 				"columnName":"Category",
 				"displayColumn":"displayCategory",
 				"altDisplay":"--",				
-				"sortFunctions":[]
+				"sortFunctions":[
+					sortByCategoryAsc,
+					sortByCategoryDesc
+				]
 			},
 			{
 				"columnName":"Tools",

@@ -102,13 +102,21 @@ function displayWishlist(displayData){
 		
 		$(displayData.columns).each(function(i,e){
 				var th = $(document.createElement("th")).append(e.columnName)
+				var sortIcon = $(document.createElement("i")).addClass("sortIcon icon pull-right").attr("id","sort"+e.columnName)
+				th.append(sortIcon);
 				if(e.sortFunctions[0] != undefined){
 					th.toggle(
 						function() {
-							e.sortFunctions[0](displayData)
+							debug = this;
+							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
+
+							e.sortFunctions[0](displayData);
+							$(this).children("i").addClass("icon-chevron-up");
 						},
 						function(){
-							e.sortFunctions[1](displayData)
+							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
+							e.sortFunctions[1](displayData);
+							$(this).children("i").addClass("icon-chevron-down");
 						}
 					)
 				}
@@ -180,6 +188,9 @@ function displayWishlist(displayData){
 	
 			table.append(row);								
 		});	
+		
+		//displayData.currentSort.call(this,displayData.list);
+		
 	}else{
 		
 		var row = $(document.createElement('tr'));
@@ -323,20 +334,9 @@ function getUserWishlist(forUserId){
 	}
 	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
-
+		
 		userWishlistData = {};
 		userWishlistData.list = "";
-		
-		/*
-		if(response == null){
-			var row = $(document.createElement('tr'));
-			var td = $(document.createElement('td')).append("No items were found for this list");
-			row.append(td);
-			
-			$("#otherUserWishlist").append(row);
-			
-		}else
-		*/
 		
 		if(response != null && response.responseType != undefined && response.responseType == "error"){
 			errorMessage(response);
@@ -351,10 +351,11 @@ function getUserWishlist(forUserId){
 			userWishlistData.targetTable = "otherUserWishlist";
 			userWishlistData.columns = storedData.columns2;
 
+			storedData.otherUserWishlist = userWishlistData;
 			displayWishlist(userWishlistData);
 		}		
 		hideLoadingIndicator();
-	},"json");	
+	},"json");
 }
 
 /*
@@ -362,12 +363,14 @@ Javascript sort functions
 */
 
 function sortByPriceDesc(listObject){
+	listObject.currentSort = sortByPriceDesc;
 	listObject.list.sort(function(a,b){return a.minprice - b.minprice});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);
 }
 
 function sortByPriceAsc(listObject){
+	listObject.currentSort = sortByPriceAsc;
 	listObject.list.sort(function(a,b){return b.minprice - a.minprice});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);	
@@ -375,10 +378,11 @@ function sortByPriceAsc(listObject){
 
 
 function sortByDescriptionDesc(listObject){
+	listObject.currentSort = sortByDescriptionDesc;	
 	listObject.list.sort(function(a,b){
-			if(a.description > b.description){
+			if(a.description.toLowerCase() > b.description.toLowerCase()){
 				return -1;
-			}else if(a.description < b.description) {
+			}else if(a.description.toLowerCase() < b.description.toLowerCase()) {
 				return 1
 			}else{
 				return 0;
@@ -386,14 +390,14 @@ function sortByDescriptionDesc(listObject){
 		});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);
-
 }
 
-function sortByDescriptionAsc(listObject){	
+function sortByDescriptionAsc(listObject){
+	listObject.currentSort = sortByDescriptionAsc;
 	listObject.list.sort(function(a,b){
-		if(a.description > b.description){
+		if(a.description.toLowerCase() > b.description.toLowerCase()){
 			return 1;
-		}else if(a.description < b.description) {
+		}else if(a.description.toLowerCase() < b.description.toLowerCase()) {
 			return -1
 		}else{
 			return 0;
@@ -414,6 +418,37 @@ function sortByRankingAsc(listObject){
 	listObject.skipHeader = true;
 	displayWishlist(listObject);	
 }
+
+
+
+function sortByCategoryAsc(listObject){
+	listObject.list.sort(function(a,b){
+			if(a.displayCategory.toLowerCase() > b.displayCategory.toLowerCase()){
+				return -1;
+			}else if(a.displayCategory.toLowerCase() < b.displayCategory.toLowerCase()) {
+				return 1
+			}else{
+				return 0;
+			}
+		});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
+}
+
+function sortByCategoryDesc(listObject){
+	listObject.list.sort(function(a,b){
+			if(a.displayCategory.toLowerCase() > b.displayCategory.toLowerCase()){
+				return 1;
+			}else if(a.displayCategory.toLowerCase() < b.displayCategory.toLowerCase()) {
+				return -1
+			}else{
+				return 0;
+			}
+		});
+	listObject.skipHeader = true;
+	displayWishlist(listObject);
+}
+
 
 
 /*

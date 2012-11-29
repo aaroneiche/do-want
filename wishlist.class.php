@@ -395,7 +395,7 @@ class wishlist extends db{
 					where
 						itemid = {$this->dbEscape($args['itemid'])}
 				";
-			
+				error_log($this->dbEscape($args['quantity']));
 			break;
 			case 'delete':
 				$query = "delete from items where itemid = {$this->dbEscape($args['itemid'])}";
@@ -404,8 +404,6 @@ class wishlist extends db{
 				
 			break;			
 		}
-
-
 		
 		if($args['itemAction'] == 'add'){
 			$result = $this->dbQuery($query);
@@ -431,6 +429,7 @@ class wishlist extends db{
 			$result = $this->dbQuery($query);
 			return $result;		
 		}else{
+			$result = $this->dbQuery($query);			
 			return $result;
 		}
 	}

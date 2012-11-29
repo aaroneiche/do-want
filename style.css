@@ -36,7 +36,6 @@ th{
 	font-size:14pt;
 }
 
-
 #addEditItemForm{
 	position:relative;
 	border:1px solid black;
@@ -213,4 +212,13 @@ td.currency{
 td.bold{
 	font-weight:bold;
 }
+
+table#listOfUsersTable td{
+	cursor: pointer;
+}
+
+
+
+
+
 
