@@ -828,7 +828,6 @@ class wishlist extends db{
 
 			from itemsources where itemsources.itemid = '{$args['itemid']}'";
 
-		
 		$sourcesResult = $this->dbQuery($sourcesQuery);
 
 		$sourcesDetailArray = ($this->dbRowCount($sourcesResult) > 0 ) ? $this->dbAssoc($sourcesResult,true) : null;

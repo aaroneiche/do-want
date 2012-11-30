@@ -814,16 +814,13 @@ function renderItemTools(itemObject, toolInfo){
 
 			sourcePrimary = $(document.createElement("i"))
 							.addClass("tool");
-							
+			
 			if(itemObject.itemPrimarySource == 1){
 				sourcePrimary.addClass("icon-star").attr("title","Primary");
 			}else{
 				sourcePrimary.addClass("icon-star-open").attr("title","Set as Primary");
 			}				
 			
-			
-			debug = itemObject;
-							
 			if(storedData.largeIcons){
 				sourceDelete.addClass("icon-large");
 				sourceEdit.addClass("icon-large");
@@ -841,9 +838,9 @@ function renderItemTools(itemObject, toolInfo){
 				);
 			});
 
-			toolBox.append(sourcePrimary);
+			toolBox.append(sourceDelete);
 			toolBox.append(sourceEdit);
-			toolBox.append(sourceDelete);							
+			toolBox.append(sourcePrimary);
 		
 		break;		
 	}
