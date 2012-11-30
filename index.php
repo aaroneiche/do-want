@@ -114,8 +114,16 @@ include 'config.php';
 			"sortFunctions":[]
 		});
 	
-		storedData.modalTree = [];
+	
+		//set the default sorting for lists
+		//storedData.userWishlistSort = storedData.columns[0].sortFunctions[0];
+		//storedData.otherUserListSort = storedData.columns[0].sortFunctions[0];
+		storedData.userWishlist = {};
+		storedData.otherUserWishlist = {};
 		
+		storedData.userWishlist.currentSort = sortByDescriptionDesc;
+		storedData.otherUserWishlist.currentSort = sortByDescriptionDesc;
+				
 		
 		$(document).ready(function(){
 			$("#tabSetContainer a")

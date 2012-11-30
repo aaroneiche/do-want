@@ -303,18 +303,22 @@ function getCurrentUserList(includeReceived){
 	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		storedData.userWishlist = response;
+		//storedData.userWishlist = response;
 		
-		wishlistData = {};
-		wishlistData.isCurrentUser = true;
-		wishlistData.forUserId = userId;		
-		wishlistData.toolset = "edit";		
-		wishlistData.list = response;		
-		wishlistData.targetTable = "userWishlist";
-		wishlistData.skipHeader = false;
-		wishlistData.columns = storedData.columns;
-
-		displayWishlist(wishlistData);
+		//storedData.userWishlist = {};
+		storedData.userWishlist.isCurrentUser = true;
+		storedData.userWishlist.forUserId = userId;		
+		storedData.userWishlist.toolset = "edit";		
+		storedData.userWishlist.list = response;		
+		storedData.userWishlist.targetTable = "userWishlist";
+		storedData.userWishlist.skipHeader = false;
+		storedData.userWishlist.columns = storedData.columns;
+		
+		storedData.userWishlist = storedData.userWishlist;
+		
+		displayWishlist(storedData.userWishlist);
+		storedData.userWishlist.currentSort.call(this,storedData.userWishlist);
+		
 		hideLoadingIndicator();		
 	},"json");
 }
@@ -335,24 +339,24 @@ function getUserWishlist(forUserId){
 	showLoadingIndicator();
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
-		userWishlistData = {};
-		userWishlistData.list = "";
+		storedData.otherUserWishlist.list = "";
 		
 		if(response != null && response.responseType != undefined && response.responseType == "error"){
 			errorMessage(response);
 			//return false;
 		}else{
 
-			userWishlistData.isCurrentUser = false;
-			userWishlistData.forUserId = forUserId;
-			userWishlistData.toolset = "shop";
-			userWishlistData.list = response;		
-			userWishlistData.skipHeader = false;			
-			userWishlistData.targetTable = "otherUserWishlist";
-			userWishlistData.columns = storedData.columns2;
-
-			storedData.otherUserWishlist = userWishlistData;
-			displayWishlist(userWishlistData);
+			storedData.otherUserWishlist.isCurrentUser = false;
+			storedData.otherUserWishlist.forUserId = forUserId;
+			storedData.otherUserWishlist.toolset = "shop";
+			storedData.otherUserWishlist.list = response;		
+			storedData.otherUserWishlist.skipHeader = false;			
+			storedData.otherUserWishlist.targetTable = "otherUserWishlist";
+			storedData.otherUserWishlist.columns = storedData.columns2;
+			
+			displayWishlist(storedData.otherUserWishlist);
+			storedData.otherUserWishlist.currentSort.call(this,storedData.otherUserWishlist);
+			
 		}		
 		hideLoadingIndicator();
 	},"json");
@@ -408,12 +412,14 @@ function sortByDescriptionAsc(listObject){
 }
 
 function sortByRankingDesc(listObject){	
+	listObject.currentSort = sortByRankingDesc;
 	listObject.list.sort(function(a,b){return a.ranking - b.ranking});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);
 }
 
 function sortByRankingAsc(listObject){
+	listObject.currentSort = sortByRankingAsc;
 	listObject.list.sort(function(a,b){return b.ranking - a.ranking});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);	
@@ -422,6 +428,7 @@ function sortByRankingAsc(listObject){
 
 
 function sortByCategoryAsc(listObject){
+	listObject.currentSort = sortByCategoryAsc;
 	listObject.list.sort(function(a,b){
 			if(a.displayCategory.toLowerCase() > b.displayCategory.toLowerCase()){
 				return -1;
@@ -436,6 +443,7 @@ function sortByCategoryAsc(listObject){
 }
 
 function sortByCategoryDesc(listObject){
+	listObject.currentSort = sortByCategoryDesc;
 	listObject.list.sort(function(a,b){
 			if(a.displayCategory.toLowerCase() > b.displayCategory.toLowerCase()){
 				return 1;
@@ -804,11 +812,24 @@ function renderItemTools(itemObject, toolInfo){
 							.addClass("icon-pencil tool")
 							.attr("title","Edit Source");
 
+			sourcePrimary = $(document.createElement("i"))
+							.addClass("tool");
+							
+			if(itemObject.itemPrimarySource == 1){
+				sourcePrimary.addClass("icon-star").attr("title","Primary");
+			}else{
+				sourcePrimary.addClass("icon-star-open").attr("title","Set as Primary");
+			}				
+			
+			
+			debug = itemObject;
+							
 			if(storedData.largeIcons){
 				sourceDelete.addClass("icon-large");
 				sourceEdit.addClass("icon-large");
-			}					
-							
+				sourcePrimary.addClass("icon-large");
+			}
+			
 			sourceEdit.click(function(){
 				populateItemSourceForm($(this).closest("tr").attr("data-itemSourceId"));
 			});
@@ -820,6 +841,7 @@ function renderItemTools(itemObject, toolInfo){
 				);
 			});
 
+			toolBox.append(sourcePrimary);
 			toolBox.append(sourceEdit);
 			toolBox.append(sourceDelete);							
 		
@@ -1181,7 +1203,7 @@ function populateManageItemForm(itemId){
 
 				
 				sourceEditTools = jQuery(document.createElement('td'))
-										.append(renderItemTools(e.itemSource,"sourceEdit"));
+										.append(renderItemTools(e,"sourceEdit"));
 									
 								
 				sourceOption = jQuery(document.createElement('tr'))

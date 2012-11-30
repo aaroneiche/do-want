@@ -473,6 +473,16 @@ class wishlist extends db{
 			case 'delete':
 				$query = "delete from itemsources where sourceid = {$this->dbEscape($args['sourceid'])}";
 			break;
+			case 'setprimary':
+			//Ideally we're going to move away from having this branch and just make the update statement more dynamic.
+				$clearQuery = "update {$this->options['table_prefix']}itemsources i set i.primarysource = 0 where i.itemid = {$this->dbEscape($args['itemid'])}";
+				
+				$setQuery = "update {$this->options['table_prefix']}itemsources i set i.primarysource = 1 where i.sourceid = {$this->dbEscape($args['sourceid'])}";
+				
+				$this->dbQuery($clearQuery);
+				$result = $this->dbQuery($setQuery);
+				return $result;
+			break;
 		}
 
 		$result = $this->dbQuery($query);
@@ -813,7 +823,8 @@ class wishlist extends db{
 			itemsources.source as itemSource,
 			itemsources.sourceurl as itemSourceUrl,
 			itemsources.sourceprice as itemSourcePrice,
-			itemsources.sourcecomments as itemSourceComments
+			itemsources.sourcecomments as itemSourceComments,
+			itemsources.primarysource as itemPrimarySource
 
 			from itemsources where itemsources.itemid = '{$args['itemid']}'";
 
