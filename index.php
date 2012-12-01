@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.6");
+define("VERSION","0.9.7");
 
 include 'config.php';
 ?>
@@ -113,11 +113,14 @@ include 'config.php';
 			"displayColumn":"displayStatus",
 			"sortFunctions":[]
 		});
-	
-	
+		storedData.columns2.splice(5,0,{
+			"columnName":"Sources",
+			"displayColumn":"sources",
+			"sortFunctions":[],
+			"altDisplay":"--"
+		});
+		
 		//set the default sorting for lists
-		//storedData.userWishlistSort = storedData.columns[0].sortFunctions[0];
-		//storedData.otherUserListSort = storedData.columns[0].sortFunctions[0];
 		storedData.userWishlist = {};
 		storedData.otherUserWishlist = {};
 		
@@ -126,17 +129,14 @@ include 'config.php';
 				
 		
 		$(document).ready(function(){
-			$("#tabSetContainer a")
-				.click(function(e){showSection(e);})
-				.button();
-
+				
 			$("a#shoppingListTab").click(function(){
 				getShoppingList();				
 			})
 
 
 			$("ul.nav li a.navLink")
-				.click(function(e){showSection2(e);});
+				.click(function(e){showSection(e);});
 
 			
 			$("#addItems").click(function(){
@@ -322,7 +322,29 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#saveCategory").click(function(){
 				manageCategory();
 			});
-
+			
+			/*
+			$(".dropdown-toggle").dropdown();
+						
+			$(".dropdown-menu li").click(function(){
+				this.attr("data-filterType")
+			}); */
+			
+			
+			$("#listFilterField").keyup(function(){
+				
+				searchTerm = $("#listFilterField").val();
+				colToFilter = $("#filterOnValue").val();
+				
+				if(searchTerm.length > 0){
+					filteredList = jQuery.extend(true, {}, storedData.otherUserWishlist);
+					filteredList.list = filterList(filteredList,colToFilter, searchTerm);
+					displayWishlist(filteredList);
+				}else{
+					displayWishlist(storedData.otherUserWishlist);
+				}
+			})
+			
 			displayShopForMeList();
 			setupUserSearch();
 			getMessagesForUser(userId,0);
@@ -652,7 +674,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 		</div>
 		<div id="otherLists" class="section">
-			<div id="myCarousel" class="carousel slide">
+			<div id="myCarousel" class="carousel slide" data-interval="false">
 			  <!-- Carousel items -->
 			  <div class="carousel-inner">
 				<div class="active item">
@@ -662,8 +684,24 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</table>
 				</div>
 				<div class="item">
-					<h2 id="otherWishlistTitle">Wishlist:</h2>
-					<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev"><i class="icon-arrow-left icon-white"></i> Back to Users</a>
+					<h2 id="otherWishlistTitle">Wishlist:</h2>									
+					<div class="row">
+						<div class="span2">		
+							<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev">
+								<i class="icon-arrow-left icon-white"></i>
+								Back to Users
+							</a>
+						</div>
+						<div class="span4">
+							Filter: <input id="listFilterField" type="text" class="input-medium" />		
+							<select id="filterOnValue" class="input-medium">
+								<option value="sources">Source</option>
+								<option value="displayCategory">Category</option>
+								<option value="displayDescription">Description</option>
+							</select>
+						</div>
+						
+					</div>
 					<div id="otherUserWishlistBlock" class="tableBlock">
 						<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">
 						</table>

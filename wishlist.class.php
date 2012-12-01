@@ -19,7 +19,7 @@ class wishlist extends db{
 			
 		$query ="select 
 					items.*, 
-					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice, 
+					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice,
 					categories.category as displayCategory 
 				from items,categories where userid = '{$_SESSION['userid']}'
 					and categories.categoryid = items.category $received";
@@ -60,6 +60,7 @@ class wishlist extends db{
 			          from itemsources
 			          where itemsources.itemid = items.itemid)
 			     as minprice,
+				(select group_concat(source order by source SEPARATOR ', ' ) as sources from itemsources where itemsources.itemid = items.itemid) as sources,			
 			   items.quantity,
 				items.quantity -
 					(select sum(allocs.quantity) from allocs where allocs.itemid = items.itemid)
@@ -823,11 +824,13 @@ class wishlist extends db{
 			itemsources.source as itemSource,
 			itemsources.sourceurl as itemSourceUrl,
 			itemsources.sourceprice as itemSourcePrice,
-			itemsources.sourcecomments as itemSourceComments,
-			itemsources.primarysource as itemPrimarySource
+			itemsources.sourcecomments as itemSourceComments
 
 			from itemsources where itemsources.itemid = '{$args['itemid']}'";
-
+			
+			//Removed for the time being.
+			//,itemsources.primarysource as itemPrimarySource
+			
 		$sourcesResult = $this->dbQuery($sourcesQuery);
 
 		$sourcesDetailArray = ($this->dbRowCount($sourcesResult) > 0 ) ? $this->dbAssoc($sourcesResult,true) : null;

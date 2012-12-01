@@ -216,9 +216,7 @@ td.bold{
 table#listOfUsersTable td{
 	cursor: pointer;
 }
-
-
-
-
-
+ul.dropdown-menu{
+	text-align:left;
+}
 
