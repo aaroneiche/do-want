@@ -16,7 +16,7 @@ information from defined forms or non-ajax made calls.
 */
 
 if(!isset($_REQUEST['args'])){
-	$_REQUEST['args'] = $_REQUEST; //array();
+	$_REQUEST['args'] = $_REQUEST;
 }
 
 
@@ -29,12 +29,15 @@ $instance->dbuser = $dbuser;
 $instance->dbpass = $dbpass;
 $instance->options = $options;
 
-$instance->dbConnect();
+/*
+We provide a flag for non-db calls. Ideally anything not done with the DB is done client-side,
+but for some setup items, we need to have server-side stuff happening.
+*/
+if(!isset($_REQUEST['nodb'])){
+	$instance->dbConnect();
+}
 
 //encode and return whatever the class method returned.
-//$jsonData =  json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
-//print $jsonData;
-//if($options['logErrors']) error_log($jsonData);
 
 print json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
 

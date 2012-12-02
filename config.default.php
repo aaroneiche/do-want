@@ -1,15 +1,10 @@
 <?php
+//Do want Default config file. Do not delete this - it's necessary for the configuration script.
 
-
-switch($_SERVER['HTTP_HOST']){
-		
-	default:
-		$dbhost = "localhost";
-		$dbname = "wishlist";
-		$dbuser = "wishlist";
-		$dbpass = "wishlist";
-	break;
-}
+$dbhost = 'localhost';
+$dbname = 'wishlist';
+$dbuser = 'wishlist';
+$dbpass = 'wishlist';
 
 // table prefixes if you need them.
 $options['table_prefix'] = '';
