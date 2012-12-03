@@ -708,7 +708,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 							<select id="filterOnValue" class="input-medium">
 								<option value="sources">Source</option>
 								<option value="displayCategory">Category</option>
-								<option value="displayDescription">Description</option>
+								<option value="description">Description</option>
 							</select>
 						</div>
 						

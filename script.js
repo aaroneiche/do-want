@@ -1979,7 +1979,6 @@ function filterList(wishlist, fieldToSearch, searchTerm){
 		var term = new RegExp(searchTerm,"i");
 		
 		if(wishlist.list[i][fieldToSearch] != null && wishlist.list[i][fieldToSearch].match(term)){
-			console.log(wishlist.list[i][fieldToSearch].match(term));
 			returnList.push(wishlist.list[i]);
 		}
 	}
