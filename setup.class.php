@@ -30,9 +30,12 @@ class setup extends db{
 	*/
 	
 	function generateConfigFile($args){
-		$configFileName = "config-test.php";
+		$configFileName = "config.php"; //"config-test.php";
+		$response = array();
 		if(file_exists($configFileName)){
-			return "It appears you already have a config file.";
+			$response['result'] = false;
+			$response['message'] = "It appears you already have a config file.";
+			return $response;
 		}
 		
 		$defaultConfig = file_get_contents("config.default.php");
@@ -60,8 +63,15 @@ class setup extends db{
 		);
 		
 		$fileReplace = str_replace ($configItems ,$populateItems , $defaultConfig);
-		$fileWrite = file_put_contents($configFileName,$fileReplace);				
-		return $fileWrite;
+		$fileWrite = file_put_contents($configFileName,$fileReplace);
+		
+		if($fileWrite !== false){
+			$response['result'] = true;
+			return $response;	
+		}else{
+			$response['result'] = false;
+			return $response;
+		}
 	}
 
 	/*
@@ -90,14 +100,18 @@ class setup extends db{
 			$queryResults[$tableName] = $this->dbQuery($queryToRun);
 		}
 		
-		return $queryResults;
+		$results = array(
+			"result"=>true,
+			"message"=>"The following tables were created",
+			"tables" => $queryResults
+		);
+		
+		return $results;
 	}
 
-
-
-
-
-
+	/*
+		Check 
+	*/
 }
 
 ?>

@@ -1472,8 +1472,12 @@ function updateUserData(){
 	//If we've made it this far, we're packaging up and sending off!
 	data.args = args;	
 	jQuery.post('ajaxCalls.php',data,function(response){
+		if(response.type != undefined && response.type == 'error'){
+			displayAlert(response.message);
+		}
+		
 		$("#userFormBlock").modal("hide");
-	});	
+	},"json");
 	
 }
 

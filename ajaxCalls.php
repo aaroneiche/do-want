@@ -8,7 +8,10 @@ function __autoload($class_name) {
 }
 
 //We need the configuration
-require_once("config.php");
+if(file_exists("config.php")){
+	require_once("config.php");
+}
+
 
 /*
 Previously, we were passing an empty array if args were not provided, by setting args to the $_REQUEST array, we can pass

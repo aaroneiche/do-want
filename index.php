@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.7");
+define("VERSION","0.9.8");
 
 include 'config.php';
 ?>
@@ -222,6 +222,14 @@ include 'config.php';
 
 <!--  -->
 <div class="container">
+<!-- 
+	<div class="row">
+		<div class="span4 offset4">
+			<h1>Gift Registry</h1>
+			<br/>
+		</div>
+	</div>
+-->
 
 <?php 
 if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
@@ -510,15 +518,20 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  </div>
 	  <div class="modal-body">
 			<!--	<form id="itemImagesForm" class="form-horizontal" onsubmit="return false;"> -->
-			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" action="ajaxCalls.php" target="uploadframe" >
-				
-			<input type="hidden" name="interact" value="wishlist">
-			<input type="hidden" name="action" value="manageItemImage">
-			<input type="hidden" name="itemImageAction" value="add">
-			<input type="hidden" name="itemid" id="itemIdForImage" value="1"/><br>
+			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" action="ajaxCalls.php" target="uploadframe" >				
+				<input type="hidden" name="interact" value="wishlist">
+				<input type="hidden" name="action" value="manageItemImage">
+				<input type="hidden" name="itemImageAction" value="add">
+				<input type="hidden" name="itemid" id="itemIdForImage" value="1"/><br/>
 			
-			<div class="control-group"><label class="control-label" for="uploadfile">Select A file for upload</label><div class="controls"><input type="file" name="uploadfile" id="uploadfile" class="input"/></div></div>
-			<button type="submit" class="btn btn-primary">Upload Image</button>
+				<div class="control-group">
+					<label class="control-label" for="uploadfile">Select A file for upload</label>
+					<div class="controls">
+						<input type="file" name="uploadfile" id="uploadfile" class="input"/>
+					</div>
+				</div>
+			
+				<button type="submit" class="btn btn-primary">Upload Image</button>
 			</form>
 
 			<div id="uploadAlert" class="alert">
@@ -630,8 +643,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<a href="#" id="saveCategory" class="btn btn-primary">Save changes</a>
 	</div>
 </div>
-
-
 
 <div class="row">
 	<div class="span8 offset2">

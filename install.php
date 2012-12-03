@@ -62,7 +62,12 @@
 
 				//Get the Categories.
 				jQuery.post('ajaxCalls.php',data,function(response){	
-					window.location ="index.php";
+					if(response == true){
+						$("#step-four div.alert-success").fadeIn();
+						$("#stepFourNextButton").prop("disabled",false).removeClass("disabled");
+					}else{
+						$("#step-four div.alert-error").fadeIn();
+					}
 				},"json");
 				
 			}
@@ -80,6 +85,23 @@
 					'currency_symbol': $("#currency_symbol").val(),
 				}
 				
+				if(args['host'].length == 0){
+					alert("You must fill in a host");
+					return false;
+				}
+				if(args['dbname'].length == 0){
+					alert("You must fill in a Database name");
+					return false;
+				}
+				if(args['dbuser'].length == 0){
+					alert("You must fill in a database username");
+					return false;
+				}
+				if(args['dbpass'].length == 0){
+					alert("You must fill in a database password");
+					return false;
+				}												
+				
 				var data = {
 					'interact':'setup',
 					'action':'generateConfigFile',
@@ -87,7 +109,16 @@
 				}
 
 				jQuery.post('ajaxCalls.php',data,function(response){
-					console.log(response);
+					if(response.result == true){
+						$("#step-two div.alert-success").fadeIn();
+						$("#stepTwoNextButton").prop("disabled",false).removeClass("disabled");
+					}else{
+						if(response.message != null){
+							$("#step-two div.alert-error").html(response.message);
+						}
+						$("#step-two div.alert-error").fadeIn();
+					}
+				
 				},"json");						
 			}
 			
@@ -95,23 +126,45 @@
 				var data = {
 					'interact':'setup',
 					'action':'checkDirectoryWriteable',
-					'args':{'dir':'.'}
+					'args':{'dir':'.',
+							'nodb':true
+					}
 				}
 				$("#step-one div.alert").hide();
 				
 				jQuery.post('ajaxCalls.php',data,function(response){
 					
-					if(response == false){
-						$("#step-one div.alert-error").fadeIn();						
+					if(response == true){
+						$("#step-one div.alert-success").fadeIn();
+						$("#stepOneNextButton").prop("disabled",false).removeClass("disabled");
 					}else{
-						$("#step-one div.alert-success").fadeIn();						
+						$("#step-one div.alert-error").fadeIn();
 					}
 				},"json");
 			}
-			
-			
-			
-			jQuery(document).ready(function(){			
+				
+			function setupTables(){
+				var data = {
+					'interact':'setup',
+					'action':'setupTables'
+				}
+
+				jQuery.post('ajaxCalls.php',data,function(response){
+					if(response.result == true){
+						//tablesResponseSuccess	
+											
+						$("#step-three div.alert-success").html("Tables have been created!").fadeIn();
+						$("#stepThreeNextButton").prop("disabled",false).removeClass("disabled");
+					}else{
+						if(response.message != null){
+							$("#step-three div.alert-error").html(response.message);
+						}
+						$("#step-three div.alert-error").fadeIn();
+					}
+				},"json");				
+			}
+				
+			jQuery(document).ready(function(){
 				//Setup the carousel and make sure it doesn't auto advance.
 				$('#setupCarousel').carousel('pause').on('slid',function(){
 					$('#setupCarousel').carousel('pause');
@@ -121,12 +174,21 @@
 					createConfig();
 				});
 
-				$("button#proceedButton").click(function(){
+				$("button#directoryWriteableCheckButton").click(function(){
 					checkDirectoryWritable();
 				});
+
+				$("button#createTables").click(function(){
+					setupTables();
+				});			
 			
-				
+				$("#setupAdminUserButton").click(function(){
+					setupAdminUser();
+				});
 			
+				$(".nextStepButton").click(function(){
+					$('#setupCarousel').carousel('next');
+				});
 			});
 		</script>
 		<style>
@@ -137,21 +199,7 @@
 		</style>
 	</head>	
 	<body>
-		<!--
-		<div class="modal hide fade" id="errorResponse">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h2>...Well Something Went Wrong</h2>
-			</div>
-			<div class="modal-body">	
-				<p id="errorMessage"></p>
-			</div>
-			<div class="modal-footer">
-				<a href="#" class="btn" data-dismiss="modal">Close</a>
-			</div>
-		</div>
-		-->
-		
+	
 		<div class="row">
 			<div class="span8 offset2">			
 				<h2>Do Want! Setup</h2>
@@ -168,19 +216,24 @@
 									<li>Create a Database and User for Do Want to use</li>
 									<li>Make the Do Want directory writeable by the server</li>
 								</ul>
-								<button class="btn btn-success" id="proceedButton">Check that the directory is writeable</button>
 
 								<div id="directoryResponseSuccess" class="hide alert alert-success">
-									Directory is writeable. Good Job!
+									Directory is writeable. Good Job! Go ahead and press the next button and we'll setup a config file.
 								</div>
 								<div id="directoryResponseFailure" class="hide alert alert-error">
 									It doesn't look like the Do Want directory is writable by the web server. We'll need this if we're going to generate a configuration file. You will only need to leave it writable until the config file has been written.
 								</div>
-								
+								<div>
+									<button id="directoryWriteableCheckButton" class="btn btn-success">Check that the directory is writeable</button>								
+									<button id="stepOneNextButton" class="btn btn-primary pull-right nextStepButton disabled" disabled>Next</button>
+								</div>
 							</div>
 						</div>
-						<div class="item">
+						<div id="step-two" class="item">
 							<form id="configSetup" class="form-horizontal" onsubmit="return false;">
+								<p>
+									Enter your database and connection details into the form below. I'll create a config file and place it in your Do Want! directory.									
+								</p>
 								<div class="well">
 									<div class="control-group">
 										<label class="control-label" for="host">Host</label>
@@ -226,12 +279,40 @@
 										<div class="controls">
 											<input type="text" class="input-mini" id="currency_symbol" value="$"/>
 										</div>
-									</div>						
-									<button class="btn btn-success" id="createConfig">Create Configuration</button>
+									</div>
+									
+									<div id="configResponseSuccess" class="hide alert alert-success">
+										The configuration file was written. You're ready for the next step!
+									</div>
+									<div id="configResponseFailure" class="hide alert alert-error">
+										There was a problem writing the configuration file.
+									</div>									
+									
+									<div>
+										<button class="btn btn-success" id="createConfig">Create Configuration</button>
+										<button id="stepTwoNextButton" class="btn btn-primary pull-right nextStepButton disabled" disabled>Next</button>
+									</div>									
 								</div>
 							</form>
 						</div>
-				  		<div class="item">
+				  		<div id="step-three" class="item">
+							<div class="well">
+								<p>Now we need to make sure the DB info you provided is valid for talking to the DB. 
+									Once we do that, we can create the Database tables.
+								</p>
+								<div id="tablesResponseSuccess" class="hide alert alert-success">
+									
+								</div>
+								<div id="tablesResponseFailure" class="hide alert alert-error">
+									There was a problem setting up tables for Do want.
+								</div>	
+								<div>
+									<button class="btn btn-success" id="createTables">Create Tables</button>
+									<button id="stepThreeNextButton" class="btn btn-primary pull-right nextStepButton disabled" disabled>Next</button>
+								</div>								
+							</div>
+				  		</div>
+						<div id="step-four" class="item">
 							<p>Please fill in the form below to create the administrator user, you will be able to change these details and add more users later. After you submit, you'll be taken to the login page where you can log in and get started.</p>
 							<div class="well">
 								<form id="createUserform" class="form-horizontal" onsubmit="return false;">
@@ -265,15 +346,31 @@
 											<input type="text" class="input-medium" id="emailAddress"/>
 										</div>
 									</div>
-									<div class="control-group">																																				
-										<button class="btn btn-primary pull-right" onclick="setupAdminUser();">Create user</button>
-									</div>
 								</form>
+								<div id="userResponseSuccess" class="hide alert alert-success">
+									Your user has been created! Please press the next button to complete the setup process.
+								</div>
+								<div id="userResponseFailure" class="hide alert alert-error">
+									There was a problem creating your admin user
+								</div>								
+								<div>
+									<button id="setupAdminUserButton" class="btn btn-success">Create user</button>									
+									<button id="stepFourNextButton" class="btn btn-primary pull-right nextStepButton disabled" disabled>Next</button>
+								</div>								
 							</div>
 				  		</div>
-					</div>
+				  		<div id="step-five" class="item">
+							<div class="well">
+								<p>That's it! You're all setup. Click the button below to be taken to your new Do Want installation! 
+								</p>
+								<div>
+									<a id="goToIndexButton" class="btn btn-primary" href="index.php">Go To Do Want!</a>
+								</div>																
+							</div>
+							
+				  		</div>
 
-					<button class="btn btn-primary" onclick="$('#setupCarousel').carousel('next')">Next</button>
+					</div>
 				</div>
 			</span>
 		</div>
