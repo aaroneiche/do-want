@@ -383,7 +383,8 @@ class user extends db{
 */
 		function getMessages($args){
 			$readStatusQuery = ($args['readStatus'] == 2)? "":" and isread = ".$args['readStatus'];
-			$query = "select * from messages where recipient = {$args['userid']} ".$readStatusQuery;
+			$query = "select m.*, u.fullname from {$options['table-prefix']}messages m left join {$options['table-prefix']}users u on u.userid = m.sender where m.recipient = {$args['userid']} ".$readStatusQuery;
+			
 
 			$result = $this->dbQuery($query);
 			return $this->dbAssoc($result,true);

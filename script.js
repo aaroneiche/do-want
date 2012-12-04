@@ -319,7 +319,9 @@ function getCurrentUserList(includeReceived){
 		storedData.userWishlist = storedData.userWishlist;
 		
 		displayWishlist(storedData.userWishlist);
-		storedData.userWishlist.currentSort.call(this,storedData.userWishlist);
+		if(storedData.userWishlist.list != null){
+			storedData.userWishlist.currentSort.call(this,storedData.userWishlist);
+		}
 		
 		hideLoadingIndicator();		
 	},"json");
@@ -357,9 +359,10 @@ function getUserWishlist(forUserId){
 			storedData.otherUserWishlist.columns = storedData.columns2;
 			
 			displayWishlist(storedData.otherUserWishlist);
-			storedData.otherUserWishlist.currentSort.call(this,storedData.otherUserWishlist);
-			
-		}		
+			if(storedData.otherUserWishlist.list != null){
+				storedData.otherUserWishlist.currentSort.call(this,storedData.otherUserWishlist);
+			}
+		}
 		hideLoadingIndicator();
 	},"json");
 }
@@ -1768,7 +1771,8 @@ function getMessagesForUser(userId,readStatus){
 			*/
 			
 			$(response).each(function(i,e){
-			
+				debug = response;
+				
 				messageRow = $(document.createElement('tr'));
 				messageCell = $(document.createElement('td'));
 				trimmedMessage = e.message.substring(0,40);
@@ -1776,9 +1780,17 @@ function getMessagesForUser(userId,readStatus){
 								.attr("id","message_"+e.messageid)
 								.addClass("fullMessage")
 								.append(e.message);
-			
+				
+				fromLabel = $(document.createElement('span')).addClass("label pull-right");
+				if(e.fullname == null){
+					fromLabel.addClass("label-inverse").append("System");
+				}else{
+					fromLabel.addClass("label-info").append(e.fullname);
+				}
+				
 				messageCell.append(trimmedMessage+"...");
 				messageCell.append(fullMessage);
+				messageCell.append(fromLabel);
 				messageRow.append(messageCell);
 				messageCell.click(function(ev){
 					displayMessage($(this).children("span.fullMessage").html());

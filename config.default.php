@@ -18,7 +18,7 @@ $options['password_hasher'] = 'MD5Hasher';
 //Relative path where to upload files to. Include a trailing slash. Make sure this path is writable by your server!
 $options['filepath'] = 'uploads/'; 
 
-//Where to upload files to. Make sure this path is writable by your server!
+//The currency symbol you would like to show up in the wishlist system.
 $options['currency_symbol'] = '$';
 
 //Switch to large icons

@@ -248,6 +248,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			buildCategorySelect(); //storedData.categories,"#itemCategoryInput"
 
 			jQuery("#myCarousel").carousel('pause');
+			//.on("slid",function(){})
 
 			jQuery("#backToUsersLink").click(function(){
 				jQuery("#myCarousel").carousel('prev');
@@ -645,7 +646,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 </div>
 
 <div class="row">
-	<div class="span8 offset2">
+	<div class="span10 offset1">
 		
 		<div class="navbar">
 		  <div class="navbar-inner">
@@ -674,7 +675,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</div>
 </div>
 <div class="row">
-	<div id="pageBlock" class="span8 offset2">
+	<div id="pageBlock" class="span10 offset1">
 		<div id="myList" class="section">
 			<h2>My Wishlist</h2>
 			<button id="addItems" class="btn btn-primary">Add Item</button>
@@ -697,13 +698,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div class="item">
 					<h2 id="otherWishlistTitle">Wishlist:</h2>									
 					<div class="row">
-						<div class="span2">		
+						<div class="span3">		
 							<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev">
 								<i class="icon-arrow-left icon-white"></i>
 								Back to Users
 							</a>
 						</div>
-						<div class="span4">
+						<div class="span7">
 							Filter: <input id="listFilterField" type="text" class="input-medium" />		
 							<select id="filterOnValue" class="input-medium">
 								<option value="sources">Source</option>
@@ -725,7 +726,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="shoppingList" class="section">
 			<h2>My Shopping List</h2>
 			<div class="row">
-				<div class="span8">
+				<div class="span10">
 					<table id="shoppingListTable" class="table table-striped table-bordered table-condensed">
 					</table>
 				</div>
@@ -734,10 +735,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="manage" class="section">
 			<h2>User Settings</h2>
 			<div class="row">
-				<div class="span4">
+				<div class="span5">
 					<button id="openManageUserForm" class="btn btn-primary">Change my settings</button>					
 				</div>
-				<div class="span4">
+				<div class="span5">
 					<h3>Messages</h3>
 					<table id="userMessages" class="table table-striped table-bordered table-condensed">
 					</table>
@@ -745,14 +746,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				</div>				
 			</div>
 			<div class="row">
-				<div class="span4">			
+				<div class="span5">			
 
 					<h3>People Shopping for me.</h3>
 					<table id="shoppingForMe" class="table table-striped table-bordered table-condensed">
 						
 					</table>
 				</div>
-				<div class="span4">			
+				<div class="span5">			
 					<h3>People I'm Shopping For:</h3>
 					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
@@ -760,7 +761,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<div class="input-append">
 						<form class="form-search" onsubmit="return false;">
 							<input type="hidden" id="userToRequest">							
-							<input type="text" id="shopForSearch" class="typeahead input-medium" placeholder="Search for a User">
+							<input type="text" id="shopForSearch" class="typeahead input-large" placeholder="Search for a User">
 							<button id="requestShopForButton" class="btn btn-primary search-query" type="submit">Shop For User</button>
 							<button id="clearShopFor" class="btn">&times;</button>							
 						</form>							
@@ -769,7 +770,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>	
 			<?php if($_SESSION['admin'] == 1){ ?>
 			<div class="row">
-				<div class="span8">
+				<div class="span10">
 					<h3>Users</h3>
 					<button id="addUserButton" class="btn btn-primary">Add User</button>					
 					<table id="adminUserList" class="table table-striped table-bordered table-condensed">
@@ -778,13 +779,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				</div>
 			</div>			
 			<div class="row">
-				<div class="span4">
+				<div class="span5">
 					<h3>Categories</h3>
 					<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
 						
 					</table>
 				</div>
-				<div class="span4">
+				<div class="span5">
 					<h3>Rankings</h3>					
 					<table id="rankingsTable" class="table table-striped table-bordered table-condensed">
 						
