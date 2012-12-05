@@ -29,13 +29,6 @@ include 'config.php';
 	<script src="bootstrap/js/bootstrap-typeahead.js"></script>	
 
 	<link href="style.css" rel="stylesheet">
-	
-	<style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-    </style>
 
 	<script>
 		/* Lest you sneaky users think you can change this and gain access to your list, 
@@ -221,6 +214,9 @@ include 'config.php';
 
 
 <!--  -->
+
+<div id="wrap">
+
 <div class="container">
 <!-- 
 	<div class="row">
@@ -230,8 +226,28 @@ include 'config.php';
 		</div>
 	</div>
 -->
-
+<?php
+if($options['includeCustom'] == true){
+	?>
+<div class="row">
+	<div class="span10 offset1" id="customSpaceTop">
+		<?php
+			if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true){
+				$customHeaderFile = "custom/customSpaceHeader.html";
+			}else{
+				$customHeaderFile = "custom/customLoginHeader.html";
+			}
+		
+			if(file_exists($customHeaderFile)){
+				$customHeader = file_get_contents($customHeaderFile);
+				print $customHeader;
+			}
+		?>
+	</div>	
+</div>	
 <?php 
+	} 
+
 if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	{
 /*
@@ -645,7 +661,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</div>
 </div>
 
-<div class="row">
+<div class="row" id="navBarRow">
 	<div class="span10 offset1">
 		
 		<div class="navbar">
@@ -806,7 +822,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 */
 ?>
 
-	<div class="row">
+	<div class="row" id="loginFormRow">
 		<div class="span4 offset4">
 			<form name="loginForm" id="loginForm" method="POST" onsubmit="return false;" class="form-inline">
 				<input name="username" id="username" type="text" class="input-small" placeholder="Username"/>
@@ -961,9 +977,36 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		  </div>
 	</div>	
 
+</div>
+<div id="push"></div>
+</div> <!-- end .wrap -->
+<div id="footer">
+	<div class="container">	
+		<?php
+		if($options['includeCustom'] == true){
+			?>
+		<div class="row">
+			<div class="span10 offset1" id="customSpaceTop">
+				<?php
+					if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true){
+						$customFooterFile = "custom/customSpaceFooter.html";
+					}else{
+						$customFooterFile = "custom/customLoginFooter.html";
+					}
 
+					if(file_exists($customFooterFile)){
+						$customFooter = file_get_contents($customFooterFile);
+						print $customFooter;
+					}
+				?>
+			</div>	
+		</div>	
+		<?php 
+			} 
+		?>
+		<a href="#" id="versionNumber">v<?php print VERSION; ?></a>
+	</div>
 </div>
 
-<a href="#" id="versionNumber">v<?php print VERSION; ?></a>
 </body>
 </html>

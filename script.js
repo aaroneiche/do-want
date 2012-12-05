@@ -485,7 +485,7 @@ function generateDisplayElements(itemObject){
 			
 
 			if(itemObject.available == null) itemObject.available = itemObject.quantity;
-			itemObject.displayStatus = (itemObject.available > 0)? itemObject.available+" Remaining":"None Remaining";
+			itemObject.displayStatus = (itemObject.available > 0)? itemObject.available+"/"+itemObject.quantity+" Remaining":"None Remaining";
 			
 			
 		break;

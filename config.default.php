@@ -26,4 +26,8 @@ $options['large-icons'] = true;
 
 //Outputs error information where available to a log if true. Not fully implemented.
 $options['logErrors'] = false; 
+
+//Enables custom inclusions in the custom directories.
+$options['includeCustom'] = true;
+
 ?>

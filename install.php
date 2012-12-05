@@ -196,6 +196,10 @@
 				margin-top:100px;				
 			}
 			
+			input[type="text"],input[type="password"]{
+				height:30px;
+			}
+			
 		</style>
 	</head>	
 	<body>

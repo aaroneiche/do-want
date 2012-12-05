@@ -1,4 +1,23 @@
+html{
+    height: 100%;
+}
+ 
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -60px;
+}
+
+#push,
+#footer {
+    height: 60px;
+}
+
+/* ------------ Sticky Footer inclusion above -------------------- */
+
 body{
+	height: 100%;
 	font-family:Arial;
 	z-index:-10;
 }
@@ -222,4 +241,8 @@ ul.dropdown-menu{
 
 table#userMessages td{
 	cursor: pointer;
+}
+
+div#navBarRow, div#loginFormRow{
+	margin-top:20px;
 }
