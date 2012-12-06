@@ -117,8 +117,8 @@ include 'config.php';
 		storedData.userWishlist = {};
 		storedData.otherUserWishlist = {};
 		
-		storedData.userWishlist.currentSort = sortByDescriptionDesc;
-		storedData.otherUserWishlist.currentSort = sortByDescriptionDesc;
+		storedData.userWishlist.currentSort = sortByRankingDesc;
+		storedData.otherUserWishlist.currentSort = sortByRankingDesc;
 				
 		
 		$(document).ready(function(){

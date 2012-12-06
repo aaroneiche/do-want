@@ -416,14 +416,14 @@ function sortByDescriptionAsc(listObject){
 	displayWishlist(listObject);
 }
 
-function sortByRankingDesc(listObject){	
+function sortByRankingAsc(listObject){	
 	listObject.currentSort = sortByRankingDesc;
 	listObject.list.sort(function(a,b){return a.ranking - b.ranking});
 	listObject.skipHeader = true;
 	displayWishlist(listObject);
 }
 
-function sortByRankingAsc(listObject){
+function sortByRankingDesc(listObject){
 	listObject.currentSort = sortByRankingAsc;
 	listObject.list.sort(function(a,b){return b.ranking - a.ranking});
 	listObject.skipHeader = true;
