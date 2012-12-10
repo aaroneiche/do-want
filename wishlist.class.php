@@ -513,6 +513,9 @@ class wishlist extends db{
 					'{$this->dbEscape($randName)}'
 				)";
 				
+				$result = $this->dbQuery($query);
+				
+				$resultArray['fileuploaded'] = $moveFile;
 				$resultArray['itemId'] = $args['itemid'];
 				
 			break;
@@ -521,20 +524,25 @@ class wishlist extends db{
 				$filenameQuery = "select filename from itemimages where imageid = '{$this->dbEscape($args['imageid'])}'";
 				$filename = $this->dbValue($this->dbQuery($filenameQuery));
 				
-				$deleteResult = unlink($this->options['filepath'].$filename);
-			
+				if(file_exists($this->options['filepath'].$filename)){
+					$deleteResult = unlink($this->options['filepath'].$filename);
+				}else{
+					$deleteResult = true;
+				}
+				
+				$resultArray['filedeleted'] = $deleteResult;
+				
+							
 				if($deleteResult){
 					$query = "delete from itemimages where imageid = '{$this->dbEscape($args['imageid'])}'";
+					$result = $this->dbQuery($query);
 				}else{
 					return $error = array('errorMessage'=>"There was a problem deleting the image file: ".$deleteResult);
 				}		
 			break;
 		}
 
-		$result = $this->dbQuery($query);
-		
-		$resultArray['queryResult'] = $result;
-		
+		$resultArray['queryResult'] = $result;		
 		return $resultArray;
 	}
 	
@@ -631,169 +639,6 @@ class wishlist extends db{
 	}
 	
 	/*
-		Method: getItemDetails Deprecated
-		OLD - do not use. Use the newer "getItemDetails method below
-		Fetches the item details for a particular item and returns them in a associative array.
-		returns an associative array containing item info, images, sources, and alloc data.
-		
-		int @itemid - The item to request details about.
-	*/
-	function getItemDetails_deprecated($args){
-		
-		
-		$query = "
-			(select
-			'item' as rowType,
-			items.itemid as commonId,
-			items.description as itemDescription,
-			items.ranking as itemRanking,
-			items.category as itemCategory,
-			items.comment as itemComment,
-			items.quantity as itemQuantity,
-			items.addedByUserId as itemAddedByUserId,
-
-			'' as itemSourceId,
-			'' as itemSource,
-			'' as itemSourceUrl,
-			'' as itemSourcePrice,
-			'' as itemSourceComments,
-
-			'' as itemImageId,
-			'' as itemImageFilename,
-
-			'' as itemAllocUserId,
-			'' as itemAllocUserName,			
-			'' as itemAllocBought,
-			'' as itemAllocQuantity
-
-			from items where itemid = '{$args['itemid']}'
-			)
-			UNION
-
-			(select
-			'source' as rowType,
-			itemsources.itemid as commonId,
-			'' as itemDescription,
-			'' as itemRanking,
-			'' as itemCategory,
-			'' as itemComment,
-			'' as itemQuantity,
-			'' as itemAddedByUserId,
-
-			itemsources.sourceid as itemSourceId,
-			itemsources.source as itemSource,
-			itemsources.sourceurl as itemSourceUrl,
-			itemsources.sourceprice as itemSourcePrice,
-			itemsources.sourcecomments as itemSourceComments,
-
-			'' as itemImageId,
-			'' as itemImageFilename,
-
-			'' as itemAllocUserId,
-			'' as itemAllocUserName,		
-			'' as itemAllocBought,
-			'' as itemAllocQuantity
-
-			from itemsources where itemsources.itemid = '{$args['itemid']}'
-			)
-
-			UNION
-
-			(select
-			'image' as rowType,
-			itemimages.itemid as commonId,
-			'' as itemDescription,
-			'' as itemRanking,
-			'' as itemCategory,
-			'' as itemComment,
-			'' as itemQuantity,
-			'' as itemAddedByUserId,
-
-			'' as itemSourceId,
-			'' as itemSource,
-			'' as itemSourceUrl,
-			'' as itemSourcePrice,
-			'' as itemSourceComments,
-
-			itemimages.imageid as itemImageId,
-			itemimages.filename as itemImageFilename,
-
-			'' as itemAllocUserId,
-			'' as itemAllocUserName,
-			'' as itemAllocBought,
-			'' as itemAllocQuantity
-
-			from itemimages where itemimages.itemid = '{$args['itemid']}'
-			)
-
-			UNION
-
-			(select
-			'alloc' as rowType,
-			allocs.itemid as commonId,
-			'' as itemDescription,
-			'' as itemRanking,
-			'' as itemCategory,
-			'' as itemComment,
-			'' as itemQuantity,
-			'' as itemAddedByUserId,
-
-			'' as itemSourceId,
-			'' as itemSource,
-			'' as itemSourceUrl,
-			'' as itemSourcePrice,
-			'' as itemSourceComments,
-
-			'' as itemImageId,
-			'' as itemImageFilename,
-
-			allocs.userid as itemAllocUserId,
-			users.fullname as itemAllocUserName,
-			allocs.bought as itemAllocBought,
-			allocs.quantity as itemAllocQuantity
-
-			from allocs,users 
-			where 
-				allocs.itemid = '{$args['itemid']}' and
-				users.userid = allocs.userid
-			)";
-		
-			$result = $this->dbQuery($query);
-			$itemDetailArray = $this->dbAssoc($result,true);
-			
-			$itemDetails = array();
-			
-			foreach($itemDetailArray as $line){
-
-				//eliminate empty values that are a carry-over from the Query.				
-				foreach($line as $key => $value){
-					if($value == null){
-						unset($line[$key]);
-					}
-				}
-				
-				switch($line['rowType']){
-					case 'item':
-						$itemDetails = $line;
-					break;
-					case 'source':
-						$itemDetails['sources'][] = $line;
-					break;
-					
-					case 'image':
-						$itemDetails['images'][] = $line;					
-					break;
-						
-					case 'alloc':
-							$itemDetails['allocs'][] = $line;
-					break;									
-				}
-			}
-			
-		return $itemDetails;
-	}
-	
-	/*
 	Method: getItemDetails
 	Fetches the item details for a particular item and returns them in a associative array.
 	returns an associative array containing item info, images, sources, and alloc data.
@@ -817,7 +662,15 @@ class wishlist extends db{
 		$itemResult = $this->dbQuery($itemQuery);
 		$itemDetailArray = $this->dbAssoc($itemResult,true);		
 		
-		$itemIsForUser = ($itemDetailArray[0]['itemOwner'] == $_SESSION['userid']);
+		$itemIsForUser = ($itemDetailArray[0]['itemOwner'] === $_SESSION['userid'])? true : false;
+		
+		if($this->options['logErrors'] == true){
+			error_log("Wishlist.Class getItemDetails: Requested Item Owner: ".$itemDetailArray[0]['itemOwner']);
+			error_log("Wishlist.Class getItemDetails: Session UserId: ".$_SESSION['userid']);
+			error_log("Wishlist.Class getItemDetails: Item is for user flag: ".$itemIsForUser);
+		}
+
+		
 					
 		$sourcesQuery = "select
 			itemsources.sourceid as itemSourceId,
@@ -828,8 +681,6 @@ class wishlist extends db{
 
 			from itemsources where itemsources.itemid = '{$args['itemid']}'";
 			
-			//Removed for the time being.
-			//,itemsources.primarysource as itemPrimarySource
 			
 		$sourcesResult = $this->dbQuery($sourcesQuery);
 
@@ -858,9 +709,8 @@ class wishlist extends db{
 
 		$allocResult = $this->dbQuery($allocQuery);
 		
-		if($itemIsForUser == false){
+		if($itemIsForUser !== true){
 			$allocDetailArray = ($this->dbRowCount($allocResult) > 0) ? $this->dbAssoc($allocResult): null;
-			
 		}else{
 			$allocDetailArray = "currentUser";
 		}
@@ -880,7 +730,7 @@ class wishlist extends db{
 	*/
 	function getCategories(){
 		
-		$query = "select * from categories";
+		$query = "select c.* from categories c order by category";
 		$categoryResult = $this->dbQuery($query);
 		return $this->dbAssoc($categoryResult);
 	}

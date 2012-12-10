@@ -219,6 +219,7 @@ class user extends db{
 		$checkUniqueQuery = "select userid from users where email = '$cleanEmail' or username = '$cleanUsername'";
 		$uniqueResult = $this->dbRowCount($this->dbQuery($checkUniqueQuery));
 		
+		$returnArray = array();
 				
 		switch($cleanAction){
 			case 'add':
@@ -230,37 +231,52 @@ class user extends db{
 				
 				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail','$cleanEmailMsg',$cleanApproved,$cleanAdmin)";
 				
-				/*				
-				senderId - The id of the Sender
-				receiverId - The id of the receiver
-				message - The Text of the Message
-				forceEmail - If this is true, email will be sent regardless of preference.
-				*/
-				$adminId = $this->dbAssoc($this->dbQuery("select * from {$this->options["table_prefix"]}users where admin = 1"));
-				$this->sendMessage(array("senderId"=>0,"receiverId"=>$adminId[0]['userid'],"message"=>
-					"$cleanFullname has requested an account on your wishlist system. Please login and approve them","forceEmail"=>false));
-
+				$adminId = $this->dbAssoc($this->dbQuery("select * from {$this->options["table_prefix"]}users where admin = 1"),true);
+				//error_log(print_r($adminId,true));
+				
+				$sendRequest = $this->sendMessage(array("senderId"=>0,
+										"receiverId"=>$adminId[0]['userid'],
+										"message"=>"$cleanFullname has requested an account on your wishlist system. Please login and approve them",
+										"forceEmail"=>false));
+										
+										
+				$returnArray['sendRequest'] = $sendRequest;
+				
+				if($sendRequest == true){
+					$returnArray['type'] = "success";
+					$returnArray['message'] = "Your request has been sent to the administrator"
+				}else{
+					$returnArray['type'] = "error";
+					$returnArray['message'] = "There was a problem sending your request. You may need to contact the administrator directly.";
+				}
+				
+				$returnArray['result'] = $this->dbQuery($query);
+				
 			break;
 			case 'edit':
 		
 				if(strlen($cleanPassword) > 0){
 					$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
 				
-					$passwordSQL = "password='$hashedPassword', ";
+					$passwordSQL = ", password='$hashedPassword'";
 				}else{
 					$passwordSQL = "";
 				}
 				
-				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', email_msgs='{$cleanEmailMsg}' ,$passwordSQL approved={$cleanApproved}, admin={$cleanAdmin} WHERE userid ='{$cleanUserId}'";			
+				$approved = (isset($args['approved']))?", approved={$cleanApproved}":"";
+				$admin = (isset($args['admin']))?", admin={$cleanAdmin}":"";
+				
+				$query = "UPDATE {$this->options["table_prefix"]}users SET username='{$cleanUsername}', fullname='{$cleanFullname}', email='{$cleanEmail}', email_msgs='{$cleanEmailMsg}' $passwordSQL $approved $admin WHERE userid ='{$cleanUserId}'";
+				
+				$returnArray['result'] = $this->dbQuery($query);				
 			break;
 			case 'delete':
 				$query = "DELETE FROM {$this->options["table_prefix"]}users WHERE userid = '{$cleanUserId}'";
+				$returnArray['result'] = $this->dbQuery($query);
 			break;
 		}
 		
-		
-		$result = $this->dbQuery($query);
-		return $result;
+		return $returnArray;
 	}
 	
 

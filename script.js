@@ -107,17 +107,21 @@ function displayWishlist(displayData){
 				var sortIcon = $(document.createElement("i")).addClass("sortIcon icon pull-right").attr("id","sort"+e.columnName)
 				th.append(sortIcon);
 				if(e.sortFunctions[0] != undefined){
+					th.addClass("sortable");
 					th.toggle(
 						function() {
 							debug = this;
 							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
-
-							e.sortFunctions[0](displayData);
+							if(displayData.list != undefined && displayData.list.length > 1){
+								e.sortFunctions[0](displayData);
+							}
 							$(this).children("i").addClass("icon-chevron-up");
 						},
 						function(){
 							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
-							e.sortFunctions[1](displayData);
+							if(displayData.list != undefined && displayData.list.length > 1){
+								e.sortFunctions[1](displayData);
+							}
 							$(this).children("i").addClass("icon-chevron-down");
 						}
 					)
@@ -389,9 +393,9 @@ function sortByPriceAsc(listObject){
 function sortByDescriptionDesc(listObject){
 	listObject.currentSort = sortByDescriptionDesc;	
 	listObject.list.sort(function(a,b){
-			if(a.description.toLowerCase() > b.description.toLowerCase()){
+			if(a.description.replace(/['"]/g,"").toLowerCase() > b.description.replace(/['"]/g,"").toLowerCase()){
 				return 1;
-			}else if(a.description.toLowerCase() < b.description.toLowerCase()) {
+			}else if(a.description.replace(/['"]/g,"").toLowerCase() < b.description.replace(/['"]/g,"").toLowerCase()) {
 				return -1;
 			}else{
 				return 0;
@@ -404,9 +408,9 @@ function sortByDescriptionDesc(listObject){
 function sortByDescriptionAsc(listObject){
 	listObject.currentSort = sortByDescriptionAsc;
 	listObject.list.sort(function(a,b){
-		if(a.description.toLowerCase() > b.description.toLowerCase()){
+		if(a.description.replace(/['"]/g,"").toLowerCase() > b.description.replace(/['"]/g,"").toLowerCase()){
 			return -1;
-		}else if(a.description.toLowerCase() < b.description.toLowerCase()) {
+		}else if(a.description.replace(/['"]/g,"").toLowerCase() < b.description.replace(/['"]/g,"").toLowerCase()) {
 			return 1;
 		}else{
 			return 0;
@@ -933,9 +937,6 @@ function buildCategorySelect(){
 
 	//Set these to defaults if they're not defined in the call
 	//I don't think these are necessary any longer because this is no longer generated on the fly.
-	
-//	categoryObject = (categoryObject == undefined)? storedData.categories: categoryObject;
-//	parentElement = (parentElement == undefined)?".categorySelect": parentElement;
 
 	var table = $("table#categoriesTable").empty();
 
@@ -958,7 +959,7 @@ function buildCategorySelect(){
 						.append(e.category,editCategory);
 
 		var row = $(document.createElement('tr'))
-						.append(catTd);	
+						.append(catTd);
 		
 		table.append(row);
 		
@@ -1272,7 +1273,6 @@ function populateItemSourceForm(sourceId){
 }
 
 
-
 /* Method: manageItemSource
 	Adds or Updates an item source.
 
@@ -1336,7 +1336,8 @@ function populateImagesOnForm(itemId){
 		$(response).each(function(i,e){
 			var img = $(document.createElement('img')).attr('src',storedData.filepath+e.filename);
 			var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
-			var removeImageControl =  $(document.createElement('a')).append("×").addClass("close").click(function(){
+			//
+			var removeImageControl =  $(document.createElement('a')).addClass("close").append("×").click(function(){
 				
 				remove = {
 					interact:'wishlist',
@@ -1421,7 +1422,7 @@ function updateUserData(){
 		args[fieldName] = $(fields[fieldName]).val();
 	}
 
-	var emailCheck = $("#manageUser #emailMessages:checked");
+	//var emailCheck = $("#manageUser #emailMessages:checked");
 	
 	var approvedCheck = $("#manageUser #userApproved:checked");
 	var adminCheck = $("#manageUser #userIsAdmin:checked");
@@ -1436,10 +1437,8 @@ function updateUserData(){
 		}
 	}
 
-	if(emailCheck != undefined && emailCheck.length > 0){
-		args.emailMsg = 1;
-	}	
-		
+	args.emailMsg = ($("#manageUser #emailMessages").prop("checked"))? 1:0;
+	
 	if(approvedCheck != undefined && approvedCheck.length > 0){
 		args.approved = 1;
 	}
@@ -1918,13 +1917,14 @@ function getShoppingList(){
 			var bestPrice = $(document.createElement("td")).append(storedData.currencySymbol+e.bestPrice).addClass("currency");
 			
 			var row = $(document.createElement("tr")).append(itemDesc,forName,quantity,bestPrice);
-			listTotal = Number(e.bestPrice)+Number(listTotal);
+			listTotal += Number(e.bestPrice);
+			
 			
 			shoppingListTable.append(row);
 		});
 		
 		var cellName = $(document.createElement("td")).append("Total:").attr("colspan","3").addClass("bold");
-		var cellTotal = $(document.createElement("td")).append(storedData.currencySymbol+listTotal).addClass("currency bold");
+		var cellTotal = $(document.createElement("td")).append(storedData.currencySymbol+listTotal.toPrecision(4)).addClass("currency bold");
 		var totalRow = $(document.createElement("tr")).append(cellName,cellTotal);
 		shoppingListTable.append(totalRow);
 		
@@ -1998,7 +1998,21 @@ function filterList(wishlist, fieldToSearch, searchTerm){
 return returnList;
 }
 
-
+/*
+	Method: uploadImage
+	
+	checks form and executes form submission.
+	
+*/
+function uploadImage(){
+	if($("#uploadfile").val() != ""){
+		$("imageUploadForm").submit();
+	}else{
+		$("#uploadAlertMessage").html("You must select a file for upload");
+		$("#uploadAlert").removeClass("alert-success").addClass("alert-error").show();
+		return false;
+	}
+}
 
 
 

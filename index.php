@@ -2,7 +2,7 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.8");
+define("VERSION","0.9.9");
 
 include 'config.php';
 ?>
@@ -142,10 +142,13 @@ include 'config.php';
 			
 			
 			$("#requestAccount, #addUserButton").click(function(){
-				$("#manageUser input#userId").val("");
+				$("#manageUser input[type='text'],#manageUser input[type='password']").val("");
+				$("#manageUser input[type='checkbox']").prop("checked",false);
+				
 				$("#manageUser input#userAction").val("add");
 				$("#manageUserSaveButton").html("Request Account");
-
+				$("#userFormBlock .modal-header h2").html("Request An Account");
+				
 				$("#userFormBlock").modal('show');
 			});
 			
@@ -176,17 +179,25 @@ include 'config.php';
 				}
 			})
 			
+			$("#uploadAlertClose").click(function(){
+				$("#uploadAlert").hide();
+				$("#uploadAlertMessage").empty();
+			});
 			
+			$("input#uploadfile").change(function(){
+				$("#uploadAlertClose").trigger("click");
+			});
+									
 			//binds firing the update images event to the loading of the relevant iframe.
 			//Most of this should be rewritten into a method on script.js
 			$("#uploadframe").load(function(){
 				uploadResult = $.parseJSON($("#uploadframe").contents().text());
 				if(uploadResult.queryResult == true){
-					$("#uploadAlert").addClass("alert-success");
+					$("#uploadAlert").removeClass("alert-error").addClass("alert-success");
 					$("#uploadAlertMessage").append("The file upload is complete");
 					populateImagesOnForm(uploadResult.itemId);
 				}else{
-					$("#uploadAlert").addClass("alert-error");
+					$("#uploadAlert").removeClass("alert-success").addClass("alert-error");
 					$("#uploadAlertMessage").append("The file upload encountered some problems. Please try again.")				
 				}
 				$("#uploadAlert").show();
@@ -263,12 +274,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			buildRankSelect(); //"#itemRankInput"
 			buildCategorySelect(); //storedData.categories,"#itemCategoryInput"
 
-			jQuery("#myCarousel").carousel('pause');
-			//.on("slid",function(){})
-
-			jQuery("#backToUsersLink").click(function(){
-				jQuery("#myCarousel").carousel('prev');
+			$("#myCarousel").carousel('pause').on("slid",function(){
+				$("#myCarousel").carousel('pause');
 			});
+
+			
+			$("#backToUsersLink").click(function(){
+				$("#myCarousel").carousel('prev');
+			});
+			
 
 			jQuery("#itemSubmit").click(function(){
 				manageItem();
@@ -279,7 +293,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			});
 			
 			$("#openManageUserForm").click(function(){
-				$("#manageUserSaveButton").html("Update Account");				
+				$("#manageUserSaveButton").html("Update Account");
+				$("#userFormBlock .modal-header h2").html("Manage Account");
 				populateManageUserForm(userId);
 			});
 			
@@ -291,6 +306,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				$("#manageItemFormBlock").modal('hide');
 				$('#itemImagesFormBlock').modal('show').on('hide',function(){
 					$("#manageItemFormBlock").modal('show');
+					$("#uploadAlert").hide();
+					$("#uploadfile").val("");
 				});
 
 				//Sets the itemIdForImage to the ID we're editing.
@@ -347,14 +364,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#saveCategory").click(function(){
 				manageCategory();
 			});
-			
-			/*
-			$(".dropdown-toggle").dropdown();
-						
-			$(".dropdown-menu li").click(function(){
-				this.attr("data-filterType")
-			}); */
-			
 			
 			$("#listFilterField").keyup(function(){
 				
@@ -534,8 +543,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<h2>Manage Images</h2>
 	  </div>
 	  <div class="modal-body">
-			<!--	<form id="itemImagesForm" class="form-horizontal" onsubmit="return false;"> -->
-			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" action="ajaxCalls.php" target="uploadframe" >				
+			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" onsubmit="return uploadImage();" action="ajaxCalls.php" target="uploadframe" >				
 				<input type="hidden" name="interact" value="wishlist">
 				<input type="hidden" name="action" value="manageItemImage">
 				<input type="hidden" name="itemImageAction" value="add">
@@ -548,11 +556,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</div>
 				</div>
 			
-				<button type="submit" class="btn btn-primary">Upload Image</button>
+				<button id="uploadSubmit" type="submit" class="btn btn-primary">Upload Image</button>
 			</form>
 
 			<div id="uploadAlert" class="alert">
-			  <a class="close" data-dismiss="alert" href="#">×</a>
+			  <a class="close" id="uploadAlertClose" href="#">×</a>
 			  <span id="uploadAlertMessage"></span>
 			</div>
 			<div id="currentImagesBlock">
@@ -714,13 +722,13 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div class="item">
 					<h2 id="otherWishlistTitle">Wishlist:</h2>									
 					<div class="row">
-						<div class="span3">		
+						<div class="span2">		
 							<a class="btn  btn-primary" href="#" id="backToUsersLink" data-slide="prev">
 								<i class="icon-arrow-left icon-white"></i>
 								Back to Users
 							</a>
 						</div>
-						<div class="span7">
+						<div class="span4">
 							Filter: <input id="listFilterField" type="text" class="input-medium" />		
 							<select id="filterOnValue" class="input-medium">
 								<option value="sources">Source</option>

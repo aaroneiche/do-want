@@ -44,8 +44,12 @@ body{
 
 th{
 	text-align:left;
-	cursor:pointer;	
 }
+
+th.sortable{
+	cursor:pointer;
+}
+
 
 .listTable{
 	margin: 0px auto;
@@ -93,6 +97,9 @@ th{
 .imageBlock{
 	float:left;
 	width:75px;
+	padding: 3px;
+	border: solid lightgray 2px;
+	margin: 2px;
 }
 
 .imageDeleteBlock img{
@@ -244,5 +251,5 @@ table#userMessages td{
 }
 
 div#navBarRow, div#loginFormRow{
-	margin-top:20px;
+	margin-top:60px;
 }

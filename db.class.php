@@ -12,7 +12,11 @@ class db{
 
 	function dbConnect(){
 		$this->dbConn = mysql_connect($this->dbhost,$this->dbuser,$this->dbpass);
-
+		
+		if($this->options['charSet'] != ''){
+			$setChar = mysql_set_charset($this->options['charSet'],$this->dbConn);
+		}
+		
 		$select = mysql_select_db($this->dbname,$this->dbConn);	
 		if(!$select) error_log("err ".mysql_error());
 	}
@@ -89,8 +93,7 @@ class db{
 		$cleanReceiverId = $this->dbEscape($args['receiverId']);
 		$cleanMessage = $this->dbEscape($args['message']);
 		$cleanForceEmail = $this->dbEscape($args['forceEmail']);
-		
-		
+
 		$emailQuery = "select {$this->options["table_prefix"]}users.*, (select {$this->options["table_prefix"]}users.fullname from {$this->options["table_prefix"]}users where {$this->options["table_prefix"]}users.userid = $cleanSenderId) as senderFullname from {$this->options["table_prefix"]}users where userid = $cleanReceiverId";
 		
 		/*
