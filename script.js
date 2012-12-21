@@ -100,7 +100,7 @@ function displayWishlist(displayData){
 		
 	}else{
 		table.html("");
-		hRow = $(document.createElement("tr"));
+		hRow = $(document.createElement("tr")).addClass("hidden-phone");
 		
 		$(displayData.columns).each(function(i,e){
 				var th = $(document.createElement("th")).append(e.columnName)
@@ -110,15 +110,14 @@ function displayWishlist(displayData){
 					th.addClass("sortable");
 					th.toggle(
 						function() {
-							debug = this;
-							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
+							$("#"+$(this).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
 							if(displayData.list != undefined && displayData.list.length > 1){
 								e.sortFunctions[0](displayData);
 							}
 							$(this).children("i").addClass("icon-chevron-up");
 						},
 						function(){
-							$("#"+$(debug).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
+							$("#"+$(this).closest("table")[0].id+" i.sortIcon").removeClass("icon-chevron-up icon-chevron-down");
 							if(displayData.list != undefined && displayData.list.length > 1){
 								e.sortFunctions[1](displayData);
 							}
@@ -181,18 +180,35 @@ function displayWishlist(displayData){
 				if(displayData.columns[column].displayStyles != undefined){
 					cell.addClass(displayData.columns[column].displayStyles);
 				}
-
-				if(displayData.columns[column].columnName != "Tools"){
-					cell.click(function(){
-						getItemDetailInfo(e.itemid);
-					}).addClass("pointer");
+				
+				/*
+					Below we handle any special cases, mainly extra items in columns for phone versions.
+					
+					TODO: Find a way to abstract these calls to output the data to an appropriate column without 
+					defining the column or the extra items
+					
+					maybe: pass the displayColumn value, and clone specifics.
+				*/
+				if(displayData.columns[column].columnName == "Description"){
+					var phoneTools = $(e.displayToolbox).clone(true).addClass("visible-phone");
+					var phoneRanking = $(e.displayRanking).clone().addClass("visible-phone");
+					cell.append(phoneTools, phoneRanking);
 				}
-
+				
+				if(displayData.columns[column].columnName == "Price"){
+					if(e.displayStatus != undefined){
+						var phoneStatus = $(document.createElement('div'))
+											.append(e.displayStatus)
+											.addClass("visible-phone");
+						cell.append(phoneStatus);
+					}
+				}
+								
+				//Finally append the cell to the row.
 				row.append(cell);
-			
 			}
-	
-			table.append(row);								
+			
+			table.append(row);
 		});	
 		
 		//displayData.currentSort.call(this,displayData.list);
@@ -487,7 +503,6 @@ function generateDisplayElements(itemObject){
 			itemObject.displayDescription = $(document.createElement("div"));		
 			itemObject.displayDescription.append($(document.createElement("span")).append(itemObject.description))
 			
-
 			if(itemObject.available == null) itemObject.available = itemObject.quantity;
 			itemObject.displayStatus = (itemObject.available > 0)? itemObject.available+"/"+itemObject.quantity+" Remaining":"None Remaining";
 			
@@ -813,19 +828,6 @@ function renderItemTools(itemObject, toolInfo){
 							.addClass("icon-pencil tool")
 							.attr("title","Edit Source");
 
-/*
-			//Was going to implement this but ended up going a different direction.
-
-			sourcePrimary = $(document.createElement("i"))
-							.addClass("tool");
-			
-			if(itemObject.itemPrimarySource == 1){
-				sourcePrimary.addClass("icon-star").attr("title","Primary");
-			}else{
-				sourcePrimary.addClass("icon-star-open").attr("title","Set as Primary");
-			}				
-*/
-			
 			if(storedData.largeIcons){
 				sourceDelete.addClass("icon-large");
 				sourceEdit.addClass("icon-large");
@@ -849,14 +851,25 @@ function renderItemTools(itemObject, toolInfo){
 		
 		break;		
 	}
+	/*
+		Items that are included in the toolbox regardless
+	*/
+	if(toolInfo != "sourceEdit"){
+		var detailsButton = $(document.createElement("i"))
+					.addClass("icon-large icon-circle-info tool")
+					.click(function(){
+						getItemDetailInfo($(this).closest("tr").attr("data-itemId"));
+					});
 	
+		toolBox.append(detailsButton);
+	}
 	return toolBox;
 	
 }
 
 /*
 Function buildShopForSet
-	Builds a set of html option elements and places them in shop for list on the "Other's lists" tab and the "I'm shopping for" list on the "manage" tab.
+	Builds HTML set items for list selection and list of users a user is shopping for.
 */
 
 function buildShopForSet(){
@@ -902,9 +915,13 @@ function buildShopForSet(){
 							.attr("id","listRowUser-"+e.userid);
 			
 				nameCell.click(function(e){
-					getUserWishlist($(e.target).attr("data-userid"));
-
+					usersName = $(e.target).html(); //As long as the name is the only thing here, we can just grab the cell contents.
+					var forUserId = $(e.target).attr("data-userid");
+					
+					getUserWishlist(forUserId);
+					
 					//Sets the request to fire the slideshow transition onclick.
+					$("#otherWishlistTitle").html("Wishlist for "+usersName);
 					$("#myCarousel").carousel('next');
 				});
 			

@@ -71,7 +71,8 @@ include 'config.php';
 				"sortFunctions":[
 					sortByRankingAsc,
 					sortByRankingDesc
-				]				
+				],
+				"displayStyles":"hidden-phone"
 			},
 			{
 				"columnName":"Price",
@@ -91,12 +92,14 @@ include 'config.php';
 				"sortFunctions":[
 					sortByCategoryAsc,
 					sortByCategoryDesc
-				]
+				],
+				"displayStyles":"hidden-phone"
 			},
 			{
 				"columnName":"Tools",
 				"displayColumn":"displayToolbox",
-				"sortFunctions":[]
+				"sortFunctions":[],
+				"displayStyles":"hidden-phone"
 			},
 		];
 
@@ -104,19 +107,24 @@ include 'config.php';
 		storedData.columns2.splice(4,0,{
 			"columnName":"Status",
 			"displayColumn":"displayStatus",
-			"sortFunctions":[]
+			"sortFunctions":[],
+			"displayStyles":"hidden-phone"
 		});
 		storedData.columns2.splice(5,0,{
 			"columnName":"Sources",
 			"displayColumn":"sources",
 			"sortFunctions":[],
-			"altDisplay":"--"
+			"altDisplay":"--",
+			"displayStyles":"hidden-phone"
 		});
 		
 		//set the default sorting for lists
 		storedData.userWishlist = {};
 		storedData.otherUserWishlist = {};
 		
+		storedData.userWishlist.defaultSort = sortByRankingDesc;
+		storedData.otherUserWishlist.defaultSort = sortByRankingDesc;
+				
 		storedData.userWishlist.currentSort = sortByRankingDesc;
 		storedData.otherUserWishlist.currentSort = sortByRankingDesc;
 				
@@ -280,6 +288,10 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 			
 			$("#backToUsersLink").click(function(){
+
+				storedData.userWishlist.currentSort = storedData.userWishlist.defaultSort;
+				storedData.otherUserWishlist.currentSort = storedData.otherUserWishlist.defaultSort;
+				
 				$("#myCarousel").carousel('prev');
 			});
 			
@@ -378,6 +390,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					displayWishlist(storedData.otherUserWishlist);
 				}
 			})
+			
+			$("select#otherSortDropDown").change(function(){
+				window[this.value](storedData.otherUserWishlist);
+			})
+			
+			$("select#userSortDropDown").change(function(){
+				window[this.value](storedData.userWishlist);
+			})
+			
 			
 			displayShopForMeList();
 			setupUserSearch();
@@ -704,6 +725,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<h2>My Wishlist</h2>
 			<button id="addItems" class="btn btn-primary">Add Item</button>
 
+			<select id="userSortDropDown" class="visible-phone">
+				<option value="sortByDescriptionAsc">Description (Asc)</option>
+				<option value="sortByDescriptionDesc">Description (Desc)</option>
+				<option value="sortByRankingAsc">Rank (Asc)</option>
+				<option value="sortByRankingDesc">Rank (Desc)</option>
+				<option value="sortByPriceAsc">Price (Asc)</option>
+				<option value="sortByPriceDesc">Price (Desc)</option>																																						
+			</select>
+
 			<div id="userWishlistBlock" class="tableBlock">
 				<table id="userWishlist" class="table table-striped table-bordered table-condensed">
 				</table>
@@ -728,15 +758,22 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 								Back to Users
 							</a>
 						</div>
-						<div class="span4">
+						<div class="span6">
 							Filter: <input id="listFilterField" type="text" class="input-medium" />		
 							<select id="filterOnValue" class="input-medium">
 								<option value="sources">Source</option>
 								<option value="displayCategory">Category</option>
 								<option value="description">Description</option>
 							</select>
+							<select id="otherSortDropDown" class="visible-phone">
+								<option value="sortByDescriptionAsc">Description (Asc)</option>
+								<option value="sortByDescriptionDesc">Description (Desc)</option>
+								<option value="sortByRankingAsc">Rank (Asc)</option>
+								<option value="sortByRankingDesc">Rank (Desc)</option>
+								<option value="sortByPriceAsc">Price (Asc)</option>
+								<option value="sortByPriceDesc">Price (Desc)</option>																																								
+							</select>
 						</div>
-						
 					</div>
 					<div id="otherUserWishlistBlock" class="tableBlock">
 						<table id="otherUserWishlist" class="table table-striped table-bordered table-condensed">

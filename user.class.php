@@ -244,7 +244,7 @@ class user extends db{
 				
 				if($sendRequest == true){
 					$returnArray['type'] = "success";
-					$returnArray['message'] = "Your request has been sent to the administrator"
+					$returnArray['message'] = "Your request has been sent to the administrator";
 				}else{
 					$returnArray['type'] = "error";
 					$returnArray['message'] = "There was a problem sending your request. You may need to contact the administrator directly.";
