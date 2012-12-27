@@ -72,7 +72,8 @@ include 'config.php';
 					sortByRankingAsc,
 					sortByRankingDesc
 				],
-				"displayStyles":"hidden-phone"
+				"columnHeaderStyles":"rankWidth",				
+				"displayStyles":"hidden-phone rankWidth"
 			},
 			{
 				"columnName":"Price",
@@ -82,7 +83,8 @@ include 'config.php';
 					sortByPriceAsc,
 					sortByPriceDesc
 				],
-				"displayStyles":"floatRight",
+				"columnHeaderStyles":"priceWidth",
+				"displayStyles":"floatRight priceWidth",
 				"prepend":storedData.currencySymbol
 			},
 			{
@@ -115,7 +117,7 @@ include 'config.php';
 			"displayColumn":"sources",
 			"sortFunctions":[],
 			"altDisplay":"--",
-			"displayStyles":"hidden-phone"
+			"displayStyles":"hidden-phone tableSource"
 		});
 		
 		//set the default sorting for lists
@@ -808,17 +810,20 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 			<div class="row">
 				<div class="span5">			
-
 					<h3>People Shopping for me.</h3>
-					<table id="shoppingForMe" class="table table-striped table-bordered table-condensed">
+					<div class="tableScrollContainer">	
+						<table id="shoppingForMe" class="table table-striped table-bordered table-condensed">
 						
-					</table>
+						</table>
+					</div>
 				</div>
 				<div class="span5">			
 					<h3>People I'm Shopping For:</h3>
-					<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
+					<div class="tableScrollContainer">	
+						<table id="currentShopFor" class="table table-striped table-bordered table-condensed">
 						
-					</table>
+						</table>
+					</div>
 					<div class="input-append">
 						<form class="form-search" onsubmit="return false;">
 							<input type="hidden" id="userToRequest">							
@@ -833,24 +838,30 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="row">
 				<div class="span10">
 					<h3>Users</h3>
-					<button id="addUserButton" class="btn btn-primary">Add User</button>					
-					<table id="adminUserList" class="table table-striped table-bordered table-condensed">
+					<button id="addUserButton" class="btn btn-primary">Add User</button>
+					<div class="tableScrollContainer">										
+						<table id="adminUserList" class="table table-striped table-bordered table-condensed">
 
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>			
 			<div class="row">
 				<div class="span5">
 					<h3>Categories</h3>
-					<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
+					<div class="tableScrollContainer">
+						<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
 						
-					</table>
+						</table>
+					</div>
 				</div>
 				<div class="span5">
-					<h3>Rankings</h3>					
-					<table id="rankingsTable" class="table table-striped table-bordered table-condensed">
+					<h3>Rankings</h3>
+					<div class="tableScrollContainer">
+						<table id="rankingsTable" class="table table-striped table-bordered table-condensed">
 						
-					</table>					
+						</table>	
+					</div>				
 				</div>				
 			</div>
 			<?php } ?>							

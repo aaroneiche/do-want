@@ -106,6 +106,11 @@ function displayWishlist(displayData){
 				var th = $(document.createElement("th")).append(e.columnName)
 				var sortIcon = $(document.createElement("i")).addClass("sortIcon icon pull-right").attr("id","sort"+e.columnName)
 				th.append(sortIcon);
+				
+				if(e.columnHeaderStyles != undefined){
+					th.addClass(e.columnHeaderStyles);
+				}
+				
 				if(e.sortFunctions[0] != undefined){
 					th.addClass("sortable");
 					th.toggle(
@@ -199,7 +204,7 @@ function displayWishlist(displayData){
 					if(e.displayStatus != undefined){
 						var phoneStatus = $(document.createElement('div'))
 											.append(e.displayStatus)
-											.addClass("visible-phone");
+											.addClass("visible-phone pull-right");
 						cell.append(phoneStatus);
 					}
 				}

@@ -253,3 +253,24 @@ table#userMessages td{
 div#navBarRow, div#loginFormRow{
 	margin-top:60px;
 }
+
+div.tableScrollContainer{
+	overflow-y: scroll;
+	height: 170px;
+}
+
+table#otherUserWishlist, table#userWishlist{
+	table-layout:fixed;
+}
+
+.rankWidth{
+	width:75px;
+}
+
+.priceWidth{
+	width:14ex;
+}
+
+.tableSource{
+	overflow:hidden;
+}

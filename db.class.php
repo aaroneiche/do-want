@@ -128,11 +128,21 @@ class db{
 		$result = $this->dbQuery($query);
 		return $result;
 	}
+
+
+	/*
+	Method manageEvent
+	Adds, updates or deletes an event in the system
+	
+	eventid - (for edit or delete) The id of the event to manage.
+	userid - The id of the user creating this event.
+	date - The date of this event
+	description - A description of this event
+	recurring - whether or not this event
+	
+	*/
+
 	
 }
-
-
-
-
 
 ?>
