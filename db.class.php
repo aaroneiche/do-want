@@ -134,6 +134,7 @@ class db{
 	Method manageEvent
 	Adds, updates or deletes an event in the system
 	
+	eventaction - which action to take: add, edit, or delete
 	eventid - (for edit or delete) The id of the event to manage.
 	userid - The id of the user creating this event.
 	date - The date of this event
@@ -141,6 +142,98 @@ class db{
 	recurring - whether or not this event
 	
 	*/
+
+	function manageEvent($args){
+		
+		
+		
+	}
+
+
+	/*
+	Method checkForUpdates
+	Checks with a defined remote server to determine if any updates are available.
+	
+	
+	
+	
+	*/
+
+
+	
+	/*
+	Method updateFiles
+	Unpacks an update, checks it for validity, and processes an update.
+	*/
+
+	function updateFiles($filePath){
+		
+		include_once('config.php');
+		$responseObject = array();
+				
+		//Create a new zipArchive Object for extracting the archive.
+		$zip = new ZipArchive;
+		$res = $zip->open($filePath);
+	
+
+		//If our archive opens properly.
+		if ($res === TRUE) {
+			//Find the manifest file
+			$manifestFile = $zip->locateName("manifest.json");
+		
+			//If we can find the manifest file in the archive
+			if($manifestFile){
+
+				//Lets get that manifest out and look at it.
+				$manifest = $zip->getFromIndex($manifestFile);
+				$manifestArray = json_decode($manifest,true); //extract it to a php array.
+			
+				if($manifestArray['version'] > VERSION){
+			
+					$zip->extractTo("updates");
+			
+					//Iterate through each of the files in the file list. 
+					foreach($manifestArray['filelist'] as $file){
+				
+						$calculatedSum = md5_file("updates/".$file['file']); // calculated the extracted file's checksum.
+						$isMatch = $calculatedSum == $file['checksum']; //Check that the info in the manifest matches the actual file values.
+						//$isMatchOutput == ($isMatch)?"Yes":"No"; //A helpful display value.
+
+						if($isMatch){
+
+							$copyResult = rename("updates/".$file['file'],$file['file']); //Move the file to it's appropriate location
+							$copyResultChecksum = md5_file($file['file']); //Get the checksum of the file for the newly moved file.
+						
+							//Verify the file we just moved is the file we wanted to move.
+							if($copyResultChecksum == $file['checksum']){ 
+								//print "<p>".$file['file']." copied and verified</p>";
+							}
+						}				
+					}
+
+				}else{
+					//versions aren't a good match
+					print "Version in update file is older than you're running";
+				}
+			
+			}else{
+				//No manifest file, this is probably not a valid update file.
+				print "No manifest file was found, this may not be a valid update archive.";
+			}
+			 $zip->close();
+		 
+	     } else {
+	         echo 'failed';
+	     }
+		
+		
+		
+		
+		
+		
+	}
+
+
 
 	
 }

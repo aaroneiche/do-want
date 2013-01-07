@@ -2,8 +2,6 @@
 session_start();
 //	print_r($_SESSION);
 
-define("VERSION","0.9.9");
-
 include 'config.php';
 ?>
 <!DOCTYPE html>
@@ -26,7 +24,7 @@ include 'config.php';
 
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="bootstrap/js/bootstrap.js"></script>
-	<script src="bootstrap/js/bootstrap-typeahead.js"></script>	
+	<script src="bootstrap/js/bootstrap-typeahead.js"></script>
 
 	<link href="style.css" rel="stylesheet">
 
@@ -428,7 +426,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</script>
 <?php /* print_r($_SESSION); */?>
 
-
 <div class="modal hide fade" id="manageItemFormBlock">
 	  <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -437,10 +434,30 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  <div class="modal-body">
 		<form id="manageItemForm" class="form-horizontal" onsubmit="return false;">
 			<input type="hidden" id="itemId" />
-			<div class="control-group"><label class="control-label" for="itemDescriptionInput">Item Description:</label><div class="controls"><input type="text" id="itemDescriptionInput"/></div></div>
-			<div class="control-group"><label class="control-label" for="itemRankingInput">Item Rank:</label><div class="controls"><select id="itemRankInput"></select></div></div>				
-			<div class="control-group"><label class="control-label" for="itemCategoryInput">Item Category:</label><div class="controls"><select id="itemCategoryInput"></select></div></div>
-			<div class="control-group"><label class="control-label" for="itemQuantityInput">Item Quantity:</label><div class="controls"><input type="text" id="itemQuantityInput" class="input-mini"/></div></div>
+			<div class="control-group">
+				<label class="control-label" for="itemDescriptionInput">Item Description:</label>
+				<div class="controls">
+					<input type="text" id="itemDescriptionInput"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="itemRankingInput">Item Rank:</label>
+				<div class="controls">
+					<select id="itemRankInput"></select>
+				</div>
+			</div>				
+			<div class="control-group">
+				<label class="control-label" for="itemCategoryInput">Item Category:</label>
+				<div class="controls">
+					<select id="itemCategoryInput"></select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="itemQuantityInput">Item Quantity:</label>
+				<div class="controls">
+					<input type="text" id="itemQuantityInput" class="input-mini"/>
+				</div>
+			</div>
 			<div class="control-group">
 				<label class="control-label" for="itemCommentInput">Item Comment:</label>
 				<div class="controls">
@@ -457,9 +474,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<div class="controls">
 					<button id="openAddImageForm" class="btn btn-primary">Manage Images</button>
 				</div>
-			</div>			
-			
-			
+			</div>
   		</form>
 	</div>
 
@@ -512,7 +527,67 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
     <a href="#" class="btn" data-dismiss="modal">Close</a>
   </div>
 </div>
-
+<!--
+<div class="modal hide fade" id="itemDetailsModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3 id="itemDetailName"></h3>
+	</div>
+	<div class="modal-body">
+		<div class="pull-left well">
+			<div id="itemDetailComment" class="itemDetailContainer"></div>
+			<div id="itemDetailRanking" class="itemDetailContainer"></div>
+			<div id="itemDetailAlloc" class="itemDetailContainer"></div>			
+		</div>
+		<div class="pull-left well">
+			<div id="itemDetailImageCarousel" class="carousel slide">
+				<div class="carousel-inner">
+				</div>
+				 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-chevron-left"></i></a>
+				 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-chevron-right"></i></a>
+			</div>			
+		</div>
+		<div class="pull-left well">
+			<table id="itemDetailSourcesTable" width="100%" class="itemDetailContainer table table-striped table-bordered table-condensed">
+			</table>
+		</div>
+			
+	<table border="1" width="100%" class="table table-bordered">
+		<tr>
+			<td id="itemDetailInfoBox">
+				<h3 id="itemDetailName" class="itemDetailContainer"></h3>
+				<div id="itemDetailRanking" class="itemDetailContainer"></div>
+				<div id="itemDetailAlloc" class="itemDetailContainer"></div>
+			</td>
+			<td id="itemDetailImageBox" rowspan="3" width="50%">
+				<div id="itemDetailImageCarousel" class="carousel slide">
+					<div class="carousel-inner">
+					</div>
+					 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-chevron-left"></i></a>
+					 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-chevron-right"></i></a>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td id="itemDetailSourcesBox">
+				<table id="itemDetailSourcesTable" width="100%" class="itemDetailContainer">
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td id="itemDetailCommentsBox">
+				<div id="itemDetailComment" class="itemDetailContainer">
+				</div>
+			</td>
+		</tr>
+	</table>
+-
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+  </div>
+</div>
+-->
 <div class="modal hide fade" id="itemSourceFormBlock">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>

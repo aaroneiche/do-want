@@ -14,7 +14,6 @@ debug = {};
 /*
 	Function displayAlert
 	Displays information to the user to be acted upon.
-	
 */
 
 function displayAlert(messageToAppend){

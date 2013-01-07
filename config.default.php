@@ -34,4 +34,9 @@ $options['includeCustom'] = true;
 //Alternatively, you can set any character set you like here.
 $options['charSet'] = 'utf8';
 
+
+
+//DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
+define("VERSION","0.9.92");
+
 ?>
