@@ -4,7 +4,8 @@ session_start();
 $classFileNames = array(
 	"wishlist.class.php",
 	"user.class.php",
-	"setup.class.php"
+	"setup.class.php",
+	"db.class.php"
 );
 
 $optionSet = array();

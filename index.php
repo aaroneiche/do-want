@@ -38,6 +38,7 @@ include 'config.php';
 		
 		/* This is really hacky, but it's the easiest way to call this and not break the existing methodology.*/
 		
+		
 		storedData.categories = jQuery.parseJSON('<?php
 			$_REQUEST["action"] = "getCategories";
 			$_REQUEST["interact"] = "wishlist";

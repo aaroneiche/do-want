@@ -145,97 +145,129 @@ class db{
 
 	function manageEvent($args){
 		
-		
-		
 	}
 
-
 	/*
-	Method checkForUpdates
-	Checks with a defined remote server to determine if any updates are available.
-	
-	
-	
-	
+	Method: checkForUpdates
+	Checks with a defined remote server to determine if any updates are available.	
 	*/
 
+	function checkForUpdates(){
+		
+		if (function_exists('curl_init')) {
+			
+		   $ch = curl_init(); 
+		   curl_setopt($ch, CURLOPT_URL, $this->options['updateSource']."?v=".VERSION);
+		   curl_setopt($ch, CURLOPT_HEADER, 0);
+		   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		   curl_setopt($ch, CURLOPT_USERAGENT, USER_AGENT_STRING);
+
+		   $content = curl_exec($ch);
+		   curl_close($ch);
+		   
+		   error_log($content);
+		   return json_decode($content);
+		}
+	}
 
 	
 	/*
-	Method updateFiles
+	Method: updateFiles
 	Unpacks an update, checks it for validity, and processes an update.
+	
 	*/
-
 	function updateFiles($filePath){
 		
-		include_once('config.php');
-		$responseObject = array();
-				
-		//Create a new zipArchive Object for extracting the archive.
-		$zip = new ZipArchive;
-		$res = $zip->open($filePath);
+	}
+
+	/*
+	Method: downloadFile
+	Downloads a file to the defined uploads directory and returns the path when complete. 
 	
-
-		//If our archive opens properly.
-		if ($res === TRUE) {
-			//Find the manifest file
-			$manifestFile = $zip->locateName("manifest.json");
-		
-			//If we can find the manifest file in the archive
-			if($manifestFile){
-
-				//Lets get that manifest out and look at it.
-				$manifest = $zip->getFromIndex($manifestFile);
-				$manifestArray = json_decode($manifest,true); //extract it to a php array.
+	@fileUri - The URI of the file to download.
+	@fileName - The Name of the file.
+	
+	*/
+	function downloadFile($args){
+		if (function_exists('curl_init')) {
 			
-				if($manifestArray['version'] > VERSION){
+			error_log($args['fileUri']);
 			
-					$zip->extractTo("updates");
-			
-					//Iterate through each of the files in the file list. 
-					foreach($manifestArray['filelist'] as $file){
-				
-						$calculatedSum = md5_file("updates/".$file['file']); // calculated the extracted file's checksum.
-						$isMatch = $calculatedSum == $file['checksum']; //Check that the info in the manifest matches the actual file values.
-						//$isMatchOutput == ($isMatch)?"Yes":"No"; //A helpful display value.
+		   $ch = curl_init(); 
+		   curl_setopt($ch, CURLOPT_URL, $args['fileUri']);
+		   curl_setopt($ch, CURLOPT_HEADER, 0);
+		   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		   curl_setopt($ch, CURLOPT_USERAGENT, USER_AGENT_STRING);
 
-						if($isMatch){
-
-							$copyResult = rename("updates/".$file['file'],$file['file']); //Move the file to it's appropriate location
-							$copyResultChecksum = md5_file($file['file']); //Get the checksum of the file for the newly moved file.
-						
-							//Verify the file we just moved is the file we wanted to move.
-							if($copyResultChecksum == $file['checksum']){ 
-								//print "<p>".$file['file']." copied and verified</p>";
-							}
-						}				
-					}
-
-				}else{
-					//versions aren't a good match
-					print "Version in update file is older than you're running";
-				}
-			
-			}else{
-				//No manifest file, this is probably not a valid update file.
-				print "No manifest file was found, this may not be a valid update archive.";
-			}
-			 $zip->close();
-		 
-	     } else {
-	         echo 'failed';
-	     }
-		
-		
-		
-		
-		
-		
+		   $content = curl_exec($ch);
+		   curl_close($ch);
+		   file_put_contents($this->options['filepath'].$args['fileName'], $content);
+		   return $this->options['filepath'].$args['fileName'];
+		}		
 	}
 
 
+	/*
+	Method: backupApp
+	This method builds a file-copy backup of the Do Want application. It adds items into a ZIP archive.
+	
+	@exclude - an array of items to exclude.
+	*/
+	function backupApp($exclude = array()){		
+		$backupName = "doWantBackup_".date("Ymd").".zip";
+		
+		$zip = new ZipArchive();
+		$res = $zip->open($this->options['filepath'].$backupName,ZipArchive::CREATE);
+		
+		//MySQL backup needs to be added in here as well.
+		
+		
+		
+		$exclude_defaults = array(".", "..", ".htaccess", ".DS_Store",".git",".gitignore","custom","uploads","generateUpdate.php","update.zip");
+		$exclude_list = array_merge($exclude_defaults,$exclude);
+		
+		$this->recursiveCreateArchive("./", $zip, $exclude_list);
+		
+		//$zip->addFromString('manifest.json', json_encode($manifestArray));
+		$zip->close();
+	}
+	
+	
+	/*
+	Method: recursiveCreateArchive
+	Recursively iterates through a directory tree and adds all items to a zip Archive.
+		
+	@dir - The directory to start in.
+	@zipArchive - An instantiated ZipArchive Object.
+	@zipdir - Optional: 
+	
+	*/
+	function recursiveCreateArchive($dir, $zipArchive, $excludeArray, $zipdir = ''){
+		
+		if (is_dir($dir)) { 
+			if ($dh = opendir($dir)) { 
 
+				//Add the directory
+				if(!empty($zipdir)) $zipArchive->addEmptyDir($zipdir); 
+			   
+				// Loop through all the files 
+				while (($file = readdir($dh)) !== false) { 
+
+					if(!in_array($file,$excludeArray)){            
+					//If it's a folder, run the function again!
+						if(!is_file($dir . $file)){
+							// Skip parent and root directories 
+							$this->recursiveCreateArchive($dir . $file . "/", $zipArchive, $excludeArray, $zipdir . $file . "/");
+						}else{
+							// Add the files
+							$zipArchive->addFile($dir . $file, $zipdir . $file);
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	
 }
-
 ?>
