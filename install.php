@@ -12,7 +12,12 @@
 
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<script>
-			
+		
+			jQuery.ajaxSetup({
+				url: 'ajaxCalls.php',
+				type: 'POST'
+			});
+
 			
 			function setupAdminUser(){
 				
@@ -130,9 +135,30 @@
 							'nodb':true
 					}
 				}
+				
+				jQuery.ajax({
+					'data':data
+				}).done(function(response,textStatus){
+					if(response == true){
+						$("#step-one div.alert-success").fadeIn();
+						$("#stepOneNextButton").prop("disabled",false).removeClass("disabled");
+					}else if(response == false){
+						$("#step-one div.alert-error").fadeIn();
+					}else{
+						$("#step-one div.alert-error").html("Invalid Data is coming back from the server. Please contact support.").fadeIn();
+					}
+				}).fail(function(response,textStatus){
+					console.log(textStatus);
+					console.log(response);
+					$("#step-one div.alert-error").html("There was an issue communicating with the server.").fadeIn();
+				});
+				
 				$("#step-one div.alert").hide();
 				
+				/*
 				jQuery.post('ajaxCalls.php',data,function(response){
+					
+					error_log(response);
 					
 					if(response == true){
 						$("#step-one div.alert-success").fadeIn();
@@ -141,6 +167,7 @@
 						$("#step-one div.alert-error").fadeIn();
 					}
 				},"json");
+				*/
 			}
 				
 			function setupTables(){

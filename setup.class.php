@@ -10,6 +10,7 @@ class setup extends db{
 		dir - the relative path of the directory in question.
 	*/
 	function checkDirectoryWriteable($args){
+		error_log(is_writeable($args['dir']));
 		return is_writable($args['dir']);
 	}
 	

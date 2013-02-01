@@ -22,21 +22,23 @@ if(!isset($_REQUEST['args'])){
 	$_REQUEST['args'] = $_REQUEST;
 }
 
-
-//Create new instance of the 
 $instance = new $_REQUEST['interact']();
 
-$instance->dbhost = $dbhost;
-$instance->dbname = $dbname;
-$instance->dbuser = $dbuser;
-$instance->dbpass = $dbpass;
-$instance->options = $options;
+if(!isset($_REQUEST['args']['nodb'])){
+	//Create new instance of the 
+	
+	$instance->dbhost = $dbhost;
+	$instance->dbname = $dbname;
+	$instance->dbuser = $dbuser;
+	$instance->dbpass = $dbpass;
+	$instance->options = $options;
+}
 
 /*
 We provide a flag for non-db calls. Ideally anything not done with the DB is done client-side,
 but for some setup items, we need to have server-side stuff happening.
 */
-if(!isset($_REQUEST['nodb'])){
+if(!isset($_REQUEST['args']['nodb'])){
 	$instance->dbConnect();
 }
 
