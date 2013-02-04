@@ -165,34 +165,61 @@ class db{
 		   $content = curl_exec($ch);
 		   curl_close($ch);
 		   
-		   error_log($content);
 		   return json_decode($content);
 		}
 	}
 
-	
 	/*
 	Method: updateFiles
 	Unpacks an update, checks it for validity, and processes an update.
+	Returns a list of updated files.
+	
+	@fileArray - The manifest file data (with filenames and relevant MD5 checksums)
+	@zipArchive - The zipArchive object created with the update archive.
 	
 	*/
-	function updateFiles($filePath){
+	function updateFiles($fileArray,$zipArchive){
+
+		$responseObject = array(
+			"updateList"
+		);
+
+		foreach($fileArray as $file){
+	
+			if(!isset($file['name'])){
+				copyUpdateFiles($file,$zipArchive);
+			}else{
+				$fileChecksum = md5_file($file['path'].$file['name']);
+				
+				if($fileChecksum != $file['checksum']){
+									
+					$result = $zipArchive->extractTo($file['path'], $file['name']);
+					
+					if($result){
+						$responseObject['updateList'][$file['name']] = "Updated!";
+					}else{
+						$responseObject['updateList'][$file['name']] = "Update failed";
+					}					
+					
+				}				
+			}
+		}
 		
-	}
+		return $responseObject;
+	}	
+	
 
 	/*
-	Method: downloadFile
+	Method: downloadUpdateFile
 	Downloads a file to the defined uploads directory and returns the path when complete. 
 	
 	@fileUri - The URI of the file to download.
 	@fileName - The Name of the file.
 	
 	*/
-	function downloadFile($args){
+	function downloadUpdateFile($args){
 		if (function_exists('curl_init')) {
-			
-			error_log($args['fileUri']);
-			
+
 		   $ch = curl_init(); 
 		   curl_setopt($ch, CURLOPT_URL, $args['fileUri']);
 		   curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -220,9 +247,7 @@ class db{
 		$res = $zip->open($this->options['filepath'].$backupName,ZipArchive::CREATE);
 		
 		//MySQL backup needs to be added in here as well.
-		
-		
-		
+				
 		$exclude_defaults = array(".", "..", ".htaccess", ".DS_Store",".git",".gitignore","custom","uploads","generateUpdate.php","update.zip");
 		$exclude_list = array_merge($exclude_defaults,$exclude);
 		

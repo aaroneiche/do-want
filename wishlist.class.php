@@ -396,7 +396,6 @@ class wishlist extends db{
 					where
 						itemid = {$this->dbEscape($args['itemid'])}
 				";
-				error_log($this->dbEscape($args['quantity']));
 			break;
 			case 'delete':
 				$query = "delete from items where itemid = {$this->dbEscape($args['itemid'])}";
@@ -458,7 +457,7 @@ class wishlist extends db{
 						'{$this->dbEscape($args['sourceprice'])}',
 						'{$this->dbEscape($args['sourcecomments'])}',						
 						'{$_SESSION['userid']}'
-					)";		
+					)";
 			break;
 			case 'edit':
 				$query = "update itemsources set
@@ -506,8 +505,7 @@ class wishlist extends db{
 				//Random name to prevent overwriting files.
 				$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];
 				
-				$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName); //
-				
+				$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName); 				
 				$query = "insert into itemimages(itemid,filename) values(
 					'{$this->dbEscape($args['itemid'])}',
 					'{$this->dbEscape($randName)}'
@@ -805,10 +803,5 @@ class wishlist extends db{
 	}
 
 }
-
-	
-
-	
-
 
 ?>

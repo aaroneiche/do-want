@@ -29,6 +29,12 @@ include 'config.php';
 	<link href="style.css" rel="stylesheet">
 
 	<script>
+		jQuery.ajaxSetup({
+			url: 'ajaxCalls.php',
+			type: 'POST'
+		});
+			
+	
 		/* Lest you sneaky users think you can change this and gain access to your list, 
 		 all db calls check session IDs, so messing with this value won't get you very far.*/
 		
@@ -36,9 +42,7 @@ include 'config.php';
 		listReceived = 0;
 		storedData = {};
 		
-		/* This is really hacky, but it's the easiest way to call this and not break the existing methodology.*/
-		
-		
+		// By including the output of the ajax call instead of using an ajax call, we're guaranteed to have this available at page load.	
 		storedData.categories = jQuery.parseJSON('<?php
 			$_REQUEST["action"] = "getCategories";
 			$_REQUEST["interact"] = "wishlist";
@@ -196,6 +200,7 @@ include 'config.php';
 			$("input#uploadfile").change(function(){
 				$("#uploadAlertClose").trigger("click");
 			});
+			
 									
 			//binds firing the update images event to the loading of the relevant iframe.
 			//Most of this should be rewritten into a method on script.js
@@ -415,6 +420,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				deleteUserFromSystem($("#deleteObjectForm #deleteObjectId").val());
 			});
 			
+			
+			//$("#checkForUpdatesButton").click(function(){
+			
+			checkForUpdates();
+			
+			//})
+			
+			
 <?php
 }
 ?>
@@ -528,67 +541,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
     <a href="#" class="btn" data-dismiss="modal">Close</a>
   </div>
 </div>
-<!--
-<div class="modal hide fade" id="itemDetailsModal">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h3 id="itemDetailName"></h3>
-	</div>
-	<div class="modal-body">
-		<div class="pull-left well">
-			<div id="itemDetailComment" class="itemDetailContainer"></div>
-			<div id="itemDetailRanking" class="itemDetailContainer"></div>
-			<div id="itemDetailAlloc" class="itemDetailContainer"></div>			
-		</div>
-		<div class="pull-left well">
-			<div id="itemDetailImageCarousel" class="carousel slide">
-				<div class="carousel-inner">
-				</div>
-				 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-chevron-left"></i></a>
-				 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-chevron-right"></i></a>
-			</div>			
-		</div>
-		<div class="pull-left well">
-			<table id="itemDetailSourcesTable" width="100%" class="itemDetailContainer table table-striped table-bordered table-condensed">
-			</table>
-		</div>
-			
-	<table border="1" width="100%" class="table table-bordered">
-		<tr>
-			<td id="itemDetailInfoBox">
-				<h3 id="itemDetailName" class="itemDetailContainer"></h3>
-				<div id="itemDetailRanking" class="itemDetailContainer"></div>
-				<div id="itemDetailAlloc" class="itemDetailContainer"></div>
-			</td>
-			<td id="itemDetailImageBox" rowspan="3" width="50%">
-				<div id="itemDetailImageCarousel" class="carousel slide">
-					<div class="carousel-inner">
-					</div>
-					 <a class="left" href="#itemDetailImageCarousel" data-slide="prev"><i class="icon-chevron-left"></i></a>
-					 <a class="right" href="#itemDetailImageCarousel" data-slide="next"><i class="icon-chevron-right"></i></a>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td id="itemDetailSourcesBox">
-				<table id="itemDetailSourcesTable" width="100%" class="itemDetailContainer">
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td id="itemDetailCommentsBox">
-				<div id="itemDetailComment" class="itemDetailContainer">
-				</div>
-			</td>
-		</tr>
-	</table>
--
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Close</a>
-  </div>
-</div>
--->
+
 <div class="modal hide fade" id="itemSourceFormBlock">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -786,11 +739,15 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<li><a href="#" id="manageTab" class="navLink" data-section="manage">
 						Manage<span id="messageIndicator">&nbsp;<span id="messagesIcon" class="badge badge-important"><i class="icon-envelope icon-white"></i></span>&nbsp;</span>
 					</a></li>
-
 			    </ul>
 			    <ul class="nav pull-right">			
-					<li><a href="#" onclick="logout();" id="logoutButton">Logout</a></li>
-					<!-- <li><a href="#" id="helpButton"><span class="badge badge-inverted">?</span></a></li> -->
+				<?php if($_SESSION['admin'] == true){ ?>
+					<li><a href="#" id="adminTab" class="navLink" data-section="admin">
+						Admin
+					</a></li>
+				<?php } ?>					
+					
+					<li><a href="#" onclick="logout();" id="logoutButton">Logout</a></li>					
 				</ul>
 			</div>
 		  </div>
@@ -942,6 +899,17 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			</div>
 			<?php } ?>							
 		</div>
+		<?php if($_SESSION['admin'] == true){ ?>
+		<div id="admin" class="section">
+			<h2>Administration</h2>
+			This is the admin section - it should be visible only if the current user has the admin flag.
+			
+			<div class="row">
+				<button id="Get Update" class="btn btn-primary">Get Update</button>
+				<span id="updateTextInfo"></span>
+			</div>
+		</div>	
+		<?php } ?>
 	</div>
 
 </div>

@@ -13,6 +13,7 @@
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<script>
 		
+			//Support for defaults on ajax calls using .ajax instead of .post
 			jQuery.ajaxSetup({
 				url: 'ajaxCalls.php',
 				type: 'POST'

@@ -2035,6 +2035,52 @@ function uploadImage(){
 	}
 }
 
+/*
+	Method: checkForUpdates
+	
+	Checks for updates and returns update information.
+*/
+function checkForUpdates(){
+	
+	var data = {
+		'interact':'setup',
+		'action':'checkForUpdates'
+	}
 
+	$("#updateTextInfo").html("Checking for update...");
 
+	jQuery.ajax({
+		'data':data,
+		'dataType':"json"		
+	}).done(function(response,textStatus){
+		if(response){
+			$("#updateTextInfo").html(response.message);
+			
+			storedData.availableUpdate = response;
+		}
+	})
+	
+}
+
+function getUpdate(){
+	var data = {
+		'interact':'setup',
+		'action':'downloadUpdateFile'
+		'args':{
+			"fileUri":storedData.availableUpdate.file,
+			"filePath":
+		}
+	}
+
+	$("#updateTextInfo").html("Checking for update..");
+
+	jQuery.ajax({
+		'data':data
+	}).done(function(response,textStatus){
+		if(response){
+			$("#updateTextInfo").html(response);
+		}
+	})	
+	
+}
 
