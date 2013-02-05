@@ -111,8 +111,23 @@ class setup extends db{
 	}
 
 	/*
-		Check 
+		testDBCredentials
 	*/
+	function testDBCredentials($args){
+		
+		$this->dbhost = $args['host'];
+		$this->dbname = $args['dbname'];
+		$this->dbuser = $args['dbuser'];
+		$this->dbpass = $args['dbpass'];
+		
+		$this->options = array("charSet"=>"utf8");
+		
+		$response = $this->dbConnect();
+		
+		return $response;
+		
+	}
+	
 }
 
 ?>

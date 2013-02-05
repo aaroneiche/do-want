@@ -78,7 +78,7 @@
 				
 			}
 			
-			function createConfig(){
+			function getConfigFields(){
 				var args = {
 					'nodb':true,
 					'host': $("#host").val(),
@@ -106,12 +106,19 @@
 				if(args['dbpass'].length == 0){
 					alert("You must fill in a database password");
 					return false;
-				}												
+				}
 				
+				return args;
+			}
+			
+			
+			function createConfig(){
+				var configFields = getConfigFields();
+
 				var data = {
 					'interact':'setup',
 					'action':'generateConfigFile',
-					'args':args
+					'args': configFields
 				}
 
 				jQuery.post('ajaxCalls.php',data,function(response){
@@ -140,17 +147,15 @@
 				jQuery.ajax({
 					'data':data
 				}).done(function(response,textStatus){
-					if(response == true){
+					if(response){
 						$("#step-one div.alert-success").fadeIn();
 						$("#stepOneNextButton").prop("disabled",false).removeClass("disabled");
-					}else if(response == false){
+					}else if(!response){
 						$("#step-one div.alert-error").fadeIn();
 					}else{
-						$("#step-one div.alert-error").html("Invalid Data is coming back from the server. Please contact support.").fadeIn();
+						$("#step-one div.alert-error").html("Response from server is unknown.").fadeIn();
 					}
 				}).fail(function(response,textStatus){
-					console.log(textStatus);
-					console.log(response);
 					$("#step-one div.alert-error").html("There was an issue communicating with the server.").fadeIn();
 				});
 				
@@ -191,7 +196,28 @@
 					}
 				},"json");				
 			}
+
+			function checkDatabaseConnect(){
+			
+				var configFields = getConfigFields();
 				
+				if(!configFields){
+					return false;
+				}
+							
+				jQuery.ajax({
+					"data":{
+						"interact":"setup",
+						"action":"testDBCredentials",
+						"args":configFields
+					}
+				}).done(function(response,responseCode){
+					if(!response){
+						
+					}
+				})
+			}
+			
 			jQuery(document).ready(function(){
 				//Setup the carousel and make sure it doesn't auto advance.
 				$('#setupCarousel').carousel('pause').on('slid',function(){
@@ -202,6 +228,11 @@
 					createConfig();
 				});
 
+				$("button#checkCredentials").click(function(){
+					checkDatabaseConnect();
+				});
+				
+				
 				$("button#directoryWriteableCheckButton").click(function(){
 					checkDirectoryWritable();
 				});
@@ -321,6 +352,7 @@
 									</div>									
 									
 									<div>
+										<button class="btn btn-success" id="checkCredentials">Check These Credentials</button>
 										<button class="btn btn-success" id="createConfig">Create Configuration</button>
 										<button id="stepTwoNextButton" class="btn btn-primary pull-right nextStepButton disabled" disabled>Next</button>
 									</div>									
@@ -329,9 +361,7 @@
 						</div>
 				  		<div id="step-three" class="item">
 							<div class="well">
-								<p>Now we need to make sure the DB info you provided is valid for talking to the DB. 
-									Once we do that, we can create the Database tables.
-								</p>
+								<p>Now we need to create the Database tables.</p>
 								<div id="tablesResponseSuccess" class="hide alert alert-success">
 									
 								</div>

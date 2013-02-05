@@ -18,7 +18,17 @@ class db{
 		}
 		
 		$select = mysql_select_db($this->dbname,$this->dbConn);	
-		if(!$select) error_log("err ".mysql_error());
+		if(!$select){
+			
+			$response = array(
+				"error"=>mysql_errno(),
+				"message"=>mysql_error()
+			);
+			return $response;
+			
+		}else{
+			return true;
+		}
 	}
 
 	
