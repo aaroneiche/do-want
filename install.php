@@ -110,8 +110,7 @@
 				
 				return args;
 			}
-			
-			
+						
 			function createConfig(){
 				var configFields = getConfigFields();
 
@@ -204,16 +203,25 @@
 				if(!configFields){
 					return false;
 				}
+				
+				$("#configResponseFailure").hide();
 							
 				jQuery.ajax({
 					"data":{
 						"interact":"setup",
 						"action":"testDBCredentials",
 						"args":configFields
-					}
+					},
+					"dataType":"json"
 				}).done(function(response,responseCode){
-					if(!response){
-						
+					
+					
+					if(response != true){
+						$("#configResponseFailure").html("There was an error trying to communicate with the database: "+response.message).fadeIn();
+					}else{
+						$("#checkCredentials").hide();
+						$("#createConfig").show();
+						$("#configResponseSuccess").html("I successfully connected to the DB. Another win! Go ahead and click that \"Create Config\" button and we'll keep moving.").fadeIn();	
 					}
 				})
 			}
@@ -257,6 +265,10 @@
 			
 			input[type="text"],input[type="password"]{
 				height:30px;
+			}
+			
+			#createConfig{
+				display:none;
 			}
 			
 		</style>
