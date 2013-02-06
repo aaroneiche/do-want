@@ -113,22 +113,29 @@
 						
 			function createConfig(){
 				var configFields = getConfigFields();
-
+	
+				if(configFields == false){
+					return false;
+				}
+				
 				var data = {
 					'interact':'setup',
 					'action':'generateConfigFile',
 					'args': configFields
 				}
-
+				$("div.configResponseSuccess").fadeOut();
+			
+								
 				jQuery.post('ajaxCalls.php',data,function(response){
 					if(response.result == true){
-						$("#step-two div.alert-success").fadeIn();
+						$("#step-two div.alert-success").html("Configuration File has been created").fadeIn();
+						
+						$("button#createConfig").prop("disabled",true).addClass("disabled");
 						$("#stepTwoNextButton").prop("disabled",false).removeClass("disabled");
 					}else{
-						if(response.message != null){
-							$("#step-two div.alert-error").html(response.message);
+						if(response.result != true){
+							$("#step-two div.alert-error").html(response.message).fadeIn();
 						}
-						$("#step-two div.alert-error").fadeIn();
 					}
 				
 				},"json");						
@@ -149,6 +156,8 @@
 					if(response){
 						$("#step-one div.alert-success").fadeIn();
 						$("#stepOneNextButton").prop("disabled",false).removeClass("disabled");
+						
+						$("#directoryWriteableCheckButton").prop("disabled",true).addClass("disabled");
 					}else if(!response){
 						$("#step-one div.alert-error").fadeIn();
 					}else{
@@ -186,6 +195,8 @@
 						//tablesResponseSuccess	
 											
 						$("#step-three div.alert-success").html("Tables have been created!").fadeIn();
+						
+						$("#createTables").prop("disabled",true).addClass("disabled");
 						$("#stepThreeNextButton").prop("disabled",false).removeClass("disabled");
 					}else{
 						if(response.message != null){
@@ -220,8 +231,8 @@
 						$("#configResponseFailure").html("There was an error trying to communicate with the database: "+response.message).fadeIn();
 					}else{
 						$("#checkCredentials").hide();
-						$("#createConfig").show();
-						$("#configResponseSuccess").html("I successfully connected to the DB. Another win! Go ahead and click that \"Create Config\" button and we'll keep moving.").fadeIn();	
+						$("#createConfig").fadeIn();
+						$("#configResponseSuccess").html("I successfully connected to the DB. Another win! <b>Go ahead and click that \"Create Config\" button</b> and we'll keep moving.").fadeIn();	
 					}
 				})
 			}
