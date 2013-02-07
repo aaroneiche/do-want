@@ -176,6 +176,8 @@ class db{
 		   curl_close($ch);
 		   
 		   return json_decode($content);
+		}else{
+			return array('message'=>"CURL is not installed.");
 		}
 	}
 

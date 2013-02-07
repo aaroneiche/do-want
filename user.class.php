@@ -230,15 +230,14 @@ class user extends db{
 				$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
 				
 				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail','$cleanEmailMsg',$cleanApproved,$cleanAdmin)";
+
 				
 				$adminId = $this->dbAssoc($this->dbQuery("select * from {$this->options["table_prefix"]}users where admin = 1"),true);
-				//error_log(print_r($adminId,true));
-				
+								
 				$sendRequest = $this->sendMessage(array("senderId"=>0,
 										"receiverId"=>$adminId[0]['userid'],
 										"message"=>"$cleanFullname has requested an account on your wishlist system. Please login and approve them",
 										"forceEmail"=>false));
-										
 										
 				$returnArray['sendRequest'] = $sendRequest;
 				

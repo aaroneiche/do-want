@@ -68,7 +68,7 @@
 
 				//Get the Categories.
 				jQuery.post('ajaxCalls.php',data,function(response){	
-					if(response == true){
+					if(response){
 						$("#step-four div.alert-success").fadeIn();
 						$("#stepFourNextButton").prop("disabled",false).removeClass("disabled");
 					}else{

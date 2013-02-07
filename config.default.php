@@ -28,7 +28,7 @@ $options['large-icons'] = true;
 $options['logErrors'] = false; 
 
 //Enables custom inclusions in the custom directories.
-$options['includeCustom'] = true;
+$options['includeCustom'] = false;
 
 //Character encoding for MySQL - If you're having problems with info coming out of the data. Change this to '', or change to 'utf8'
 //Alternatively, you can set any character set you like here.

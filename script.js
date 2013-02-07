@@ -2065,10 +2065,10 @@ function checkForUpdates(){
 function getUpdate(){
 	var data = {
 		'interact':'setup',
-		'action':'downloadUpdateFile'
+		'action':'downloadUpdateFile',
 		'args':{
 			"fileUri":storedData.availableUpdate.file,
-			"filePath":
+			"filePath":""
 		}
 	}
 
