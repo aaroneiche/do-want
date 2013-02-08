@@ -1,7 +1,17 @@
-do-want
+Do-Want
 =======
 
-Do Want - Open Source Gift Registry
-
-Do Want is an Open Source Gift Registry system designed to be quick and easy to run on your preferred web
+Do Want is an Open Source Gift Registry system designed to be quick and easy to setup and run on your preferred web
 server. 
+
+Whether you're exchanging gifts with just one other person or with 50 other people, Do Want makes it easy to pick out 
+gifts and make sure no one else ends up with the same thing.
+
+----
+Developers
+==
+Interested in helping out? Great! We'd love to have you join us. We don't have a strongly casted workflow yet, so feel 
+free to dig in by forking the project, and finding an issue that interests you!
+
+
+Thanks Again!
