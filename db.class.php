@@ -199,7 +199,7 @@ class db{
 		foreach($fileArray as $file){
 	
 			if(!isset($file['name'])){
-				copyUpdateFiles($file,$zipArchive);
+				$this->updateFiles($file,$zipArchive);
 			}else{
 				$fileChecksum = md5_file($file['path'].$file['name']);
 				
@@ -239,7 +239,7 @@ class db{
 			$manifestFile = $zip->getFromIndex($manifestLocation);
 			$manifest = json_decode($manifestFile,true);
 	
-			updateFiles($manifest,$zip);
+			$this->updateFiles($manifest,$zip);
 		}		
 	}
 
@@ -256,18 +256,23 @@ class db{
 		if (function_exists('curl_init')) {
 
 		   $ch = curl_init(); 
-		   curl_setopt($ch, CURLOPT_URL, $args['fileUri']);
+		   curl_setopt($ch, CURLOPT_URL, $this->options['updateSource'].$args['fileUri']);
 		   curl_setopt($ch, CURLOPT_HEADER, 0);
 		   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		   curl_setopt($ch, CURLOPT_USERAGENT, USER_AGENT_STRING);
 
 		   $content = curl_exec($ch);
+		   error_log(curl_error($ch));
 		   curl_close($ch);
 		   $copiedfile = file_put_contents($this->options['filepath'].$args['fileName'], $content);
+		   error_log($copiedfile);
+
+		   
 		   
 		   $returnArray = array();
-		   $returnArray['updateDownloaded'] = ($copiedFile === false)? false : true;
+		   $returnArray['updateDownloaded'] = ($copiedfile === false)? false : true;
 		   $returnArray['file'] = $args['fileName'];
+		   $returnArray['fileSize'] = $copiedfile;
 		   
 		   return $returnArray;
 		}		

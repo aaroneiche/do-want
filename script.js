@@ -2080,9 +2080,10 @@ function getUpdate(){
 	$("#updateTextInfo").html("Checking for update..");
 
 	jQuery.ajax({
-		'data':data
+		'data':data,
+		'dataType':"json"
 	}).done(function(response,textStatus){
-		if(response.updateDownloaded){
+		if(response.updateDownloaded == true){
 			storedData.updateLocation = response.file
 			$("button#getUpdate").fadeOut();
 			
@@ -2113,9 +2114,7 @@ function applySystemUpdate(){
 		'data':data,
 		'dataType':"json"		
 	}).done(function(response,textStatus){
-		if(response){
-			
-		}
+		if(response){s}
 	})	
 }
 
