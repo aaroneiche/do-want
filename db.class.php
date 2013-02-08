@@ -193,7 +193,7 @@ class db{
 	function updateFiles($fileArray,$zipArchive){
 
 		$responseObject = array(
-			"updateList"
+			"updateList"=>array()
 		);
 
 		foreach($fileArray as $file){
@@ -222,6 +222,29 @@ class db{
 	
 
 	/*
+	Method: systemUpdate
+	Unzips an update archive, retrieves the manifest and applies updates across the file structure.
+	
+	@updateFileLocation - the relative path to the file update.
+	
+	*/
+	function systemUpdate($args){
+		$zip = new ZipArchive;
+		$res = $zip->open($args['updateFileLocation']);
+
+		if($res == true){
+	
+			$manifestLocation = $zip->locateName("manifest.json");
+	
+			$manifestFile = $zip->getFromIndex($manifestLocation);
+			$manifest = json_decode($manifestFile,true);
+	
+			updateFiles($manifest,$zip);
+		}		
+	}
+
+
+	/*
 	Method: downloadUpdateFile
 	Downloads a file to the defined uploads directory and returns the path when complete. 
 	
@@ -240,8 +263,13 @@ class db{
 
 		   $content = curl_exec($ch);
 		   curl_close($ch);
-		   file_put_contents($this->options['filepath'].$args['fileName'], $content);
-		   return $this->options['filepath'].$args['fileName'];
+		   $copiedfile = file_put_contents($this->options['filepath'].$args['fileName'], $content);
+		   
+		   $returnArray = array();
+		   $returnArray['updateDownloaded'] = ($copiedFile === false)? false : true;
+		   $returnArray['file'] = $args['fileName'];
+		   
+		   return $returnArray;
 		}		
 	}
 

@@ -39,7 +39,10 @@ function addFolderToZip($dir, $zipArchive, $zipdir = '', $manifest){
 }
 
 $zip = new ZipArchive();
-$res = $zip->open("update.zip",ZipArchive::CREATE);
+
+$filename = (isset($_REQUEST['name']))? $_REQUEST['name'].".zip" : "update.zip";
+
+$res = $zip->open($filename, ZipArchive::CREATE);
 $manifestArray = addFolderToZip("./",$zip,"",array());
 
 $zip->addFromString('manifest.json', json_encode($manifestArray));

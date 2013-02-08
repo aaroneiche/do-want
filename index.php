@@ -415,18 +415,19 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	if($_SESSION['admin'] == 1){
 ?>
 			displaySystemUsers();
+			checkForUpdates();
 			
 			$("#deleteObjectForm #deleteSubmit").click(function(){
 				deleteUserFromSystem($("#deleteObjectForm #deleteObjectId").val());
 			});
+						
+			$("button#getUpdate").click(function(){
+				getUpdate();
+			});
 			
-			
-			//$("#checkForUpdatesButton").click(function(){
-			
-			checkForUpdates();
-			
-			//})
-			
+			$("button#updateSystem").click(function(){
+				applySystemUpdate();
+			})
 			
 <?php
 }
@@ -866,8 +867,16 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 						</form>							
 					</div>					
 				</div>				
-			</div>	
-			<?php if($_SESSION['admin'] == 1){ ?>
+			</div>				
+		</div>
+		<?php if($_SESSION['admin'] == true){ ?>
+		<div id="admin" class="section">
+			<h2>Administration</h2>
+			<div class="row">
+				<button id="getUpdate" class="btn btn-primary">Get Update</button>
+				<button id="updateSystem" class="btn btn-primary">Update System</button>
+				<span id="updateTextInfo"></span>
+			</div>
 			<div class="row">
 				<div class="span10">
 					<h3>Users</h3>
@@ -896,18 +905,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 						</table>	
 					</div>				
 				</div>				
-			</div>
-			<?php } ?>							
-		</div>
-		<?php if($_SESSION['admin'] == true){ ?>
-		<div id="admin" class="section">
-			<h2>Administration</h2>
-			This is the admin section - it should be visible only if the current user has the admin flag.
-			
-			<div class="row">
-				<button id="Get Update" class="btn btn-primary">Get Update</button>
-				<span id="updateTextInfo"></span>
-			</div>
+			</div>			
 		</div>	
 		<?php } ?>
 	</div>

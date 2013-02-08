@@ -2043,7 +2043,7 @@ function uploadImage(){
 function checkForUpdates(){
 	
 	var data = {
-		'interact':'setup',
+		'interact':'db',
 		'action':'checkForUpdates'
 	}
 
@@ -2062,13 +2062,18 @@ function checkForUpdates(){
 	
 }
 
+/*
+	Method: getUpdate
+	Makes a server call to download a previously found update and places it in the uploads directory.
+*/
+
 function getUpdate(){
 	var data = {
-		'interact':'setup',
+		'interact':'db',
 		'action':'downloadUpdateFile',
 		'args':{
 			"fileUri":storedData.availableUpdate.file,
-			"filePath":""
+			"fileName":storedData.availableUpdate.name
 		}
 	}
 
@@ -2077,10 +2082,40 @@ function getUpdate(){
 	jQuery.ajax({
 		'data':data
 	}).done(function(response,textStatus){
-		if(response){
-			$("#updateTextInfo").html(response);
+		if(response.updateDownloaded){
+			storedData.updateLocation = response.file
+			$("button#getUpdate").fadeOut();
+			
 		}
 	})	
 	
+}
+
+
+/*
+	Method: applySystemUpdate
+	
+	Takes a file location, and calls the systemUpdate method serverside.
+	
+	@updateFileLocation - The downloaded file.
+*/
+function applySystemUpdate(){
+	
+	var data = {
+		'interact':'db',
+		'action':'systemUpdate',
+		'args':{
+			'updateFileLocation': storedData.filepath+storedData.updateLocation
+		}
+	}
+	
+	jQuery.ajax({
+		'data':data,
+		'dataType':"json"		
+	}).done(function(response,textStatus){
+		if(response){
+			
+		}
+	})	
 }
 
