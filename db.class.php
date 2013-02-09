@@ -205,7 +205,7 @@ class db{
 				
 				if($fileChecksum != $file['checksum']){
 									
-					$result = $zipArchive->extractTo($file['path'], $file['name']);
+					$result = $zipArchive->extractTo(rtrim($file['path'],'/'), $file['name']);
 					
 					if($result){
 						$responseObject['updateList'][$file['name']] = "Updated!";
@@ -239,7 +239,8 @@ class db{
 			$manifestFile = $zip->getFromIndex($manifestLocation);
 			$manifest = json_decode($manifestFile,true);
 	
-			$this->updateFiles($manifest,$zip);
+			return $this->updateFiles($manifest,$zip);
+			
 		}		
 	}
 

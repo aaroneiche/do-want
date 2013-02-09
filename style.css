@@ -274,3 +274,7 @@ table#otherUserWishlist, table#userWishlist{
 .tableSource{
 	overflow:hidden;
 }
+
+button#updateSystem{
+	display:none;
+}

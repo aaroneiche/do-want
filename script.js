@@ -2077,7 +2077,7 @@ function getUpdate(){
 		}
 	}
 
-	$("#updateTextInfo").html("Checking for update..");
+	$("#updateTextInfo").html("Downloading Update");
 
 	jQuery.ajax({
 		'data':data,
@@ -2086,6 +2086,11 @@ function getUpdate(){
 		if(response.updateDownloaded == true){
 			storedData.updateLocation = response.file
 			$("button#getUpdate").fadeOut();
+			$("button#updateSystem").fadeIn();
+			$("#updateTextInfo").html("Update Downloaded");
+			
+		}else{
+			$("updateTextInfo").html("There was a problem downloading the file.");
 			
 		}
 	})	
@@ -2114,7 +2119,9 @@ function applySystemUpdate(){
 		'data':data,
 		'dataType':"json"		
 	}).done(function(response,textStatus){
-		if(response){s}
+		if(response){
+			$("updateTextInfo").html("Update Applied. Here's the detail information: ");
+		}
 	})	
 }
 
