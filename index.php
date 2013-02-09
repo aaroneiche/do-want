@@ -2,6 +2,10 @@
 session_start();
 //	print_r($_SESSION);
 
+if(!file_exists('config.php')){
+	header("Location: http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."install.php");
+}
+
 include 'config.php';
 ?>
 <!DOCTYPE html>

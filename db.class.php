@@ -339,5 +339,56 @@ class db{
 	}
 	
 	
+	/*
+	Method: getDBPermissions
+	Gets grants for the db user on 
+	
+	*/
+	function getDBPermissions(){
+	
+		$validPermissions = array(
+			"SELECT",
+			"INSERT",
+			"UPDATE",
+			"DELETE",
+			"CREATE",
+			"ALTER",
+			"DROP",
+			"ALL"
+		);
+			
+		$query = "show grants for `{$this->dbuser}`@`{$this->dbhost}`";
+		$grantsResult = $this->dbAssoc($this->dbquery($query));
+		$grantSet = array();		
+			
+			
+			//GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON *.* TO 'wishlist'@'localhost' IDENTIFIED BY PASSWORD '*A99D97056D4D0C7D7D453D99AB02F34E7CDD4160'
+			foreach($grantsResult as $grant){
+				$keyName = array_keys($grant);
+			
+				$grantItems = explode(" TO ",$grant[$keyName[0]]);
+				$individualPermissions = explode($grantItems[0]," ");
+				
+				foreach($individualPermissions as $word){
+					print $word;
+					if(in_array(trim($word," ,"),$validPermissions)){
+						$grantSet[] = $word;
+					}
+				}
+				
+			}
+				
+		return $grantSet;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 ?>
