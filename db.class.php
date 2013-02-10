@@ -233,14 +233,13 @@ class db{
 		$res = $zip->open($args['updateFileLocation']);
 
 		if($res == true){
-	
+			
 			$manifestLocation = $zip->locateName("manifest.json");
-	
+			
 			$manifestFile = $zip->getFromIndex($manifestLocation);
 			$manifest = json_decode($manifestFile,true);
-	
-			return $this->updateFiles($manifest,$zip);
 			
+			return $this->updateFiles($manifest['files'],$zip);
 		}		
 	}
 

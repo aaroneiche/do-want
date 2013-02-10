@@ -42,12 +42,21 @@ $zip = new ZipArchive();
 
 $filename = (isset($_REQUEST['name']))? $_REQUEST['name'].".zip" : "update.zip";
 
-$res = $zip->open($filename, ZipArchive::CREATE);
-$manifestArray = addFolderToZip("./",$zip,"",array());
+$_REQUEST['version'] = $_REQUEST['name'];
 
-$zip->addFromString('manifest.json', json_encode($manifestArray));
+$res = $zip->open($filename, ZipArchive::CREATE);
+$manifestFileArray = addFolderToZip("./",$zip,"",array());
+
+$mainfestData = array(
+	'version'=>$_REQUEST['version'],
+	'files'=>$manifestFileArray
+);
+
+$zip->addFromString('manifest.json', json_encode($manifestData));
 $zip->close();
+
 }
+
 ?>
 If you'd like to create an update, click <a href="generateUpdate.php?gen=gen">here</a>.
 

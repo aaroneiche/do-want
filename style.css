@@ -278,3 +278,8 @@ table#otherUserWishlist, table#userWishlist{
 button#updateSystem{
 	display:none;
 }
+
+button#getUpdate{
+	display:none;
+}
+

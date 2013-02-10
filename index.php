@@ -419,7 +419,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	if($_SESSION['admin'] == 1){
 ?>
 			displaySystemUsers();
-			checkForUpdates();
+
 			
 			$("#deleteObjectForm #deleteSubmit").click(function(){
 				deleteUserFromSystem($("#deleteObjectForm #deleteObjectId").val());
@@ -433,6 +433,11 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				applySystemUpdate();
 			})
 			
+			$("button#checkForUpdate").click(function(){
+				checkForUpdates();
+			});
+			
+			$("button#checkForUpdate").trigger("click");
 <?php
 }
 ?>
@@ -877,9 +882,14 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<div id="admin" class="section">
 			<h2>Administration</h2>
 			<div class="row">
-				<button id="getUpdate" class="btn btn-primary">Get Update</button>
-				<button id="updateSystem" class="btn btn-primary">Update System</button>
-				<span id="updateTextInfo"></span>
+				<div class="span10">
+					<div class="well">
+						<button id="checkForUpdate" class="btn btn-primary">Check for Update</button>
+						<button id="getUpdate" class="btn btn-primary">Get Update</button>
+						<button id="updateSystem" class="btn btn-primary">Update System</button>
+						<span id="updateTextInfo" class="alert"></span>
+					</div>
+				</div>
 			</div>
 			<div class="row">
 				<div class="span10">
@@ -887,7 +897,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					<button id="addUserButton" class="btn btn-primary">Add User</button>
 					<div class="tableScrollContainer">										
 						<table id="adminUserList" class="table table-striped table-bordered table-condensed">
-
+							
 						</table>
 					</div>
 				</div>

@@ -2048,17 +2048,27 @@ function checkForUpdates(){
 	}
 
 	$("#updateTextInfo").html("Checking for update...");
-
+	$("button#checkForUpdate").hide();
+		
 	jQuery.ajax({
 		'data':data,
-		'dataType':"json"		
+		'dataType':"json"
 	}).done(function(response,textStatus){
-		if(response){
-			$("#updateTextInfo").html(response.message);
-			
-			storedData.availableUpdate = response;
+		
+		if(response.updateAvailable == true){
+			$("button#getUpdate").show();
+			$("#updateTextInfo").removeClass("alert-success alert-info").addClass("alert-success");
+		
+		}else if(response.updateAvailable == false){
+			$("button#checkForUpdate").show();
+			$("#updateTextInfo").removeClass("alert-success alert-info").addClass("alert-info");
+			$("#checkForUpdate").fadeIn();
 		}
-	})
+		
+		$("#updateTextInfo").fadeIn().html(response.message);
+		storedData.availableUpdate = response;
+		
+	});
 	
 }
 
@@ -2120,7 +2130,7 @@ function applySystemUpdate(){
 		'dataType':"json"		
 	}).done(function(response,textStatus){
 		if(response){
-			$("updateTextInfo").html("Update Applied. Here's the detail information: ");
+			$("updateTextInfo").html("Update Applied. Here's the detail information:");
 		}
 	})	
 }
