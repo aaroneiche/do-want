@@ -69,8 +69,8 @@ class wishlist extends db{
 				join {$this->options['table_prefix']}categories on `categoryid` = items.`category`
 				join {$this->options['table_prefix']}shoppers on shopper = '{$_SESSION['userid']}' and mayshopfor = '{$args['shopForId']}'
 				left join {$this->options['table_prefix']}allocs on allocs.itemid = items.itemid and allocs.userid = '{$_SESSION['userid']}'
-			where items.`userid` = '{$args['shopForId']}'";
-//				and items.`received` = 0";
+			where items.`userid` = '{$args['shopForId']}'
+				and items.`received` = 0";
 				
 //		error_log($query);
 
