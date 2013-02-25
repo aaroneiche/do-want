@@ -367,7 +367,7 @@ class user extends db{
 		$query = "select userid, username, fullname, email from users";
 	
 		$result = $this->dbQuery($query);
-		return $this->dbAssoc($result);
+		return $this->dbAssoc($result,true);
 	}
 
 	/*
