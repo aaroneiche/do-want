@@ -1,12 +1,16 @@
 <?php 
 session_start();
-//	print_r($_SESSION);
 
+
+//If we don't have a config file (and therefore haven't installed) redirect to the installer script.
 if(!file_exists('config.php')){
 	header("Location: http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."install.php");
 }
 
+
 include 'config.php';
+include 'initialize.php';
+print_r($_SESSION);
 ?>
 <!DOCTYPE html>
 

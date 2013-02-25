@@ -34,11 +34,8 @@ $options['includeCustom'] = false;
 //Alternatively, you can set any character set you like here.
 $options['charSet'] = 'utf8';
 
-//This is the place that Do Want looks for updates. Change this ONLY if you KNOW your new source is safe.
-$options['updateSource'] = "http://aaroneiche.net/dwupdate/";
-
 //DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
-define("VERSION","0.9.92");
+define("VERSION","0.9.94");
 define("USER_AGENT_STRING","Mozilla/5.0 (compatible; DoWant/1.0; +code.google.com/p/do-want/)");
 
 ?>
