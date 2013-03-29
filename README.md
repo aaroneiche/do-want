@@ -7,6 +7,12 @@ server.
 Whether you're exchanging gifts with just one other person or with 50 other people, Do Want makes it easy to pick out 
 gifts and make sure no one else ends up with the same thing.
 
+Looking for a Download?
+=======================
+
+If you just want to download an installable, reasonably stable version, you can visit the [end-user-friendly page here](http://aaroneiche.github.com/do-want/)
+
+
 ----
 Developers
 ==
