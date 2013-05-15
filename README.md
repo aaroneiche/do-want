@@ -12,6 +12,13 @@ Looking for a Download?
 
 If you just want to download an installable, reasonably stable version, you can visit the [end-user-friendly page here](http://aaroneiche.github.com/do-want/)
 
+What's on the Docket?
+=====================
+Things that we're planning on having done for a version 1.0 release:
+[ ] Self-updating - Do Want will be able to check for updates, download, unpack, and install both files and Database updates
+[ ] Improvements in UI - The unification of the item detail and edit screens are high on the list, and better item creation.
+[ ] Better user notifications & management.
+[ ] Getting rid of all those annoying bugs that everyone hates.
 
 ----
 Developers
