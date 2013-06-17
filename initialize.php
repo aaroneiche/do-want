@@ -9,12 +9,17 @@
 	$init->dbname = $dbname;
 	$init->dbuser = $dbuser;
 	$init->dbpass = $dbpass;
-	$init->options = $options;
+	$init->options = $_SESSION['options'];
+	$conn = $init->dbConnect();
 	
-	$init->dbConnect();
-		
 	$ops = $init->dbQuery("select * from options");
 	
-	$_SESSION['options'] = $init->dbAssoc($ops);
+	foreach($init->dbAssoc($ops) as $option){
+		$_SESSION['options'][$option['option_name']] = $option['option_value'];
+	}
+
+	define("VERSION",$_SESSION['options']['version']);
+	define("USER_AGENT_STRING",$_SESSION['options']['user_agent_string']);
+//	$options = $_SESSION['options'];
 
 ?>

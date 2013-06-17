@@ -7,10 +7,9 @@ if(!file_exists('config.php')){
 	header("Location: http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."install.php");
 }
 
-
 include 'config.php';
 include 'initialize.php';
-print_r($_SESSION);
+
 ?>
 <!DOCTYPE html>
 
@@ -261,7 +260,8 @@ print_r($_SESSION);
 -->
 <?php
 if($options['includeCustom'] == true){
-	?>
+	print $options['includeCustom'];
+?>
 <div class="row">
 	<div class="span10 offset1" id="customSpaceTop">
 		<?php
@@ -279,7 +279,7 @@ if($options['includeCustom'] == true){
 	</div>	
 </div>	
 <?php 
-	} 
+	}
 
 if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	{

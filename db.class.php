@@ -55,14 +55,14 @@ class db{
 		*/
 		
 		while($row = mysql_fetch_assoc($resource)){
-
+			//$assocData = array();
+			
 			if(mysql_num_rows($resource) > 1 || $forceMulti == true){ //
 				$assocData[] = $row;
 			}else{
 				$assocData = $row;
 			}
 		}
-		
 		return $assocData;
 	}
 	

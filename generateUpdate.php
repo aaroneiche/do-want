@@ -38,11 +38,39 @@ function addFolderToZip($dir, $zipArchive, $zipdir = '', $manifest){
     }
 }
 
+function generateTableStructure($dbname, $host, $username, $password){
+
+	$conn = mysql_connect($host, $username, $password); //localhost","root","root"
+	mysql_select_db($dbname);
+	$tableSet = array();
+	
+	$res = mysql_query("show tables");
+	
+	while($row = mysql_fetch_assoc($res)){
+		$tableName = $row["Tables_in_".$dbname];
+		$tableSet[$tableName] = array();
+		
+		$fieldNames = mysql_query("describe ".$tableName);
+		while($fr = mysql_fetch_assoc($fieldNames)){			
+			$tableSet[$tableName][$fr['Field']] = $fr;
+		}
+	}
+	
+	return $tableSet;
+}
+
+
 $zip = new ZipArchive();
 
 $filename = (isset($_REQUEST['name']))? $_REQUEST['name'].".zip" : "update.zip";
 
-$_REQUEST['version'] = $_REQUEST['name'];
+if(!isset($_REQUEST['version'])){
+	print "Version not defined";
+	return false;
+}
+//$_REQUEST['version'] = $_REQUEST['name'];
+
+$tableGen = file_put_contents("db.struct","<?php \$updateStructure = ".var_export(generateTableStructure("dowant", "localhost", "root", "root"),true)." ?>");
 
 $res = $zip->open($filename, ZipArchive::CREATE);
 $manifestFileArray = addFolderToZip("./",$zip,"",array());

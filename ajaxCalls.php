@@ -31,7 +31,7 @@ if(!isset($_REQUEST['args']['nodb'])){
 	$instance->dbname = $dbname;
 	$instance->dbuser = $dbuser;
 	$instance->dbpass = $dbpass;
-	$instance->options = $options;
+	$instance->options = $_SESSION['options'];
 }
 
 /*
