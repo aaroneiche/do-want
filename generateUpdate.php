@@ -38,6 +38,12 @@ function addFolderToZip($dir, $zipArchive, $zipdir = '', $manifest){
     }
 }
 
+
+/*
+Generates PHP string of array code of the database structure
+This will be run on the current data base and the arrays will be compared to each other during and update.
+
+*/
 function generateTableStructure($dbname, $host, $username, $password){
 
 	$conn = mysql_connect($host, $username, $password); //localhost","root","root"
