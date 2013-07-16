@@ -127,7 +127,36 @@ class setup extends db{
 		return $response;
 		
 	}
-	
+
+
+	/*
+	Generates PHP string of array code of the database structure
+	This will be run on the current data base and the arrays will be compared to each other during and update.
+	*/
+	function generateTableStructure(){
+		
+		//$conn = mysql_connect($this->dbhost, $this->dbuser, $this->dbpass); //localhost","root","root"
+		//mysql_select_db($this->dbname);
+		$this->dbConnect();
+		$tableSet = array();
+		
+		$res = mysql_query("show tables");
+		if($res){
+			while($row = mysql_fetch_assoc($res)){
+				$tableName = $row["Tables_in_".$dbname];
+				$tableSet[$tableName] = array();
+				
+				$fieldNames = mysql_query("describe ".$tableName);
+				error_log(print_r(mysql_fetch_assoc($fieldNames),true));
+				while($fr = mysql_fetch_assoc($fieldNames)){			
+					$tableSet[$tableName][$fr['Field']] = $fr;
+				}
+			}
+		}else{
+			error_log($res);
+		}
+		return $tableSet;
+	}
 }
 
 ?>
