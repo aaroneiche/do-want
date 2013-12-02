@@ -735,11 +735,11 @@ function renderItemTools(itemObject, toolInfo){
 			});
 
 			itemEdit.click(function(){
-				populateManageItemForm($(this).closest("tr").attr("data-itemId"));
+				setActiveItemFromServer($(this).closest("tr").attr("data-itemId"))
 			});
 
 			itemDelete.click(function(){
-				displayConfirmScreen($(this).closest("tr").attr("data-itemId"),"item","deleteItem")				
+				displayConfirmScreen($(this).closest("tr").attr("data-itemId"),"item","deleteItem");			
 			});
 
 			toolBox.append(itemDelete);	
@@ -839,14 +839,19 @@ function renderItemTools(itemObject, toolInfo){
 			}
 			
 			sourceEdit.click(function(){
+				$("#itemSourceSubmit").html("Update Source");
 				populateItemSourceForm($(this).closest("tr").attr("data-itemSourceId"));
 			});
 
 			sourceDelete.click(function(){
-				deleteItemSource(
-					$("input#itemId").val(),
-					$(this).closest("tr").attr("data-itemSourceId")
-				);
+				var sourceID = $(this).closest("tr").attr("data-itemSourceId");
+				
+				if(isNaN(sourceID)){
+					delete storedData.activeItem.sources[sourceID];
+				}else{
+					storedData.activeItem.sources[sourceID].action = "delete";
+				}
+				populateItemFormSourceList();
 			});
 
 			toolBox.append(sourceDelete);
@@ -1150,6 +1155,7 @@ function manageItem(){
 		action:'manageItem',
 		args:{}
 	}
+	
 	currentItemId = jQuery("#manageItemForm #itemId").val();
 	
 	//Ternary operation to determine whether we're editing or adding an item.
@@ -1166,6 +1172,7 @@ function manageItem(){
 		
 		getCurrentUserList(listReceived);
 		$("#manageItemFormBlock").modal('hide');
+		
 	});	
 }
 
@@ -1193,8 +1200,64 @@ function clearManageItemForm(){
 /* Method: populateManageItemForm
 	Gets the itemDetails and puts them into the #manageItemForm form, then calls the modal to display.
 */
-function populateManageItemForm(itemId){
+function populateManageItemForm(){
 	
+	clearManageItemForm(); //Clears the form of any previous data. 
+
+	jQuery('#itemDescriptionInput').val(storedData.activeItem.description);
+	jQuery('#itemQuantityInput').val(storedData.activeItem.quantity);
+	jQuery('#itemRankInput').val(storedData.activeItem.ranking);
+	jQuery('#itemCategoryInput').val(storedData.activeItem.category);
+	jQuery('#itemCommentInput').val(storedData.activeItem.comment);
+	
+	//Sources Data
+	
+	
+//	$("#openAddImageForm").removeClass("disabled").prop("disabled","");
+//	$("#addSourceButton").removeClass("disabled").prop("disabled","");
+	
+	populateItemFormSourceList();
+	
+	$('#manageItemFormBlock').modal('show');
+}
+
+/* Method: populateItemFormSourceList
+Takes list of sources from storedData.activeItem and displays it on itemForm.
+
+*/
+
+function populateItemFormSourceList(){
+	if(storedData.activeItem.sources != undefined){
+			
+		jQuery("#itemSourcesEdit tr.sourceRow").remove();
+
+			$.each(storedData.activeItem.sources,function(i,e){		
+				
+				if(e.action != "delete"){
+					sourceCell = jQuery(document.createElement('td'))
+								.html(e.name);
+			
+					sourceEditTools = jQuery(document.createElement('td'))
+										.append(renderItemTools(e,"sourceEdit"));
+							
+					sourceOption = jQuery(document.createElement('tr'))
+									.append(sourceCell)
+									.append(sourceEditTools)
+									.attr("data-itemSourceId",e.id)
+									.addClass("sourceRow");
+	
+				jQuery("tr#addSourceRow").before(sourceOption);
+			}
+		});
+	}
+	
+}
+
+
+/* Method: setActiveItemFromServer
+	Gets the itemDetails and puts them into the activeItem object, then populates the item form for editing.
+*/
+function setActiveItemFromServer(itemId){
 	clearManageItemForm(); //Clears the form of any previous data. 
 	
 	data = {
@@ -1205,45 +1268,70 @@ function populateManageItemForm(itemId){
 	showLoadingIndicator();
 
 	jQuery.post('ajaxCalls.php',data,function(response){
-	
-		jQuery('#itemId').val(itemId);
-		jQuery('#itemDescriptionInput').val(response.itemDescription);
-		jQuery('#itemQuantityInput').val(response.itemQuantity);
-		jQuery('#itemRankInput').val(response.itemRanking);
-		jQuery('#itemCategoryInput').val(response.itemCategory);
-		jQuery('#itemCommentInput').val(response.itemComment);		
-		jQuery('#openAddImageForm').attr("data-forItemId",itemId);
+		storedData.activeItem = {};
 		
-		//Sources Data
+		storedData.activeItem.id = itemId;
+		storedData.activeItem.description = response.itemDescription;
+		storedData.activeItem.quantity = response.itemQuantity;
+		storedData.activeItem.ranking = response.itemRanking;
+		storedData.activeItem.category = response.itemCategory;
+		storedData.activeItem.comment = response.itemComment;
+		
 		if(response.sources != undefined){
+			storedData.activeItem.sources = {};
 			jQuery(response.sources).each(function(i,e){
 				
-				sourceCell = jQuery(document.createElement('td'))
-								.html(e.itemSource);
-
+				source = {};
+				source.id = e.itemSourceId;
+				source.name = e.itemSource;
+				source.comments = e.itemSourceComments;
+				source.price = e.itemSourcePrice;
+				source.url = e.itemSourceUrl;	
 				
-				sourceEditTools = jQuery(document.createElement('td'))
-										.append(renderItemTools(e,"sourceEdit"));
-									
-								
-				sourceOption = jQuery(document.createElement('tr'))
-									.append(sourceCell)
-									.append(sourceEditTools)
-									.attr("data-itemSourceId",e.itemSourceId)
-									.addClass("sourceRow");
-		
-				jQuery("tr#addSourceRow").before(sourceOption);
+				storedData.activeItem.sources[source.id] = source;
 			});
-		
 		}
-
-		$("#openAddImageForm").removeClass("disabled").prop("disabled","");
-		$("#addSourceButton").removeClass("disabled").prop("disabled","");
 		
-		$('#manageItemFormBlock').modal('show');
+		if(response.images != undefined){
+			storedData.activeItem.images = {};
+			jQuery(response.images).each(function(i,e){
+				image = {};
+				image.filename = e.itemImageFilename;
+				image.id = e.itemImageId;
+				
+				storedData.activeItem.images[image.id] = image;
+			});
+		}
+		
+		populateManageItemForm();
 		hideLoadingIndicator();
 	},"json");
 }
+
+/* Method: setActiveItem
+	Sets the activeItem object with the most recent form values. Prepartory to sending to server.
+*/
+function setActiveItem(){
+	storedData.activeItem.description = jQuery("#itemDescriptionInput").val();
+	storedData.activeItem.category = jQuery("#itemCategoryInput").val();
+	storedData.activeItem.quantity = jQuery("#itemQuantityInput").val();
+	storedData.activeItem.comment = jQuery("#itemCommentInput").val();
+	storedData.activeItem.ranking = jQuery("#itemRankInput").val();
+		
+	var data = {
+		interact:'wishlist',
+		action:'manageItemAll',
+		args: storedData.activeItem
+	}
+	
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		getCurrentUserList(listReceived);
+		$("#manageItemFormBlock").modal('hide');
+				
+	},'json');
+}
+
 
 /* Method clearItemSourceForm
 	Clears the values in the Item Source Form
@@ -1261,36 +1349,68 @@ function clearItemSourceForm(){
 
 
 
+
+/* Method setActiveItemSource
+	Puts the source information from the form into the activeItem object
+*/
+function setActiveItemSource(){
+	
+	var formData = {};
+
+	formData.id = $("#itemSourceForm #sourceId").val();
+	formData.name = $("#itemSourceForm #sourceName").val();
+	formData.url = $("#itemSourceForm #sourceUrl").val();
+	formData.price = $("#itemSourceForm #sourcePrice").val();
+	formData.comments = $("#itemSourceForm #sourceComments").val();
+
+	if(storedData.activeItem.sources == undefined){
+		storedData.activeItem.sources ={};
+	}
+
+	if(formData.id.length == 0 || isNaN(formData.id)){
+		formData.action = "add"
+		if(formData.id.length == 0){
+			formData.id = randomString();
+		}
+		storedData.activeItem.sources[formData.id] = formData;
+		
+	}else{
+		formData.action = "edit"
+		storedData.activeItem.sources[formData.id] = formData;
+	}
+	
+	populateItemFormSourceList();
+	
+	$('#itemSourceFormBlock').modal('hide');
+	$('#manageItemFormBlock').modal('show');
+}
+
+
 /* Method populateItemSourceForm
 	Gets itemSource details and puts them into the #itemSourceForm form, then calls the modal to display.
 */
 function populateItemSourceForm(sourceId){
 	// Note to developer: This should probably also get the name of the related item, so it's available to the user for context.
-	data = {
-		interact:'wishlist',
-		action:'getSourceDetails',
-		args:{'sourceId':sourceId}
-	}
+	
+	thisSource = storedData.activeItem.sources[sourceId];
+	
 	showLoadingIndicator();
+
+	$("#itemSourceForm #sourceId").val(thisSource.id);
+	$("#itemSourceForm #sourceName").val(thisSource.name);
+	$("#itemSourceForm #sourceUrl").val(thisSource.url);
+	$("#itemSourceForm #sourcePrice").val(thisSource.price);
+	$("#itemSourceForm #sourceComments").val(thisSource.comments);										
+
+	$("#addSourceSubmit").html("Edit Source");
+	hideLoadingIndicator();
 	
-	jQuery.post('ajaxCalls.php',data,function(response){
-		debug = response;
-		
-		$("#itemSourceForm #sourceItemId").val(response.itemid);
-		$("#itemSourceForm #sourceId").val(response.sourceid);
-		$("#itemSourceForm #sourceName").val(response.source);
-		$("#itemSourceForm #sourceUrl").val(response.sourceurl);
-		$("#itemSourceForm #sourcePrice").val(response.sourceprice);
-		$("#itemSourceForm #sourceComments").val(response.sourcecomments);										
-		
-		hideLoadingIndicator();
-		
-		$('#manageItemFormBlock').modal('hide');
-		$("#itemSourceFormBlock").modal("show").on('hide',function(){
-			$("#manageItemFormBlock").modal('show');
-		});
 	
-	},"json");	
+	
+	$('#manageItemFormBlock').modal('hide');
+	$("#itemSourceFormBlock").modal("show").on('hide',function(){
+		$("#manageItemFormBlock").modal('show');
+	});
 }
 
 
@@ -1345,41 +1465,25 @@ function deleteItemSource(itemId,sourceId){
 }
 
 
-function populateImagesOnForm(itemId){
-	data = {
-		interact:'wishlist',
-		action:'getImages',
-		args:{"itemId":itemId}
-	}
-	jQuery.post('ajaxCalls.php',data,function(response){
-		$("#currentImagesBlock").empty();
-		
-		$(response).each(function(i,e){
-			var img = $(document.createElement('img')).attr('src',storedData.filepath+e.filename);
-			var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
-			//
-			var removeImageControl =  $(document.createElement('a')).addClass("close").append("×").click(function(){
-				
-				remove = {
-					interact:'wishlist',
-					action:'manageItemImage',
-					args:{
-						"imageid":e.imageid,
-						"itemImageAction":"delete"
-					}
-				}
-				jQuery.post('ajaxCalls.php',remove,function(response){
-					$(this.parent).remove();
-					//This seems recursive, but it's really just setting up the call to refresh the images on the form here.
-					populateImagesOnForm(itemId); 
-				});
-			});
-			
-			itemImageDiv.append(removeImageControl);
-			$("#currentImagesBlock").append(itemImageDiv);
-		});
+function populateImagesOnForm(){
+	$("#currentImagesBlock").empty();
 
-	},"json");
+	if(storedData.activeItem.images != undefined){
+		$.each(storedData.activeItem.images, function(i,e){
+			if(e.action != "delete"){
+				var img = $(document.createElement('img')).attr('src',storedData.filepath+e.filename);
+				var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
+
+				var removeImageControl =  $(document.createElement('a')).attr("data-id",e.id).addClass("close").append("×").click(function(ev){
+					storedData.activeItem.images[e.id].action = "delete";
+					populateImagesOnForm();
+				});
+		
+				itemImageDiv.append(removeImageControl);
+				$("#currentImagesBlock").append(itemImageDiv);
+			}
+		});
+	}
 }
 
 /*
@@ -2135,3 +2239,18 @@ function applySystemUpdate(){
 	})	
 }
 
+/*
+	Method: randomString
+	Return a random string.
+*/
+function randomString(){
+
+	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	var string_length = 5;
+	var randomstring = '';
+	for (var i=0; i<string_length; i++) {
+		var rnum = Math.floor(Math.random() * chars.length);
+		randomstring += chars.substring(rnum,rnum+1);
+	}
+	return randomstring;
+}

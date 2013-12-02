@@ -358,6 +358,67 @@ class wishlist extends db{
 	}
 	
 	/*
+		Method: manageItemAll
+		Updates all components of an item in a single call
+		
+	*/
+	function manageItemAll($args){
+		$itemManage = array();
+		
+		//error_log(print_r($args,true));
+
+		$itemManage = $args;
+		if(isset($args['id'])){
+			$itemManage['itemid'] = $args['id'];
+			$itemManage['itemAction'] = "edit"; 
+			
+		}else{
+			$itemManage['itemAction'] = "add";	
+		}
+		
+		//Return our item ID
+		$manageResult = $this->manageItem($itemManage);
+		$itemId = ($itemManage['itemAction'] == 'add')? $manageResult : $args['id'];
+		
+		
+		
+		$sourceResult = array();
+		
+		//Manage Sources
+		
+		foreach($args['sources'] as $source){
+			if(isset($source['action'])){
+
+				$sourceArgs = array();
+				$sourceArgs['sourceid'] = $source['id'];					
+				$sourceArgs['itemid'] = $itemId;
+				$sourceArgs['source'] = $source['name'];
+				$sourceArgs['sourceurl'] = $source['url'];
+				$sourceArgs['sourceprice'] = $source['price'];
+				$sourceArgs['sourcecomments'] = $source['comments'];
+				
+				$sourceArgs['itemSourceAction'] = $source['action'];
+				$sourceResult[] = $this->manageItemSource($sourceArgs);
+			}
+		}
+
+		// Manage images.
+		$imagesResult = array();
+		
+		if(count($args['images']) > 0){
+			
+			foreach($args['images'] as $image){
+				if(isset($image['action'])){
+					$image['itemid'] = $itemId;
+					$image['itemImageAction'] = $image['action'];
+					$imagesResult[] = $this->manageItemImage($image);
+				}
+			}
+		}
+	}
+	
+	
+	/*
 		Method: manageItem
 		Adds, Edits or Deletes an item from the database.
 
@@ -408,7 +469,9 @@ class wishlist extends db{
 		
 		if($args['itemAction'] == 'add'){
 			$result = $this->dbQuery($query);
-			return $this->dbLastInsertId();
+			$resultItemId = $this->dbLastInsertId();
+						
+			return $resultItemId;
 			
 		}else if($args['itemAction'] == 'delete'){
 
@@ -445,6 +508,7 @@ class wishlist extends db{
 		string @source - The name of the source: A store or website
 		string @sourceurl - The URL for the source
 		string @sourceprice - The price for the source
+		string @sourcecomments - Comments for the source.
 		int @addedByUserId - The userId who provided the source. - other users can offer sources for products.
 	*/
 	function manageItemSource($args){
@@ -487,6 +551,7 @@ class wishlist extends db{
 		}
 
 		$result = $this->dbQuery($query);
+		error_log($result);
 		return $result;
 	}
 	
@@ -504,17 +569,15 @@ class wishlist extends db{
 			case 'add':
 
 				//Random name to prevent overwriting files.
-				$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];
-				
-				$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName); 				
+//				$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];				
+//				$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName);
+
 				$query = "insert into itemimages(itemid,filename) values(
 					'{$this->dbEscape($args['itemid'])}',
-					'{$this->dbEscape($randName)}'
+					'{$this->dbEscape($args['filename'])}'
 				)";
 				
 				$result = $this->dbQuery($query);
-				
-				$resultArray['fileuploaded'] = $moveFile;
 				$resultArray['itemId'] = $args['itemid'];
 				
 			break;
@@ -544,6 +607,19 @@ class wishlist extends db{
 		$resultArray['queryResult'] = $result;		
 		return $resultArray;
 	}
+	
+	function uploadFile($args){
+		
+		$randName = substr(md5(uniqid(rand(), true)),0,10).$_FILES['uploadfile']['name'];
+		$moveFile = move_uploaded_file($_FILES['uploadfile']['tmp_name'], $this->options['filepath'].$randName); 				
+		
+		$result = array();
+		$result['fileUploaded'] = $moveFile;
+		$result['fileName'] = $randName;
+		
+		return $result;
+	}
+	
 	
 	/*
 		Method: markItemReceived
