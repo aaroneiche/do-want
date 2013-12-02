@@ -9,8 +9,8 @@ if(!file_exists('config.php')){
 
 
 include 'config.php';
-include 'initialize.php';
-//print_r($_SESSION);
+//include 'initialize.php';
+
 ?>
 <!DOCTYPE html>
 
