@@ -11,6 +11,20 @@ if(!file_exists('config.php')){
 include 'config.php';
 //include 'initialize.php';
 
+
+if(!defined('VERSION')){
+	//DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
+	define("VERSION","0.9.96");
+	define("USER_AGENT_STRING","Mozilla/5.0 (compatible; DoWant/1.0; +code.google.com/p/do-want/)");	
+}else{
+	if($_SESSION['admin'] == 1){
+		?>
+		Hi Admin!
+		Please remove the "VERSION" and "USER_AGENT_STRING" Constants from your config.php file. 
+		They are no longer required there.
+		<?php
+	}
+}
 ?>
 <!DOCTYPE html>
 
@@ -922,6 +936,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<?php if($_SESSION['admin'] == true){ ?>
 		<div id="admin" class="section">
 			<h2>Administration</h2>
+			<!--
 			<div class="row">
 				<div class="span10">
 					<div class="well">
@@ -932,6 +947,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</div>
 				</div>
 			</div>
+			-->
 			<div class="row">
 				<div class="span10">
 					<h3>Users</h3>

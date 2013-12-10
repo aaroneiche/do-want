@@ -34,8 +34,4 @@ $options['includeCustom'] = false;
 //Alternatively, you can set any character set you like here.
 $options['charSet'] = 'utf8';
 
-//DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
-define("VERSION","0.9.94");
-define("USER_AGENT_STRING","Mozilla/5.0 (compatible; DoWant/1.0; +code.google.com/p/do-want/)");
-
 ?>
