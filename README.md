@@ -12,6 +12,11 @@ Looking for a Download?
 
 If you just want to download an installable, reasonably stable version, you can visit the [end-user-friendly page here](http://aaroneiche.github.com/do-want/)
 
+Most recent update
+==================
+Just added support for adding and deleting categories at your whim. Items with that category now move to a "none" category, which is a valid option.
+Also some minor bug fixes.
+
 What's on the Docket?
 =====================
 Things that we're planning on having done for a version 1.0 release:
