@@ -465,7 +465,17 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				checkForUpdates();
 			});
 			
-			$("button#checkForUpdate").trigger("click");
+			$("button#addCategoryButton").click(function(){
+				clearCategoryForm();
+				$('div#manageCategoryFormBlock').modal('show');
+			});
+			
+			$("#deleteCategorySubmit").click(function(){
+				deleteCategory($("#confirmObjectForm #confirmObjectId").val());
+			});
+						
+			
+//			$("button#checkForUpdate").trigger("click");
 <?php
 }
 ?>
@@ -501,7 +511,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="control-group">
 				<label class="control-label" for="itemCategoryInput">Item Category:</label>
 				<div class="controls">
-					<select id="itemCategoryInput"></select>
+					<select id="itemCategoryInput">
+					<option value="null" >None</option>
+					</select>
 				</div>
 			</div>
 			<div class="control-group">
@@ -680,6 +692,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<a href="#" id="deleteSubmit" class="confirmButton btn btn-danger">Yes, Delete Item</a>
 			<a href="#" id="receivedSubmit" class="confirmButton btn btn-success">Yes, Mark Received</a>
 			<a href="#" id="deleteUserSubmit" class="confirmButton btn btn-danger">Yes, Delete This User</a>
+			<a href="#" id="deleteCategorySubmit" class="confirmButton btn btn-danger">Yes, Delete This Category</a>
 		</form>		
 	</div>
 </div>
@@ -777,7 +790,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</a></li>
 			    </ul>
 			    <ul class="nav pull-right">			
-				<?php if($_SESSION['admin'] == true){ ?>
+				<?php
+				 if($_SESSION['admin'] == true){
+					?>
 					<li><a href="#" id="adminTab" class="navLink" data-section="admin">
 						Admin
 					</a></li>
@@ -931,6 +946,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="row">
 				<div class="span5">
 					<h3>Categories</h3>
+					<button id="addCategoryButton" class="btn btn-primary">Add Category</button>
 					<div class="tableScrollContainer">
 						<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
 						

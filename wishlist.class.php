@@ -17,13 +17,13 @@ class wishlist extends db{
 			$received = "";
 		}
 			
-		$query ="select 
+		$query ="select
 					items.*, 
 					(select Min(sourceprice) from itemsources where itemsources.itemid = items.itemid) as minprice,
 					categories.category as displayCategory 
-				from items,categories where userid = '{$_SESSION['userid']}'
-					and categories.categoryid = items.category $received";
-		
+				from items 
+				left join categories on categoryid = items.category
+				where userid = '{$_SESSION['userid']}' $received";
 		
 		$result = $this->dbQuery($query);
 		$list = $this->dbAssoc($result);
@@ -442,7 +442,7 @@ class wishlist extends db{
 							'{$_SESSION['userid']}',
 							'{$this->dbEscape($args['description'])}',
 							'{$this->dbEscape($args['ranking'])}',
-							'{$this->dbEscape($args['category'])}',
+							{$this->dbEscape($args['category'])},
 							'{$this->dbEscape($args['comment'])}',
 							'{$this->dbEscape($args['quantity'])}'
 						)
@@ -452,7 +452,7 @@ class wishlist extends db{
 				$query = "update items set 
 						description = '{$this->dbEscape($args['description'])}',
 						ranking = '{$this->dbEscape($args['ranking'])}',
-						category = '{$this->dbEscape($args['category'])}',
+						category = {$this->dbEscape($args['category'])},
 						comment = '{$this->dbEscape($args['comment'])}',
 						quantity = '{$this->dbEscape($args['quantity'])}'
 					where
@@ -871,11 +871,24 @@ class wishlist extends db{
 		
 	*/
 	function manageCategory($args){
+
 		$cleanId = $this->dbEscape($args['categoryid']); 
 		$cleanCat = $this->dbEscape($args['category']);
 		
-		$query = "update {$this->options['table_prefix']}categories set category = '$cleanCat' where categoryid = '$cleanId'";
-		$result = $this->dbQuery($query);
+		if(isset($args['action']) && $args['action'] == 'add'){
+			$query = "insert into {$this->options['table_prefix']}categories(category) values('$cleanCat')";
+		}else if(isset($args['action']) && $args['action'] == 'delete'){
+			//remove category from items
+			$updateItemCatsQuery = "update items set category = null where category = $cleanId";
+			$updateItems = $this->dbQuery($updateItemCatsQuery);
+			
+			$query = "delete from categories where categoryid = $cleanId";
+
+		}else{	
+			$query = "update {$this->options['table_prefix']}categories set category = '$cleanCat' where categoryid = '$cleanId'";
+		}
+		
+		$result = $this->dbQuery($query);			
 		return $result;
 	}
 

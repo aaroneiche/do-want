@@ -442,14 +442,18 @@ function sortByDescriptionAsc(listObject){
 
 function sortByRankingAsc(listObject){	
 	listObject.currentSort = sortByRankingAsc;
-	listObject.list.sort(function(a,b){return a.ranking - b.ranking});
+	if(listObject.list.length > 0){
+		listObject.list.sort(function(a,b){return a.ranking - b.ranking});
+	}	
 	listObject.skipHeader = true;
 	displayWishlist(listObject);
 }
 
 function sortByRankingDesc(listObject){
 	listObject.currentSort = sortByRankingDesc;
-	listObject.list.sort(function(a,b){return b.ranking - a.ranking});
+	if(listObject.list.length > 0){
+			listObject.list.sort(function(a,b){return b.ranking - a.ranking});
+	}
 	listObject.skipHeader = true;
 	displayWishlist(listObject);	
 }
@@ -963,14 +967,23 @@ function buildCategorySelect(){
 
 	//Set these to defaults if they're not defined in the call
 	//I don't think these are necessary any longer because this is no longer generated on the fly.
-
 	var table = $("table#categoriesTable").empty();
+	var select = $("select#itemCategoryInput");
+
+	jQuery(".category-option").remove();
 
 	jQuery(storedData.categories).each(function(i,e){
 		var option =  jQuery(document.createElement("option"))
 							.attr("value",e.categoryid)
+							.addClass("category-option")
 							.html(e.category);
-		jQuery("select#itemCategoryInput").append(option);
+		select.append(option);
+
+		var deleteCategoryButton = $(document.createElement('i'))
+								.addClass("icon-trash icon-large pull-right")
+								.click(function(ev){			
+									displayConfirmScreen(e.categoryid,"category","deleteCategory");
+								});
 				
 		var editCategory = $(document.createElement('button'))
 								.append("edit")
@@ -980,9 +993,10 @@ function buildCategorySelect(){
 									$("input#categoryName").val(e.category);
 									$('div#manageCategoryFormBlock').modal('show');
 								});
-								
+
 		var catTd = $(document.createElement('td'))
-						.append(e.category,editCategory);
+						.append(e.category,deleteCategoryButton,editCategory);
+						
 
 		var row = $(document.createElement('tr'))
 						.append(catTd);
@@ -1328,7 +1342,7 @@ function setActiveItem(){
 	jQuery.post('ajaxCalls.php',data,function(response){
 		getCurrentUserList(listReceived);
 		$("#manageItemFormBlock").modal('hide');
-				
+		storedData.activeItem = {};		
 	},'json');
 }
 
@@ -1986,6 +2000,10 @@ function displayConfirmScreen(objectId,objectType,action){
 			$("#deleteUserSubmit").show();
 			$("#confirmWarningMessage").html("Warning! You are deleting a user on the system. If you continue, they will not be able to log in or access any of their items. A Deleted user cannot be recovered!");
 		break;
+		case "deleteCategory":
+			$("#deleteCategorySubmit").show();
+			$("#confirmWarningMessage").html("Are you sure you want to delete this category? Items with this category will have their category removed");
+		break;
 	}
 	$("#confirmActivityBlock").modal('show');
 }
@@ -2097,11 +2115,48 @@ function manageCategory(){
 			"category":catName
 		}
 	}
+	
+	if(catId.length == 0){
+		data.args.action = "add";
+	}
+	
 	jQuery.post('ajaxCalls.php',data,function(response){	
 		$('#manageCategoryFormBlock').modal('hide');
 			remoteBuildCategorySelect();
 	},"json");	
 }
+
+/*
+	Method: clearCategoryForm
+	clears ID and name fields from the category form
+*/
+function clearCategoryForm(){
+	$("input#categoryId").val("");
+	$("input#categoryName").val("");
+}
+
+/*
+	Method: deleteCategory
+	deletes a category from the system
+	
+*/
+function deleteCategory(catId){
+	data = {
+		interact:'wishlist',
+		action:'manageCategory',
+		args:{
+			"action":"delete",
+			"categoryid":catId
+		}
+	}
+	
+	jQuery.post('ajaxCalls.php',data,function(response){
+		remoteBuildCategorySelect();
+		getCurrentUserList();
+		$("#confirmActivityBlock").modal('hide');
+	},"json");		
+}
+
 
 /*
 	Method: filterList
