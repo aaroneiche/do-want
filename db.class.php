@@ -293,7 +293,8 @@ class db{
 		
 		//MySQL backup needs to be added in here as well.
 				
-		$exclude_defaults = array(".", "..", ".htaccess", ".DS_Store",".git",".gitignore","custom","uploads","generateUpdate.php","update.zip");
+		$exclude_defaults = array(".", "..", ".htaccess", ".DS_Store",".git",".gitignore","generateUpdate.php","update.zip");
+		//"custom","uploads"
 		$exclude_list = array_merge($exclude_defaults,$exclude);
 		
 		$this->recursiveCreateArchive("./", $zip, $exclude_list);
