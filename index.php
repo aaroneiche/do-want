@@ -8,7 +8,22 @@ if(!file_exists('config.php')){
 }
 
 include 'config.php';
-include 'initialize.php';
+
+//include 'initialize.php';
+
+if(!defined('VERSION')){
+	//DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
+	define("VERSION","0.9.96");
+	define("USER_AGENT_STRING","Mozilla/5.0 (compatible; DoWant/1.0; +code.google.com/p/do-want/)");	
+}else{
+	if($_SESSION['admin'] == 1){
+		?>
+		Hi Admin!
+		Please remove the "VERSION" and "USER_AGENT_STRING" Constants from your config.php file. 
+		They are no longer required there.
+		<?php
+	}
+}
 
 ?>
 <!DOCTYPE html>
@@ -139,7 +154,8 @@ include 'initialize.php';
 				
 		storedData.userWishlist.currentSort = sortByRankingDesc;
 		storedData.otherUserWishlist.currentSort = sortByRankingDesc;
-				
+
+		storedData.activeItem = {};
 		
 		$(document).ready(function(){
 				
@@ -154,8 +170,8 @@ include 'initialize.php';
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
-				$('#addSourceButton').addClass('disabled').prop("disabled","disabled");
-				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
+//				$('#addSourceButton').addClass('disabled').prop("disabled","disabled");
+//				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
 				$('#manageItemFormBlock').modal();
 				//swapModal("#manageItemFormBlock");
 			});
@@ -213,6 +229,20 @@ include 'initialize.php';
 			//Most of this should be rewritten into a method on script.js
 			$("#uploadframe").load(function(){
 				uploadResult = $.parseJSON($("#uploadframe").contents().text());
+
+				$("#uploadAlert").removeClass("alert-error").addClass("alert-success");
+				$("#uploadAlertMessage").append("The file upload is complete");
+
+				if(storedData.activeItem.images == undefined){
+					storedData.activeItem.images = {};
+				}
+
+				var imgTempId = randomString();
+				storedData.activeItem.images[imgTempId] = {"filename":uploadResult.fileName,"action":"add"}
+				
+				populateImagesOnForm();
+				
+				/*
 				if(uploadResult.queryResult == true){
 					$("#uploadAlert").removeClass("alert-error").addClass("alert-success");
 					$("#uploadAlertMessage").append("The file upload is complete");
@@ -221,6 +251,7 @@ include 'initialize.php';
 					$("#uploadAlert").removeClass("alert-success").addClass("alert-error");
 					$("#uploadAlertMessage").append("The file upload encountered some problems. Please try again.")				
 				}
+				*/
 				$("#uploadAlert").show();
 			});
 			
@@ -311,11 +342,18 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			
 
 			jQuery("#itemSubmit").click(function(){
-				manageItem();
+				//manageItem();
+				setActiveItem();
 			});
 			
+			jQuery("#itemCancel").click(function(){
+				storedData.activeItem = {};
+			})
+
+			
 			jQuery("#itemSourceSubmit").click(function(){
-				manageItemSource();
+				//manageItemSource();
+				setActiveItemSource();
 			});
 			
 			$("#openManageUserForm").click(function(){
@@ -355,7 +393,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				clearItemSourceForm();
 
 				//Set the itemID to get info for.
-				$("#itemSourceForm #sourceItemId").val($("form#manageItemForm input#itemId").val());
+				//$("#itemSourceForm #sourceItemId").val($("form#manageItemForm input#itemId").val());
+				$("#itemSourceSubmit").html("Add Source");
 				
 				$("#manageItemFormBlock").modal("hide");
 				$("#itemSourceFormBlock").modal("show").on('hide',function(){
@@ -441,7 +480,17 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				checkForUpdates();
 			});
 			
-			$("button#checkForUpdate").trigger("click");
+			$("button#addCategoryButton").click(function(){
+				clearCategoryForm();
+				$('div#manageCategoryFormBlock').modal('show');
+			});
+			
+			$("#deleteCategorySubmit").click(function(){
+				deleteCategory($("#confirmObjectForm #confirmObjectId").val());
+			});
+						
+			
+//			$("button#checkForUpdate").trigger("click");
 <?php
 }
 ?>
@@ -477,7 +526,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="control-group">
 				<label class="control-label" for="itemCategoryInput">Item Category:</label>
 				<div class="controls">
-					<select id="itemCategoryInput"></select>
+					<select id="itemCategoryInput">
+					<option value="null" >None</option>
+					</select>
 				</div>
 			</div>
 			<div class="control-group">
@@ -507,7 +558,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</div>
 
 	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<a href="#" id="itemCancel" class="btn" data-dismiss="modal">Cancel</a>
 		<a href="#" id="itemSubmit" class="btn btn-primary">Save changes</a>
 	</div>
 
@@ -611,9 +662,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	  <div class="modal-body">
 			<form method="POST" id="imageUploadForm" enctype="multipart/form-data" onsubmit="return uploadImage();" action="ajaxCalls.php" target="uploadframe" >				
 				<input type="hidden" name="interact" value="wishlist">
-				<input type="hidden" name="action" value="manageItemImage">
-				<input type="hidden" name="itemImageAction" value="add">
-				<input type="hidden" name="itemid" id="itemIdForImage" value="1"/><br/>
+				<input type="hidden" name="action" value="uploadFile">
 			
 				<div class="control-group">
 					<label class="control-label" for="uploadfile">Select A file for upload</label>
@@ -636,7 +685,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<iframe id="uploadframe" name="uploadframe"></iframe>
 	  </div>
 	  <div class="modal-footer">
-		<a href="#" id="manageImageCloseButton" class="btn" data-dismiss="modal">Close</a>
+		<a href="#" id="manageImageCloseButton" class="btn" data-dismiss="modal">Back</a>
 	  </div>
 </div>
 
@@ -658,6 +707,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<a href="#" id="deleteSubmit" class="confirmButton btn btn-danger">Yes, Delete Item</a>
 			<a href="#" id="receivedSubmit" class="confirmButton btn btn-success">Yes, Mark Received</a>
 			<a href="#" id="deleteUserSubmit" class="confirmButton btn btn-danger">Yes, Delete This User</a>
+			<a href="#" id="deleteCategorySubmit" class="confirmButton btn btn-danger">Yes, Delete This Category</a>
 		</form>		
 	</div>
 </div>
@@ -755,7 +805,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</a></li>
 			    </ul>
 			    <ul class="nav pull-right">			
-				<?php if($_SESSION['admin'] == true){ ?>
+				<?php
+				 if($_SESSION['admin'] == true){
+					?>
 					<li><a href="#" id="adminTab" class="navLink" data-section="admin">
 						Admin
 					</a></li>
@@ -885,6 +937,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		<?php if($_SESSION['admin'] == true){ ?>
 		<div id="admin" class="section">
 			<h2>Administration</h2>
+			<!--
 			<div class="row">
 				<div class="span10">
 					<div class="well">
@@ -895,6 +948,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 					</div>
 				</div>
 			</div>
+			-->
 			<div class="row">
 				<div class="span10">
 					<h3>Users</h3>
@@ -909,6 +963,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<div class="row">
 				<div class="span5">
 					<h3>Categories</h3>
+					<button id="addCategoryButton" class="btn btn-primary">Add Category</button>
 					<div class="tableScrollContainer">
 						<table id="categoriesTable" class="table table-striped table-bordered table-condensed">
 						

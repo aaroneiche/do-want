@@ -10,5 +10,4 @@ $dbpass = 'dowant';
 $options['table_prefix'] = '';
 $options['charSet'] = 'utf8';
 
-
 ?>
