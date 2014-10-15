@@ -88,14 +88,14 @@ class db{
 	}
 
 	/*
-		Method sendMessage
-		Sends a message from the current user to another user in the system.
-		Because both user and wishlist classes need access to this method, it's being defined here.
-		
-		senderId - The id of the Sender
-		receiverId - The id of the receiver
-		message - The Text of the Message
-		forceEmail - If this is true, email will be sent regardless of preference.
+	Method: sendMessage
+	Sends a message from the current user to another user in the system.
+	Because both user and wishlist classes need access to this method, it's being defined here.
+	
+	@senderId - The id of the Sender
+	@receiverId - The id of the receiver
+	@message - The Text of the Message
+	@forceEmail - If this is true, email will be sent regardless of preference.
 		
 	*/
 	function sendMessage($args){
@@ -127,7 +127,18 @@ class db{
 		$subject = "New message from the Wishlist!";	
 		
 		if($usersResult['email_msgs'] == 1 || $cleanForceEmail == 1){
-			$mailresult = mail($usersResult['email'],$subject,stripslashes($args['message']));
+
+
+			if(isset($this->options['mailHeaders'])){
+				foreach($this->options['mailHeaders'] as $key => $val){
+					$extraHeaders = $key.":".$val."\\n";
+				}
+				
+			}else{
+				$extraHeaders = "";
+			}
+
+			$mailresult = mail($usersResult['email'],$subject,stripslashes($args['message']),$extraHeaders."\\n");
 			return $mailresult;
 		}
 		return $result;
