@@ -385,20 +385,21 @@ class wishlist extends db{
 		$sourceResult = array();
 		
 		//Manage Sources
-		
-		foreach($args['sources'] as $source){
-			if(isset($source['action'])){
+		if(count($args['sources']) > 0 ){
+			foreach($args['sources'] as $source){
+				if(isset($source['action'])){
 
-				$sourceArgs = array();
-				$sourceArgs['sourceid'] = $source['id'];					
-				$sourceArgs['itemid'] = $itemId;
-				$sourceArgs['source'] = $source['name'];
-				$sourceArgs['sourceurl'] = $source['url'];
-				$sourceArgs['sourceprice'] = $source['price'];
-				$sourceArgs['sourcecomments'] = $source['comments'];
-				
-				$sourceArgs['itemSourceAction'] = $source['action'];
-				$sourceResult[] = $this->manageItemSource($sourceArgs);
+					$sourceArgs = array();
+					$sourceArgs['sourceid'] = $source['id'];					
+					$sourceArgs['itemid'] = $itemId;
+					$sourceArgs['source'] = $source['name'];
+					$sourceArgs['sourceurl'] = $source['url'];
+					$sourceArgs['sourceprice'] = $source['price'];
+					$sourceArgs['sourcecomments'] = $source['comments'];
+					
+					$sourceArgs['itemSourceAction'] = $source['action'];
+					$sourceResult[] = $this->manageItemSource($sourceArgs);
+				}
 			}
 		}
 
