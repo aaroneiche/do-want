@@ -66,7 +66,7 @@ class wishlist extends db{
 					(select sum(allocs.quantity) from allocs where allocs.itemid = items.itemid)
 			     as available
 			from {$this->options['table_prefix']}items
-				join {$this->options['table_prefix']}categories on `categoryid` = items.`category`
+				left join {$this->options['table_prefix']}categories on `categoryid` = items.`category`
 				join {$this->options['table_prefix']}shoppers on shopper = '{$_SESSION['userid']}' and mayshopfor = '{$args['shopForId']}'
 				left join {$this->options['table_prefix']}allocs on allocs.itemid = items.itemid and allocs.userid = '{$_SESSION['userid']}'
 			where items.`userid` = '{$args['shopForId']}'
