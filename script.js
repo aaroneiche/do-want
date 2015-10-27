@@ -980,14 +980,13 @@ function buildCategorySelect(){
 		select.append(option);
 
 		var deleteCategoryButton = $(document.createElement('i'))
-								.addClass("icon-trash icon-large pull-right")
+								.addClass("icon-trash icon-large tool pull-right")
 								.click(function(ev){			
 									displayConfirmScreen(e.categoryid,"category","deleteCategory");
 								});
 				
-		var editCategory = $(document.createElement('button'))
-								.append("edit")
-								.addClass("btn btn-mini pull-right")
+		var editCategory = $(document.createElement('i'))
+								.addClass("icon-pencil icon-large tool pull-right")
 								.click(function(){
 									$("input#categoryId").val(e.categoryid);
 									$("input#categoryName").val(e.category);
@@ -1051,9 +1050,8 @@ function buildRankSelect(){
 			 var rankOption = $(document.createElement('option')).val(e.ranking).html(e.title);
 			 select.append(rankOption);
 			
-			var editRank = $(document.createElement('button'))
-								.append("edit")
-								.addClass("btn btn-mini pull-right")
+			var editRank = $(document.createElement('i'))								
+								.addClass("icon-trash icon-large tool pull-right")
 								.click(function(){
 									$("input#rankId").val(e.ranking);
 									$("input#rankTitle").val(e.title);
