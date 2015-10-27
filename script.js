@@ -1051,7 +1051,7 @@ function buildRankSelect(){
 			 select.append(rankOption);
 			
 			var editRank = $(document.createElement('i'))								
-								.addClass("icon-trash icon-large tool pull-right")
+								.addClass("icon-pencil icon-large tool pull-right")
 								.click(function(){
 									$("input#rankId").val(e.ranking);
 									$("input#rankTitle").val(e.title);
@@ -1665,7 +1665,7 @@ function displaySystemUsers(){
 			
 			//We should probably expand on tool construction above - but barring that here are some quick tools for management.
 			var editUserButton = $(document.createElement("button"))
-									.addClass("btn btn-info btn-mini pull-right")
+									.addClass("btn btn-info btn-mini tool pull-right")
 									.append("Edit user")
 									.click(function(){
 										
@@ -1673,7 +1673,7 @@ function displaySystemUsers(){
 									});
 									
 			var deleteUserButton = $(document.createElement("button"))
-										.addClass("btn btn-danger btn-mini pull-right")
+										.addClass("btn btn-danger btn-mini tool pull-right")
 										.append("Delete user")
 										.click(function(){
 											//Set the form delete ID to the userId provided and show the warning Modal.
