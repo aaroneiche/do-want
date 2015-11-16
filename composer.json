@@ -1,0 +1,6 @@
+{
+    "require": {
+        "hybridauth/hybridauth": "^2.5",
+        "robmorgan/phinx": "^0.4.6"
+    }
+}

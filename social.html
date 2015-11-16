@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<title> Do Want Social Login!!!!</title>
+
+		<script>
+			function openAuthWindow(service){
+				window.open("socialLogin.php?s="+service,'LOGIN!',config='height=400,width=400');
+			}
+		</script>
+	</head>
+	<body>
+		<button onclick="openAuthWindow('facebook');">Facebook!</button>
+		<br/>
+		<button onclick="openAuthWindow('google');">Google!</button>
+
+	</body>
+</html>
+
+
