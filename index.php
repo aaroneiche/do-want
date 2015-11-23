@@ -238,7 +238,7 @@ if(!defined('VERSION')){
 				}
 
 				var imgTempId = randomString();
-				storedData.activeItem.images[imgTempId] = {"filename":uploadResult.fileName,"action":"add"}
+				storedData.activeItem.images[imgTempId] = {"id":imgTempId,"filename":uploadResult.fileName,"action":"add"}
 				
 				populateImagesOnForm();
 				

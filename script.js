@@ -1487,7 +1487,12 @@ function populateImagesOnForm(){
 				var itemImageDiv = $(document.createElement('div')).append(img).addClass("imageBlock");
 
 				var removeImageControl =  $(document.createElement('a')).attr("data-id",e.id).addClass("close").append("×").click(function(ev){
-					storedData.activeItem.images[e.id].action = "delete";
+					if($.isNumeric(e.id)){
+						storedData.activeItem.images[e.id].action = "delete";
+					}else{
+						delete storedData.activeItem.images[e.id];
+					}
+					
 					populateImagesOnForm();
 				});
 		

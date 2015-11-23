@@ -583,8 +583,7 @@ class wishlist extends db{
 				
 			break;
 			case 'delete':
-				
-				$filenameQuery = "select filename from itemimages where imageid = '{$this->dbEscape($args['imageid'])}'";
+				$filenameQuery = "select filename from itemimages where imageid = '{$this->dbEscape($args['id'])}'";
 				$filename = $this->dbValue($this->dbQuery($filenameQuery));
 				
 				if(file_exists($this->options['filepath'].$filename)){
@@ -597,7 +596,7 @@ class wishlist extends db{
 				
 							
 				if($deleteResult){
-					$query = "delete from itemimages where imageid = '{$this->dbEscape($args['imageid'])}'";
+					$query = "delete from itemimages where imageid = '{$this->dbEscape($args['id'])}'";
 					$result = $this->dbQuery($query);
 				}else{
 					return $error = array('errorMessage'=>"There was a problem deleting the image file: ".$deleteResult);
