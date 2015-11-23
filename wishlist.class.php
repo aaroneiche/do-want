@@ -583,7 +583,6 @@ class wishlist extends db{
 				
 			break;
 			case 'delete':
-				error_log(print_r($args,true));
 				$filenameQuery = "select filename from itemimages where imageid = '{$this->dbEscape($args['id'])}'";
 				$filename = $this->dbValue($this->dbQuery($filenameQuery));
 				
