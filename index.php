@@ -185,6 +185,12 @@ if(!defined('VERSION')){
 				$("#manageUserSaveButton").html("Request Account");
 				$("#userFormBlock .modal-header h2").html("Request An Account");
 				
+
+				$("#manageUserSocialGoogle").html("Create Account with Google");
+				$("#manageUserSocialGoogle").attr("data-calltype","create");
+				$("#manageUserSocialFacebook").html("Create with Facebook");
+				$("#manageUserSocialFacebook").attr("data-calltype","create");
+
 				$("#userFormBlock").modal('show');
 			});
 			
@@ -260,7 +266,7 @@ if(!defined('VERSION')){
 			Support for social login.
 			*/
 			$(".social_login").click(function(ev){
-				window.open("socialLogin.php?s="+ev.target.getAttribute("data-social"),'LOGIN!',config='height=400,width=400');
+				window.open("socialLogin.php?s="+ev.target.getAttribute("data-social")+"&"+ev.target.getAttribute("data-calltype"),'LOGIN!',config='height=400,width=400');
 			});
 
 			$('.dropdown-toggle').dropdown();
@@ -368,6 +374,12 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#openManageUserForm").click(function(){
 				$("#manageUserSaveButton").html("Update Account");
 				$("#userFormBlock .modal-header h2").html("Manage Account");
+				
+				$("#manageUserSocialGoogle").html("Add Login with Google");
+				$("#manageUserSocialGoogle").attr("data-calltype","add");
+				$("#manageUserSocialFacebook").html("Add Login with Facebook");
+				$("#manageUserSocialFacebook").attr("data-calltype","add");
+
 				populateManageUserForm(userId);
 			});
 			
@@ -1009,9 +1021,9 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 				<p><button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button></p>
 			</form>
 		</div>
-		<div class="span2">
-			<p><button class="social_login btn" data-social="google">Google</button></p>
-			<p><button class="social_login btn" data-social="google">Facebook</button></p>
+		<div class="span3" id="socialAuthButtons">
+			<p><button class="social_login btn" data-social="google" data-calltype="auth">Login with Google</button></p>
+			<p><button class="social_login btn" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
 		</div>
 	</div>
 	<div class="row" id="additionalInfo">
@@ -1102,8 +1114,12 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 		  </div>
 		  <div class="modal-footer">
-			<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Cancel</a>
-			<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
+		  	<div id="socialAccounts">
+				<a id="manageUserSocialGoogle" href="#" class="btn pull-left social_login" data-social="google" data-calltype="create">Add Account with Google</a> 
+				<a id="manageUserSocialFacebook" href="#" class="btn pull-left social_login" data-social="facebook" data-calltype="create">Add Account with Facebook</a>
+			</div>
+			<a href="#" id="manageUserCloseButton" class="btn pull-right" data-dismiss="modal">Cancel</a>
+			<a href="#" id="manageUserSaveButton" class="btn btn-primary pull-right">Save</a>
 		  </div>
 	</div>
 

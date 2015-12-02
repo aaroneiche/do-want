@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" defaultPhpNamingMethod="underscore">
+  <table name="allocs" idMethod="native" phpName="Allocs">
+    <column name="itemid" phpName="Itemid" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <column name="userid" phpName="Userid" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <column name="bought" phpName="Bought" type="BOOLEAN" size="1" primaryKey="true" required="true" defaultValue="false"/>
+    <column name="quantity" phpName="Quantity" type="INTEGER" required="true" defaultValue="0"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="categories" idMethod="native" phpName="Categories">
+    <column name="categoryid" phpName="Categoryid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="category" phpName="Category" type="VARCHAR" size="50"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="events" idMethod="native" phpName="Events">
+    <column name="eventid" phpName="Eventid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="userid" phpName="Userid" type="INTEGER"/>
+    <column name="description" phpName="Description" type="VARCHAR" size="100" required="true" defaultValue=""/>
+    <column name="eventdate" phpName="Eventdate" type="DATE" required="true" defaultValue="0000-00-00"/>
+    <column name="recurring" phpName="Recurring" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="families" idMethod="native" phpName="Families">
+    <column name="familyid" phpName="Familyid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="familyname" phpName="Familyname" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="itemimages" idMethod="native" phpName="Itemimages">
+    <column name="imageid" phpName="Imageid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="itemid" phpName="Itemid" type="INTEGER" required="true"/>
+    <column name="filename" phpName="Filename" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="items" idMethod="native" phpName="Items">
+    <column name="itemid" phpName="Itemid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="userid" phpName="Userid" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="description" phpName="Description" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <column name="price" phpName="Price" type="DECIMAL" size="7" scale="2"/>
+    <column name="source" phpName="Source" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <column name="ranking" phpName="Ranking" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="url" phpName="Url" type="VARCHAR" size="255"/>
+    <column name="category" phpName="Category" type="INTEGER"/>
+    <column name="comment" phpName="Comment" type="LONGVARCHAR"/>
+    <column name="quantity" phpName="Quantity" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="image_filename" phpName="ImageFilename" type="VARCHAR" size="255"/>
+    <column name="addedByUserId" phpName="Addedbyuserid" type="INTEGER"/>
+    <column name="received" phpName="Received" type="INTEGER" size="1" defaultValue="0"/>
+    <column name="visibleToOwner" phpName="Visibletoowner" type="INTEGER" size="1"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="itemsources" idMethod="native" phpName="Itemsources">
+    <column name="sourceid" phpName="Sourceid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="itemid" phpName="Itemid" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="source" phpName="Source" type="LONGVARCHAR" required="true"/>
+    <column name="sourceurl" phpName="Sourceurl" type="VARCHAR" size="255"/>
+    <column name="sourceprice" phpName="Sourceprice" type="DECIMAL" size="10" scale="2"/>
+    <column name="sourcecomments" phpName="Sourcecomments" type="LONGVARCHAR"/>
+    <column name="addedByUserId" phpName="Addedbyuserid" type="INTEGER" required="true"/>
+    <column name="visibleToOwner" phpName="Visibletoowner" type="INTEGER"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="memberships" idMethod="native" phpName="Memberships">
+    <column name="userid" phpName="Userid" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <column name="familyid" phpName="Familyid" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="messages" idMethod="native" phpName="Messages">
+    <column name="messageid" phpName="Messageid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="sender" phpName="Sender" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="recipient" phpName="Recipient" type="INTEGER" required="true" defaultValue="0"/>
+    <column name="message" phpName="Message" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <column name="isread" phpName="Isread" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="created" phpName="Created" type="DATE" required="true" defaultValue="0000-00-00"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="phinxlog" idMethod="native" phpName="Phinxlog">
+    <column name="version" phpName="Version" type="BIGINT" primaryKey="true" required="true"/>
+    <column name="start_time" phpName="StartTime" type="TIMESTAMP" required="true" defaultExpr="CURRENT_TIMESTAMP"/>
+    <column name="end_time" phpName="EndTime" type="TIMESTAMP" required="true" defaultExpr="CURRENT_TIMESTAMP"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="ranks" idMethod="native" phpName="Ranks">
+    <column name="ranking" phpName="Ranking" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="title" phpName="Title" type="VARCHAR" size="50" required="true" defaultValue=""/>
+    <column name="rendered" phpName="Rendered" type="VARCHAR" size="255" required="true" defaultValue=""/>
+    <column name="rankorder" phpName="Rankorder" type="INTEGER" required="true" defaultValue="0"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="shoppers" idMethod="native" phpName="Shoppers">
+    <column name="shopper" phpName="Shopper" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <column name="mayshopfor" phpName="Mayshopfor" type="INTEGER" primaryKey="true" required="true" defaultValue="0"/>
+    <column name="pending" phpName="Pending" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+  <table name="user_auth_providers" idMethod="native" phpName="UserAuthProviders">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="user_id" phpName="UserId" type="INTEGER" required="true"/>
+    <column name="provider" phpName="Provider" type="VARCHAR" size="60" required="true"/>
+    <column name="social_id" phpName="SocialId" type="VARCHAR" size="60" required="true"/>
+    <foreign-key foreignTable="users" phpName="Users" refPhpName="UserAuthProviers">
+      <reference local="user_id" foreign="userid"/>
+    </foreign-key>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="users" idMethod="native" phpName="Users">
+    <column name="userid" phpName="Userid" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="username" phpName="Username" type="VARCHAR" size="20" required="true" defaultValue=""/>
+    <column name="password" phpName="Password" type="VARCHAR" size="50" required="true" defaultValue=""/>
+    <column name="fullname" phpName="Fullname" type="VARCHAR" size="50" required="true" defaultValue=""/>
+    <column name="email" phpName="Email" type="VARCHAR" size="255"/>
+    <column name="approved" phpName="Approved" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="admin" phpName="Admin" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="comment" phpName="Comment" type="LONGVARCHAR"/>
+    <column name="email_msgs" phpName="EmailMsgs" type="BOOLEAN" size="1" required="true" defaultValue="false"/>
+    <column name="list_stamp" phpName="ListStamp" type="TIMESTAMP"/>
+    <column name="initialfamilyid" phpName="Initialfamilyid" type="INTEGER"/>
+    <vendor type="mysql">
+      <parameter name="Engine" value="MyISAM"/>
+    </vendor>
+  </table>
+</database>

@@ -11,13 +11,13 @@
 
 return
 		array(
-			"base_url" => "http://aaron.dev/hybrid.php",
+			"base_url" => "http://dowant.dev/hybrid.php",
 			"providers" => array(
 				"Google" => array(
 					"enabled" => true,
 					"keys" => array("id" => "911019304085-0faeouu5lmnis90mlbukj78dogu9bcfs.apps.googleusercontent.com", 
-									"secret" => "J9cTY87gsnZlJNn74iz1Or-J"),
-					"scope" => "https://www.googleapis.com/auth/userinfo.profile"
+									"secret" => "Bu1ZAFP_4yRUmpCMXfE05v7P"),
+					"scope" => "profile email"
 				),
 				"Facebook" => array(
 					"enabled" => true,
@@ -29,7 +29,7 @@ return
 			// You can also set it to
 			// - "error" To log only error messages. Useful in production
 			// - "info" To log info and error messages (ignore debug messages)
-			"debug_mode" => false,
+			"debug_mode" => true,
 			// Path to file writable by the web server. Required if 'debug_mode' is not false
-			"debug_file" => "",
+			"debug_file" => "logs/error_log",
 );
