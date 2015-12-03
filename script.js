@@ -559,6 +559,12 @@ function getItemDetailInfo(itemId){
 	jQuery.post('ajaxCalls.php',data,function(response){
 		
 		debug = response;
+
+		if(response.responseType != undefined && response.responseType == "error"){
+			displayMessage(response.message);
+		}
+
+
 		jQuery('#itemDetailName').html(response.itemDescription);
 		jQuery('#itemDetailComment').html(response.itemComment);
 		jQuery('#itemDetailRanking').html(renderRanking(response.itemRanking));

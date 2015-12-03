@@ -185,6 +185,12 @@ if(!defined('VERSION')){
 				$("#manageUserSaveButton").html("Request Account");
 				$("#userFormBlock .modal-header h2").html("Request An Account");
 				
+
+				$("#manageUserSocialGoogle").html("Create Account with Google");
+				$("#manageUserSocialGoogle").attr("data-calltype","create");
+				$("#manageUserSocialFacebook").html("Create with Facebook");
+				$("#manageUserSocialFacebook").attr("data-calltype","create");
+
 				$("#userFormBlock").modal('show');
 			});
 			
@@ -255,6 +261,16 @@ if(!defined('VERSION')){
 				$("#uploadAlert").show();
 			});
 			
+
+			/*
+			Support for social login.
+			*/
+			$(".social_login").click(function(ev){
+				window.open("socialLogin.php?s="+ev.target.getAttribute("data-social")+"&"+ev.target.getAttribute("data-calltype"),'LOGIN!',config='height=400,width=400');
+			});
+
+			$('.dropdown-toggle').dropdown();
+
 		});
 		
 	</script>
@@ -358,6 +374,12 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#openManageUserForm").click(function(){
 				$("#manageUserSaveButton").html("Update Account");
 				$("#userFormBlock .modal-header h2").html("Manage Account");
+				
+				$("#manageUserSocialGoogle").html("Add Login with Google");
+				$("#manageUserSocialGoogle").attr("data-calltype","add");
+				$("#manageUserSocialFacebook").html("Add Login with Facebook");
+				$("#manageUserSocialFacebook").attr("data-calltype","add");
+
 				populateManageUserForm(userId);
 			});
 			
@@ -450,8 +472,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("select#userSortDropDown").change(function(){
 				window[this.value](storedData.userWishlist);
 			})
-			
-			
+
 			displayShopForMeList();
 			setupUserSearch();
 			getMessagesForUser(userId,0);
@@ -487,7 +508,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			$("#deleteCategorySubmit").click(function(){
 				deleteCategory($("#confirmObjectForm #confirmObjectId").val());
 			});
-						
+				
 			
 //			$("button#checkForUpdate").trigger("click");
 <?php
@@ -496,7 +517,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 			//This is the point that loads which tab the user is on. This will eventually be a choose-able option.
 			jQuery("#myListTab").trigger("click");
-						
+
 		});
 		
 	</script>
@@ -993,19 +1014,22 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 ?>
 
 	<div class="row" id="loginFormRow">
-		<div class="span4 offset4">
+		<div class="span3 offset3">
 			<form name="loginForm" id="loginForm" method="POST" onsubmit="return false;" class="form-inline">
-				<input name="username" id="username" type="text" class="input-small" placeholder="Username"/>
-				<input name="password" id="password" type="password" class="input-small" placeholder="Password" />
-				<button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button>
-			</form>			
+				<p><input name="username" id="username" type="text" class="input-medium" placeholder="Username"/></p>
+				<p><input name="password" id="password" type="password" class="input-medium" placeholder="Password" /></p>
+				<p><button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button></p>
+			</form>
 		</div>
-		
+		<div class="span3" id="socialAuthButtons">
+			<p><button class="social_login btn" data-social="google" data-calltype="auth">Login with Google</button></p>
+			<p><button class="social_login btn" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
+		</div>
 	</div>
 	<div class="row" id="additionalInfo">
 		<!-- A great place for extra buttons, messages, etc. -->
 		<div class="span4 offset4">
-			<button id="requestAccount" type="button" class="btn btn-small">Request an Account</button> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button>
+			<button id="requestAccount" type="button" class="btn btn-small">Create an Account</button> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button>
 		</div>
 	</div>
 	<div class="row" id="alertLocation">
@@ -1090,8 +1114,12 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 		  </div>
 		  <div class="modal-footer">
-			<a href="#" id="manageUserCloseButton" class="btn" data-dismiss="modal">Cancel</a>
-			<a href="#" id="manageUserSaveButton" class="btn btn-primary">Save</a>
+		  	<div id="socialAccounts">
+				<a id="manageUserSocialGoogle" href="#" class="btn pull-left social_login" data-social="google" data-calltype="create">Add Account with Google</a> 
+				<a id="manageUserSocialFacebook" href="#" class="btn pull-left social_login" data-social="facebook" data-calltype="create">Add Account with Facebook</a>
+			</div>
+			<a href="#" id="manageUserCloseButton" class="btn pull-right" data-dismiss="modal">Cancel</a>
+			<a href="#" id="manageUserSaveButton" class="btn btn-primary pull-right">Save</a>
 		  </div>
 	</div>
 

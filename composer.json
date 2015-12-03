@@ -1,0 +1,10 @@
+{
+    "require": {
+        "hybridauth/hybridauth": "^2.5",
+        "robmorgan/phinx": "^0.4.6",
+        "propel/propel": "~2.0@dev"
+    },
+    "autoload": {
+		"classmap": ["models/"]
+  	}
+}
