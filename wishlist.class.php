@@ -722,6 +722,16 @@ class wishlist extends db{
 	*/
 	
 	function getItemDetails($args){
+
+		//If there's not a userid set, return an error.
+		if(isset($_SESSION['userid']) == false){
+			return array(
+				'responseType'=>"error",
+				'title'=>'Not Logged in.',
+				'message'=>"You're not logged in! Please refresh the page, and login again."
+				);
+		}
+
 		$itemQuery = "select
 			items.itemid,
 			items.description as itemDescription,
@@ -736,16 +746,15 @@ class wishlist extends db{
 
 		$itemResult = $this->dbQuery($itemQuery);
 		$itemDetailArray = $this->dbAssoc($itemResult,true);		
-		
-		$itemIsForUser = ($itemDetailArray[0]['itemOwner'] === $_SESSION['userid'])? true : false;
-		
+
+		$itemIsForUser = ($itemDetailArray[0]['itemOwner'] == $_SESSION['userid'] && is_numeric($_SESSION['userid']) && $_SESSION['userid'] != 0) ? true : false ;
+
 		if($this->options['logErrors'] == true){
-			error_log("Wishlist.Class getItemDetails: Requested Item Owner: ".$itemDetailArray[0]['itemOwner']);
-			error_log("Wishlist.Class getItemDetails: Session UserId: ".$_SESSION['userid']);
+			error_log("Wishlist.Class getItemDetails: Requested Item Owner: ".gettype($itemDetailArray[0]['itemOwner'])." ".$itemDetailArray[0]['itemOwner']);
+			error_log("Wishlist.Class getItemDetails: Session UserId: ".gettype($_SESSION['userid'])." ".$_SESSION['userid']);
 			error_log("Wishlist.Class getItemDetails: Item is for user flag: ".$itemIsForUser);
 		}
 
-		
 					
 		$sourcesQuery = "select
 			itemsources.sourceid as itemSourceId,
@@ -770,21 +779,20 @@ class wishlist extends db{
 		$imagesResult = $this->dbQuery($imagesQuery);
 		$imagesDetailArray = ($this->dbRowCount($imagesResult) > 0 ) ? $this->dbAssoc($imagesResult,true) : null;
 
-		$allocQuery = "select
-			allocs.itemid,
-			allocs.userid as itemAllocUserId,
-			users.fullname as itemAllocUserName,
-			allocs.bought as itemAllocBought,
-			allocs.quantity as itemAllocQuantity
+		if($itemIsForUser == false){
+			$allocQuery = "select
+				allocs.itemid,
+				allocs.userid as itemAllocUserId,
+				users.fullname as itemAllocUserName,
+				allocs.bought as itemAllocBought,
+				allocs.quantity as itemAllocQuantity
 
-			from allocs,users 
-			where 
-				allocs.itemid = '{$args['itemid']}' and
-				users.userid = allocs.userid";
+				from allocs,users 
+				where 
+					allocs.itemid = '{$args['itemid']}' and
+					users.userid = allocs.userid";
 
-		$allocResult = $this->dbQuery($allocQuery);
-		
-		if($itemIsForUser !== true){
+			$allocResult = $this->dbQuery($allocQuery);
 			$allocDetailArray = ($this->dbRowCount($allocResult) > 0) ? $this->dbAssoc($allocResult): null;
 		}else{
 			$allocDetailArray = "currentUser";
