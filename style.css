@@ -250,9 +250,19 @@ table#userMessages td{
 	cursor: pointer;
 }
 
-div#navBarRow, div#loginFormRow{
-	margin-top:60px;
+div#navBarRow, div#loginFormRow {
+
+	margin-top:5%;
 }
+
+#loginForm #username,
+#loginForm #password,
+#loginForm #requestAccount,
+#loginForm #forgotPassword {
+	width: 100%;
+}
+
+
 
 div.tableScrollContainer{
 	overflow-y: scroll;

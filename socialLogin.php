@@ -11,7 +11,13 @@ if($_GET['s'] == 'facebook'){
 	$adapter = $instance->authenticate( "Google" );
 }
 
-$user_profile = $adapter->getUserProfile();
+try{
+	$user_profile = $adapter->getUserProfile();
+}
+catch( Exception $e){
+    print "An error occurred: " . $e->getMessage();
+    print " Error code: " . $e->getCode();	
+}
 
 
 //If we're creating a user.
@@ -56,13 +62,14 @@ if(isset($_GET['create'])){
 //If we're adding social login for this user/
 if(isset($_GET['add'])){
 	
-	$user = UsersQuery::create()->filterByEmail($user_profile->email)->findOne();
+	$uid = (isset($_GET['uid'])) ? $_GET['uid'] : -1 ;
+	$user = UsersQuery::create()->filterByUserid($_GET['uid'])->findOne();
 
-	if(count($userCheck) > 0){
+	if(count($user) > 0){
 		createSocialAuthForUser($user->getUserid(),$_GET['s'],$user_profile->identifier);
 		print "Your Account login for {$_GET['s']} has been created";
 	}else{
-		print "An account for the social media account listed email address doesn't seem to exist. Please create an account with the social login instead.";
+		print "We couldn't find your account. There may be a problem. Please contact your administrator.";
 		return; 
 	}
 }
@@ -82,7 +89,6 @@ if(isset($_GET['auth'])){
 		
 		if($user->getApproved() == 1){
 			loginUser($user->getUserId(),$user->getFullname(),$user->getAdmin());
-
 			//Reload the parent window to the app, logged in. Then Close this window.
 			?>
 			<script>
