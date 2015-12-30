@@ -79,7 +79,8 @@ if(!defined('VERSION')){
 		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
 		storedData.filepath = "<?php print $options['filepath'] ?>";
 		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
-		
+		storedData.allowSocial = <?php print ($options['allowSocial']) ? 'true' : 'false' ; ?>;
+
 		storedData.columns = [
 			{
 				"columnName":"Description",
@@ -176,7 +177,12 @@ if(!defined('VERSION')){
 				//swapModal("#manageItemFormBlock");
 			});
 			
-			
+			//Hide the social login buttons if social login is not enabled.
+			if(storedData.allowSocial == false){
+				$(".socialAuthButtons").hide();
+				$("#loginButtons").removeClass("offset3").addClass("offset4");
+			}
+
 			$("#requestAccount, #addUserButton").click(function(){
 				$("#manageUser input[type='text'],#manageUser input[type='password']").val("");
 				$("#manageUser input[type='checkbox']").prop("checked",false);
@@ -266,7 +272,14 @@ if(!defined('VERSION')){
 			Support for social login.
 			*/
 			$(".social_login").click(function(ev){
-				window.open("socialLogin.php?s="+ev.target.getAttribute("data-social")+"&"+ev.target.getAttribute("data-calltype"),'LOGIN!',config='height=400,width=400');
+				//Which network?
+				var socialNetwork = ev.target.getAttribute("data-social");
+
+				//If we're adding, include the userid for use later.
+				callType = ev.target.getAttribute("data-calltype");
+				var callType = (callType == 'add') ? callType+"&uid="+userId : callType;
+
+				window.open("socialLogin.php?s="+socialNetwork+"&"+callType,'LOGIN!',config='height=400,width=400');
 			});
 
 			$('.dropdown-toggle').dropdown();
@@ -1013,21 +1026,54 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 */
 ?>
 
+<div id="loginFormRow" class="span4 offset4">
+    <div class="row">
+    	<div class="col-md-4 col-md-offset-4">
+    		<div class="panel panel-default">
+			  	<div class="well">
+			    	<form accept-charset="UTF-8" role="form" name="loginForm" id="loginForm" method="POST" onsubmit="return false;" >
+                    <fieldset>
+			    	  	<div class="form-group">
+			    		    <input class="form-control" placeholder="username" type="text" name="username" id="username">
+			    		</div>
+			    		<div class="form-group">
+			    			<input class="form-control" placeholder="Password" name="password" id="password" type="password" >
+			    		</div>
+			    		<p><input class="btn btn-lg btn-primary btn-block" type="submit" onclick="login();" value="Login"></p>
+			    		<p> <button id="requestAccount" type="button" class="btn btn-small">Create an Account</button> </p>
+			    		<p> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button></p>
+			    	</fieldset>
+			      	</form>
+			      	<div class="socialAuthButtons">
+    	                <hr/>
+	                    <center><h4>OR</h4></center>
+	                    <p><button class="social_login btn btn-lg btn-block" data-social="google" data-calltype="auth">Login with Google</button></p>
+						<p><button class="social_login btn btn-lg btn-block" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
+					</div>
+			    </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--
 	<div class="row" id="loginFormRow">
-		<div class="span3 offset3">
+		<div id="loginButtons" class="span3 offset3">
 			<form name="loginForm" id="loginForm" method="POST" onsubmit="return false;" class="form-inline">
 				<p><input name="username" id="username" type="text" class="input-medium" placeholder="Username"/></p>
 				<p><input name="password" id="password" type="password" class="input-medium" placeholder="Password" /></p>
 				<p><button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button></p>
 			</form>
 		</div>
-		<div class="span3" id="socialAuthButtons">
+		<div class="span3 socialAuthButtons">
 			<p><button class="social_login btn" data-social="google" data-calltype="auth">Login with Google</button></p>
 			<p><button class="social_login btn" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
 		</div>
 	</div>
+	
 	<div class="row" id="additionalInfo">
-		<!-- A great place for extra buttons, messages, etc. -->
+		
 		<div class="span4 offset4">
 			<button id="requestAccount" type="button" class="btn btn-small">Create an Account</button> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button>
 		</div>
@@ -1038,6 +1084,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			<a class="close" data-dismiss="alert" href="#">&times;</a>
 		</div>
 	</div>	
+	-->
 <?php 
 }
 ?>
@@ -1114,7 +1161,7 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 
 		  </div>
 		  <div class="modal-footer">
-		  	<div id="socialAccounts">
+		  	<div id="socialAccounts" class="socialAuthButtons">
 				<a id="manageUserSocialGoogle" href="#" class="btn pull-left social_login" data-social="google" data-calltype="create">Add Account with Google</a> 
 				<a id="manageUserSocialFacebook" href="#" class="btn pull-left social_login" data-social="facebook" data-calltype="create">Add Account with Facebook</a>
 			</div>
