@@ -11,17 +11,17 @@
 
 return
 		array(
-			"base_url" => "http://dowant.dev/hybrid.php",
+			"base_url" => "http://yourDomainName.tld/hybrid.php",
 			"providers" => array(
 				"Google" => array(
 					"enabled" => true,
-					"keys" => array("id" => "911019304085-0faeouu5lmnis90mlbukj78dogu9bcfs.apps.googleusercontent.com", 
-									"secret" => "Bu1ZAFP_4yRUmpCMXfE05v7P"),
+					"keys" => array("id" => "yourClientIdGoesHereAbcdefg.apps.googleusercontent.com", 
+									"secret" => "ClientSecretGoesHere"),
 					"scope" => "profile email"
 				),
 				"Facebook" => array(
 					"enabled" => true,
-					"keys" => array("id" => "31003322366", "secret" => "c5fce8a14f1d7e01b4c2b7816f929344"),
+					"keys" => array("id" => "yourClientIdGoesHereAbcdefg", "secret" => "ClientSecretGoesHere"),
 					"trustForwarded" => false
 				)
 			),
@@ -29,7 +29,7 @@ return
 			// You can also set it to
 			// - "error" To log only error messages. Useful in production
 			// - "info" To log info and error messages (ignore debug messages)
-			"debug_mode" => true,
+			"debug_mode" => false,
 			// Path to file writable by the web server. Required if 'debug_mode' is not false
 			"debug_file" => "logs/error_log",
 );

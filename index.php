@@ -9,12 +9,11 @@ if(!file_exists('config.php')){
 
 
 include 'config.php';
-//include 'initialize.php';
 
 
 if(!defined('VERSION')){
 	//DO NOT CHANGE THIS!! IT COULD BREAK YOUR INSTALLATION!
-	define("VERSION","0.9.96");
+	define("VERSION","0.9.97");
 	define("USER_AGENT_STRING","Mozilla/5.0 (compatible; DoWant/1.0; +code.google.com/p/do-want/)");	
 }else{
 	if($_SESSION['admin'] == 1){
@@ -79,7 +78,7 @@ if(!defined('VERSION')){
 		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
 		storedData.filepath = "<?php print $options['filepath'] ?>";
 		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
-		storedData.allowSocial = <?php print ($options['allowSocial']) ? 'true' : 'false' ; ?>;
+		storedData.allowSocial = <?php print (isset($options['allowSocial']) && $options['allowSocial'] == true) ? 'true' : 'false' ; ?>;
 
 		storedData.columns = [
 			{

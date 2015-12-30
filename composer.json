@@ -2,9 +2,8 @@
     "require": {
         "hybridauth/hybridauth": "^2.5",
         "robmorgan/phinx": "^0.4.6",
-        "propel/propel": "~2.0@dev"
+        "j4mie/paris": "^1.5"
     },
     "autoload": {
-		"classmap": ["models/"]
   	}
 }
