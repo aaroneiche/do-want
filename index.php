@@ -78,7 +78,7 @@ if(!defined('VERSION')){
 		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
 		storedData.filepath = "<?php print $options['filepath'] ?>";
 		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
-		storedData.allowSocial = <?php print ($options['allowSocial']) ? 'true' : 'false' ; ?>;
+		storedData.allowSocial = <?php print (isset($options['allowSocial']) && $options['allowSocial'] == true) ? 'true' : 'false' ; ?>;
 
 		storedData.columns = [
 			{
