@@ -223,17 +223,18 @@ class user extends db{
 				
 		switch($cleanAction){
 			case 'add':
-				if($uniqueResult >0){
+				if($uniqueResult > 0){
 					return array('type'=>"error",'message'=>'This email or username is already taken. Please choose another');
 				}
 			
 				$hashedPassword = call_user_func_array(array($this,$this->options["password_hasher"]), array($cleanPassword));
 				
 				$query = "INSERT into {$this->options["table_prefix"]}users(username,password,fullname,email,email_msgs,approved,admin) VALUES('$cleanUsername','$hashedPassword','$cleanFullname','$cleanEmail','$cleanEmailMsg',$cleanApproved,$cleanAdmin)";
+				$addUserResult = $this->dbQuery($query);
 
-				
-				$adminId = $this->dbAssoc($this->dbQuery("select * from {$this->options["table_prefix"]}users where admin = 1"),true);
-								
+
+
+				$adminId = $this->dbAssoc($this->dbQuery("select * from {$this->options["table_prefix"]}users where admin = 1"),true);				
 				$sendRequest = $this->sendMessage(array("senderId"=>0,
 										"receiverId"=>$adminId[0]['userid'],
 										"message"=>"$cleanFullname has requested an account on your wishlist system. Please login and approve them",
@@ -249,7 +250,7 @@ class user extends db{
 					$returnArray['message'] = "There was a problem sending your request. You may need to contact the administrator directly.";
 				}
 				
-				$returnArray['result'] = $this->dbQuery($query);
+				$returnArray['result'] = $addUserResult;
 				
 			break;
 			case 'edit':
