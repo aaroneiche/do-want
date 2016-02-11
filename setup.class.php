@@ -81,32 +81,26 @@ class setup extends db{
 	*/
 	
 	function setupTables($args){
-		
-		$queries = array();
-		
-		if ($handle = opendir('sql/')) {
-		    /* This is the correct way to loop over the directory. */
-		    while (false !== ($entry = readdir($handle))) {
-				$fileNameEnd = strpos($entry,".sql");
+		require 'vendor/autoload.php';
+		require "config.php";
 
-				if($fileNameEnd != false){
-					$queries[substr($entry,0,$fileNameEnd)] = file_get_contents("sql/".$entry);
-				}
-		    }
-		    closedir($handle);
-		}
-		
-		$queryResults = array();
-		foreach($queries as $tableName => $queryToRun){
-			$queryResults[$tableName] = $this->dbQuery($queryToRun);
-		}
-		
-		$results = array(
-			"result"=>true,
-			"message"=>"The following tables were created",
-			"tables" => $queryResults
-		);
-		
+		$app = new Phinx\Console\PhinxApplication();
+		$wrap = new Phinx\Wrapper\TextWrapper($app, array("configuration"=>"phinx_conf.php","parser"=>"php"));
+
+		$execution = call_user_func([$wrap, "getMigrate"], 'production', "20151101000000");
+		if($execution){
+			$results = array(
+				"result"=>true,
+				"message"=>"Table migration run",
+				"tables" => ""
+			);
+		}else{
+			$results = array(
+				"result"=>false,
+				"message"=>$execution,
+				"tables" => ""
+			);
+		}			
 		return $results;
 	}
 
