@@ -35,6 +35,6 @@ $options['includeCustom'] = false;
 $options['charSet'] = 'utf8';
 
 //Allow logins and account creation from OAuth providers like Google and facebook.
-$options['allowSocial'] = true;
+$options['allowSocial'] = false;
 
 ?>

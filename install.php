@@ -71,6 +71,9 @@
 					if(response){
 						$("#step-four div.alert-success").fadeIn();
 						$("#stepFourNextButton").prop("disabled",false).removeClass("disabled");
+						
+						$("button#setupAdminUserButton").prop("disabled",true).addClass("disabled");
+
 					}else{
 						$("#step-four div.alert-error").fadeIn();
 					}
@@ -168,20 +171,6 @@
 				});
 				
 				$("#step-one div.alert").hide();
-				
-				/*
-				jQuery.post('ajaxCalls.php',data,function(response){
-					
-					error_log(response);
-					
-					if(response == true){
-						$("#step-one div.alert-success").fadeIn();
-						$("#stepOneNextButton").prop("disabled",false).removeClass("disabled");
-					}else{
-						$("#step-one div.alert-error").fadeIn();
-					}
-				},"json");
-				*/
 			}
 				
 			function setupTables(){
