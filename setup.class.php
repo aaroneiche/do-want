@@ -101,6 +101,14 @@ class setup extends db{
 				"tables" => ""
 			);
 		}			
+
+		$seed = call_user_func([$wrap, "getSeed"]);
+		if($seed){
+			$results["message"] .= ", Tables Seeded";
+		}else{
+			$results["message"] .= ", Tables Seeding Failed";
+		}
+		        
 		return $results;
 	}
 

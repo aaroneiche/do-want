@@ -1,7 +1,7 @@
 {
     "require": {
         "hybridauth/hybridauth": "^2.5",
-        "robmorgan/phinx": "^0.4.6",
+        "robmorgan/phinx": "^0.5.0",
         "j4mie/paris": "^1.5"
     },
     "autoload": {
