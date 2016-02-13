@@ -85,7 +85,7 @@ class setup extends db{
 		require "config.php";
 
 		$app = new Phinx\Console\PhinxApplication();
-		$wrap = new Phinx\Wrapper\TextWrapper($app, array("configuration"=>"phinx_conf.php","parser"=>"php"));
+		$wrap = new Phinx\Wrapper\TextWrapper($app, array("configuration"=>"phinx.php","parser"=>"php"));
 
 		$execution = call_user_func([$wrap, "getMigrate"], 'production', "20151101000000");
 		if($execution){
