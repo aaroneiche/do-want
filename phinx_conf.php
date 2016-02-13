@@ -5,7 +5,7 @@ require "config.php";
 
 return array(
     "paths" => array(
-        "migrations" => "migrations"
+        "migrations" => "db/migrations"
     ),
     "environments" => array(
         "default_migration_table" => "phinxlog",
