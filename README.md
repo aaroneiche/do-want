@@ -9,27 +9,37 @@ gifts and make sure no one else ends up with the same thing.
 
 Looking for a Download?
 =======================
+If you just want to download an installable, reasonably stable version, you can visit the [end-user-friendly page here](http://aaroneiche.github.com/do-want/).
 
-If you just want to download an installable, reasonably stable version, you can visit the [end-user-friendly page here](http://aaroneiche.github.com/do-want/)
+Installation
+============
+####The preferred way
 
-Most recent update
-==================
-Just added support for adding and deleting categories at your whim. Items with that category now move to a "none" category, which is a valid option.
-Also some minor bug fixes.
+Download the most recent version from the link above and go to the directory where you placed it in your browser. You will be redirected to the installation page.
 
-What's on the Docket?
-=====================
-Things that we're planning on having done for a version 1.0 release:
-- Self-updating - Do Want will be able to check for updates, download, unpack, and install both files and Database updates
-- Improvements in UI - The unification of the item detail and edit screens are high on the list, and better item creation.
-- Better user notifications & management.
-- Getting rid of all those annoying bugs that everyone hates.
+####The alternative way
+If you would prefer to use the most recent code (at your own risk), or at least the most recent code committed, you can download the code on the github (https://github.com/aaroneiche/do-want) This version is not guaranteed to work properly, though the code should be relatively complete.
 
-----
-Developers
-==
-Interested in helping out? Great! We'd love to have you join us. We don't have a strongly casted workflow yet, so feel 
-free to dig in by forking the project, and finding an issue that interests you!
+You will need to have [Composer installed](https://getcomposer.org/), Then do the following:
 
+```
+composer install
+```
 
-Thanks Again!
+That will make composer fetch all the appropriate files 
+Additionally, you will need to install a customized version of the Phinx TextWrapper Class [found here](https://github.com/aaroneiche/phinx/tree/0.5.x-dev/src/Phinx/Wrapper) - this version supports seed commands from php applications. Simply replace the corrosponding file in your vendor/robmorgan/phinx/src/Wrapper/ with the new one. A pull request is into the Phinx project to get the file updated.
+
+Contributing
+============
+If you're willing to contribute, I'm delighted to have you work on it! The workflow is pretty simple:
+	
+	1) Fork the "develop" branch (it's the default)
+	2) Create a branch to fix an issue, or implement a feature
+	3) Write code (pull 'develop' and merge it into your branch as you go to stay up to date)
+	4) Push that branch to your Github
+	5) Issue a pull request to the develop branch
+
+I'm still figuring out unit testing, and the release cycle. I figure once we tackle a few bugs, we'll merge into master and 
+tag a release.
+
+Feel free to email with questions, comments, concerns, or ideas: aaron@aaroneiche.com
