@@ -29,6 +29,16 @@ composer install
 That will make composer fetch all the appropriate files 
 Additionally, you will need to install a customized version of the Phinx TextWrapper Class [found here](https://github.com/aaroneiche/phinx/tree/0.5.x-dev/src/Phinx/Wrapper) - this version supports seed commands from php applications. Simply replace the corrosponding file in your vendor/robmorgan/phinx/src/Wrapper/ with the new one. A pull request is into the Phinx project to get the file updated.
 
+
+Migrating from a previous version
+=================================
+There are two steps necessary to migrate from a previous installation of DoWant. This is a temporary solution while a more elegant process is put into place. 
+
+1) Copy all new files from the distribution to your installation. Many FTP programs have a sync feature that will accomplish this.
+
+2) Update your database; In your browser, go to your wishlist and to /migrator.php  Here you will find a table of migrations - simply click on the last available one. This will migrate your installation to the most recent database version. After that, you're done!
+
+
 Contributing
 ============
 If you're willing to contribute, I'm delighted to have you work on it! The workflow is pretty simple:
