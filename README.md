@@ -34,7 +34,7 @@ Migrating from a previous version
 =================================
 There are two steps necessary to migrate from a previous installation of DoWant. This is a temporary solution while a more elegant process is put into place. 
 
-1) Copy all new files from the distribution to your installation. Many FTP programs have a sync feature that will accomplish this.
+1) Copy all new files from the distribution to your installation. Many FTP programs have a sync feature that will accomplish this. Be sure to not overwrite your **uploads** directory, or your **custom** directory - if you're using it.
 
 2) Update your database; In your browser, go to your wishlist and to /migrator.php  Here you will find a table of migrations - simply click on the last available one. This will migrate your installation to the most recent database version. After that, you're done!
 
