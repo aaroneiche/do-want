@@ -78,7 +78,26 @@ if(!defined('VERSION')){
 		storedData.currencySymbol = "<?php print $options['currency_symbol'] ?>";
 		storedData.filepath = "<?php print $options['filepath'] ?>";
 		storedData.largeIcons = "<?php print $options['large-icons'] ?>";
-		storedData.allowSocial = <?php print (isset($options['allowSocial']) && $options['allowSocial'] == true) ? 'true' : 'false' ; ?>;
+		
+		//storedData.allowSocial = <?php print (isset($options['allowSocial']) && $options['allowSocial'] == true) ? 'true' : 'false' ; ?>;
+		storedData.socialLogin = [];
+		<?php
+			$socialLogin = array();
+			if(file_exists("authconf.php")){
+				$socialLoginPrefs = include("authconf.php");
+				
+				foreach($socialLoginPrefs['providers'] as $provider =>$providerData){
+					if($providerData['enabled'] == true){
+						$socialLogin[] = $provider;
+					}
+				}
+
+				?>
+				storedData.socialLogin = <?php print json_encode($socialLogin); ?>
+				<?php
+			}
+		?>		
+
 
 		storedData.columns = [
 			{
@@ -170,15 +189,19 @@ if(!defined('VERSION')){
 			
 			$("#addItems").click(function(){
 				clearManageItemForm();
-//				$('#addSourceButton').addClass('disabled').prop("disabled","disabled");
-//				$('#openAddImageForm').addClass('disabled').prop("disabled","disabled");
 				$('#manageItemFormBlock').modal();
-				//swapModal("#manageItemFormBlock");
 			});
 			
-			//Hide the social login buttons if social login is not enabled.
-			if(storedData.allowSocial == false){
+			if(storedData.socialLogin.length > 0){
+				$('[data-social]').hide();
+				$(".socialAuthButtons").show();
+
+				for(socLogin in storedData.socialLogin){
+					$('[data-social="'+storedData.socialLogin[socLogin]+'"]').show();
+				}
+			}else{
 				$(".socialAuthButtons").hide();
+				$('[data-social]').hide();
 				$("#loginButtons").removeClass("offset3").addClass("offset4");
 			}
 
@@ -1046,8 +1069,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 			      	<div class="socialAuthButtons">
     	                <hr/>
 	                    <center><h4>OR</h4></center>
-	                    <p><button class="social_login btn btn-lg btn-block" data-social="google" data-calltype="auth">Login with Google</button></p>
-						<p><button class="social_login btn btn-lg btn-block" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
+	                    <p><button class="social_login btn btn-lg btn-block" data-social="Google" data-calltype="auth">Login with Google</button></p>
+						<p><button class="social_login btn btn-lg btn-block" data-social="Facebook" data-calltype="auth">Login with Facebook</button></p>
 					</div>
 			    </div>
 			</div>
@@ -1055,35 +1078,6 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 	</div>
 </div>
 
-
-<!--
-	<div class="row" id="loginFormRow">
-		<div id="loginButtons" class="span3 offset3">
-			<form name="loginForm" id="loginForm" method="POST" onsubmit="return false;" class="form-inline">
-				<p><input name="username" id="username" type="text" class="input-medium" placeholder="Username"/></p>
-				<p><input name="password" id="password" type="password" class="input-medium" placeholder="Password" /></p>
-				<p><button type="submit" onclick="login();" value="login" class="btn btn-primary">Login</button></p>
-			</form>
-		</div>
-		<div class="span3 socialAuthButtons">
-			<p><button class="social_login btn" data-social="google" data-calltype="auth">Login with Google</button></p>
-			<p><button class="social_login btn" data-social="facebook" data-calltype="auth">Login with Facebook</button></p>
-		</div>
-	</div>
-	
-	<div class="row" id="additionalInfo">
-		
-		<div class="span4 offset4">
-			<button id="requestAccount" type="button" class="btn btn-small">Create an Account</button> <button id="forgotPassword" type="button" class="btn btn-small">I Forgot my password</button>
-		</div>
-	</div>
-	<div class="row" id="alertLocation">
-		<div id="displayAlert" class="span4 offset4 alert">
-			<span id="loginAlertMessage"></span>
-			<a class="close" data-dismiss="alert" href="#">&times;</a>
-		</div>
-	</div>	
-	-->
 <?php 
 }
 ?>
@@ -1161,8 +1155,8 @@ if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true)
 		  </div>
 		  <div class="modal-footer">
 		  	<div id="socialAccounts" class="socialAuthButtons">
-				<a id="manageUserSocialGoogle" href="#" class="btn pull-left social_login" data-social="google" data-calltype="create">Add Account with Google</a> 
-				<a id="manageUserSocialFacebook" href="#" class="btn pull-left social_login" data-social="facebook" data-calltype="create">Add Account with Facebook</a>
+				<a id="manageUserSocialGoogle" href="#" class="btn pull-left social_login" data-social="Google" data-calltype="create">Add Account with Google</a> 
+				<a id="manageUserSocialFacebook" href="#" class="btn pull-left social_login" data-social="Facebook" data-calltype="create">Add Account with Facebook</a>
 			</div>
 			<a href="#" id="manageUserCloseButton" class="btn pull-right" data-dismiss="modal">Cancel</a>
 			<a href="#" id="manageUserSaveButton" class="btn btn-primary pull-right">Save</a>
