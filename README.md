@@ -38,6 +38,40 @@ There are two steps necessary to migrate from a previous installation of DoWant.
 
 2) Update your database; In your browser, go to your wishlist and to /migrator.php  Here you will find a table of migrations - simply click on the last available one. This will migrate your installation to the most recent database version. After that, you're done!
 
+Social Login
+============
+Social Login is an advanced configuration feature that allows login with (currently) Google or Facebook instead of using DoWant's internal login system (a native user is still generated).
+Documentation is being generated, but it's currently incomplete.
+A knowledge of PHP is helpful in setting the values, but it should be pretty easy to figure out.
+
+Here's a short version':
+
+####For Both
+ - Copy ```authconf.default.php``` to ```authconf.php```
+ - Change the ```base_url``` value to ```http://yourDomainName.tld/hybrid.php``` (replacing the domain)
+
+####Then For Google
+ - Go to Googles Developer Console
+ - Create an Application
+ - Enable the Google+ API on it
+ - Create Credentials (Id/Secret)
+ - Add the authorized URL: ```http://yourdomain.tld/hybrid.php?hauth.done=Google``` (replacing the domain)
+
+
+####Then For Facebook
+ - Go to the [Facebook Developers Page](https://developers.facebook.com/)
+ - Create an Application
+ - Go to Settings
+ - Add your domain to the "domains".
+ - 
+
+####Then For Both
+ - Add your client secret and client ID to the relavant section
+ - Set enabled to ```true``` (no quotes)
+ - Save your ```authconf.php``` file
+
+Reload the site, you should now see the buttons for logging in on the login panel.
+If you can't get it to work, feel free to post to [the developers group](https://groups.google.com/forum/#!forum/do-want) You should get a pretty quick response.
 
 Contributing
 ============
