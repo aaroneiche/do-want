@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Do-want : Do Want - Open Source Gift Registry">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Do-want</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/aaroneiche/do-want">View on GitHub</a>
+
+          <h1 id="project_title">Do-want</h1>
+          <h2 id="project_tagline">Do Want - Open Source Gift Registry</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/aaroneiche/do-want/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/aaroneiche/do-want/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="do-want" class="anchor" href="#do-want" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Do-Want</h1>
+
+<p>Do Want is an Open Source Gift Registry system designed to be quick and easy to setup and run on your preferred web
+server. </p>
+
+<p>Whether you're exchanging gifts with just one other person or with 50 other people, Do Want makes it easy to pick out 
+gifts and make sure no one else ends up with the same thing.</p>
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
+
+<h4>
+<a id="the-preferred-way" class="anchor" href="#the-preferred-way" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The preferred way</h4>
+
+<p>Download the most recent version from the link above and go to the directory where you placed it in your browser. You will be redirected to the installation page.</p>
+
+<h4>
+<a id="the-alternative-way" class="anchor" href="#the-alternative-way" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The alternative way</h4>
+
+<p>If you would prefer to use the most recent code (at your own risk), or at least the most recent code committed, you can download the code on the github (<a href="https://github.com/aaroneiche/do-want">https://github.com/aaroneiche/do-want</a>) This version is not guaranteed to work properly, though the code should be relatively complete.</p>
+
+<p>You will need to have <a href="https://getcomposer.org/">Composer installed</a>, Then do the following:</p>
+
+<pre><code>composer install
+</code></pre>
+
+<p>That will make composer fetch all the appropriate files 
+Additionally, you will need to install a customized version of the Phinx TextWrapper Class <a href="https://github.com/aaroneiche/phinx/tree/0.5.x-dev/src/Phinx/Wrapper">found here</a> - this version supports seed commands from php applications. Simply replace the corrosponding file in your vendor/robmorgan/phinx/src/Wrapper/ with the new one. A pull request is into the Phinx project to get the file updated.</p>
+
+<h1>
+<a id="migrating-from-a-previous-version" class="anchor" href="#migrating-from-a-previous-version" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Migrating from a previous version</h1>
+
+<p>There are two steps necessary to migrate from a previous installation of DoWant. This is a temporary solution while a more elegant process is put into place. </p>
+
+<p>1) Copy all new files from the distribution to your installation. Many FTP programs have a sync feature that will accomplish this. Be sure to not overwrite your <strong>uploads</strong> directory, or your <strong>custom</strong> directory - if you're using it.</p>
+
+<p>2) Update your database; In your browser, go to your wishlist and to /migrator.php  Here you will find a table of migrations - simply click on the last available one. This will migrate your installation to the most recent database version. After that, you're done!</p>
+
+<h1>
+<a id="social-login" class="anchor" href="#social-login" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Social Login</h1>
+
+<p>Social Login is an advanced configuration feature that allows login with (currently) Google or Facebook instead of using DoWant's internal login system (a native user is still generated).
+Documentation is being generated, but it's currently incomplete.
+A knowledge of PHP is helpful in setting the values, but it should be pretty easy to figure out.</p>
+
+<p>Here's a short version':</p>
+
+<h4>
+<a id="for-both" class="anchor" href="#for-both" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>For Both</h4>
+
+<ul>
+<li>Copy <code>authconf.default.php</code> to <code>authconf.php</code>
+</li>
+<li>Change the <code>base_url</code> value to <code>http://yourDomainName.tld/hybrid.php</code> (replacing the domain)</li>
+</ul>
+
+<h4>
+<a id="then-for-google" class="anchor" href="#then-for-google" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Then For Google</h4>
+
+<ul>
+<li>Go to Googles Developer Console</li>
+<li>Create an Application</li>
+<li>Enable the Google+ API on it</li>
+<li>Create Credentials (Id/Secret)</li>
+<li>Add the authorized URL: <code>http://yourdomain.tld/hybrid.php?hauth.done=Google</code> (replacing the domain)</li>
+</ul>
+
+<h4>
+<a id="then-for-facebook" class="anchor" href="#then-for-facebook" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Then For Facebook</h4>
+
+<ul>
+<li>Go to the <a href="https://developers.facebook.com/">Facebook Developers Page</a>
+</li>
+<li>Create an Application</li>
+<li>Go to Settings</li>
+<li>Add your domain to the "domains".</li>
+<li>
+</ul>
+
+<h4>
+<a id="then-for-both" class="anchor" href="#then-for-both" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Then For Both</h4>
+
+<ul>
+<li>Add your client secret and client ID to the relavant section</li>
+<li>Set enabled to <code>true</code> (no quotes)</li>
+<li>Save your <code>authconf.php</code> file</li>
+</ul>
+
+<p>Reload the site, you should now see the buttons for logging in on the login panel.
+If you can't get it to work, feel free to post to <a href="https://groups.google.com/forum/#!forum/do-want">the developers group</a> You should get a pretty quick response.</p>
+
+<h1>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>If you're willing to contribute, I'm delighted to have you work on it! The workflow is pretty simple:</p>
+
+<pre><code>1) Fork the "develop" branch (it's the default)
+2) Create a branch to fix an issue, or implement a feature
+3) Write code (pull 'develop' and merge it into your branch as you go to stay up to date)
+4) Push that branch to your Github
+5) Issue a pull request to the develop branch
+</code></pre>
+
+<p>I'm still figuring out unit testing, and the release cycle. I figure once we tackle a few bugs, we'll merge into master and 
+tag a release.</p>
+
+<p>Feel free to email with questions, comments, concerns, or ideas: <a href="mailto:aaron@aaroneiche.com">aaron@aaroneiche.com</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Do-want maintained by <a href="https://github.com/aaroneiche">aaroneiche</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
