@@ -16,7 +16,7 @@ require 'vendor/autoload.php';
 require "config.php";
 
 $app = new Phinx\Console\PhinxApplication();
-$wrap = new Phinx\Wrapper\TextWrapper($app, array("configuration"=>"phinx_conf.php","parser"=>"php"));
+$wrap = new Phinx\Wrapper\TextWrapper($app, array("configuration"=>"phinx.php","parser"=>"php"));
 
 if(isset($_POST['migrate'])){
     
