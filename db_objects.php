@@ -9,19 +9,29 @@ ORM::configure('username', $dbuser);
 ORM::configure('password', $dbpass);
 
 //Users object
-class Users extends Model { 
+class Users extends Model {
 	public static $_id_column = 'userid';
 
 	function UserAuthProviders(){
 		return $this->hasMany('UserAuthProviders','user_id');
 	}
+
+	function Items(){
+		return $this->hasMany('Items');
+	}
 }
 
 //UserAuthProviders object
 class UserAuthProviders extends Model {
-	
+
 	function User() {
 		return $this->belongs_to("Users","user_id");
+	}
+}
+
+class Items extends model {
+	public function User() {
+		return $this->belongs_to("Users");
 	}
 }
 

@@ -2,7 +2,9 @@
     "require": {
         "hybridauth/hybridauth": "^2.5",
         "robmorgan/phinx": "^0.5.0",
-        "j4mie/paris": "^1.5"
+        "j4mie/paris": "^1.5",
+        "visualappeal/php-auto-update": "^0.9.2",
+        "slim/slim": "3.0"
     },
     "autoload": {
   	}
