@@ -29,7 +29,7 @@ class UserAuthProviders extends Model {
 	}
 }
 
-class Items extends model {
+class Items extends Model {
 	public function User() {
 		return $this->belongs_to("Users");
 	}
