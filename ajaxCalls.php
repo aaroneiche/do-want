@@ -3,9 +3,9 @@
 This script handles ajax calls for the server.
 */
 
-function __autoload($class_name) {
-    require_once strtolower($class_name . '.class.php');
-}
+spl_autoload_register(function ($class_name) {
+    require strtolower($class_name . '.class.php');
+});
 
 //We need the configuration
 if(file_exists("config.php")){
@@ -21,6 +21,8 @@ information from defined forms or non-ajax made calls.
 if(!isset($_REQUEST['args'])){
 	$_REQUEST['args'] = $_REQUEST;
 }
+
+
 
 $instance = new $_REQUEST['interact']();
 
@@ -43,7 +45,6 @@ if(!isset($_REQUEST['args']['nodb'])){
 }
 
 //encode and return whatever the class method returned.
-
-print json_encode($instance->$_REQUEST['action']($_REQUEST['args']));
+print json_encode($instance->{$_REQUEST['action']}($_REQUEST['args']));
 
 ?>

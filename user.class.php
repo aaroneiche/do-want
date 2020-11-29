@@ -416,7 +416,7 @@ class user extends db{
 		$query = "update messages set isread = 1 where messageid = {$args['messageId']}";
 		$result = $this->dbQuery($query);
 
-	 	return $this->dbAssoc($result);
+	 	return $result;
 	}
 	
 }

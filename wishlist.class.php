@@ -406,7 +406,7 @@ class wishlist extends db{
 		// Manage images.
 		$imagesResult = array();
 		
-		if(count($args['images']) > 0){
+		if(array_key_exists('images', $args) && count($args['images']) > 0){
 			
 			foreach($args['images'] as $image){
 				if(isset($image['action'])){

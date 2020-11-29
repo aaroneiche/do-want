@@ -11,18 +11,18 @@ class db{
 	public $debug;
 
 	function dbConnect(){
-		$this->dbConn = mysql_connect($this->dbhost,$this->dbuser,$this->dbpass);
+		$this->dbConn = mysqli_connect($this->dbhost,$this->dbuser,$this->dbpass);
 		
 		if($this->options['charSet'] != ''){
-			$setChar = mysql_set_charset($this->options['charSet'],$this->dbConn);
+			$setChar = mysqli_set_charset($this->dbConn, $this->options['charSet']);
 		}
 		
-		$select = mysql_select_db($this->dbname,$this->dbConn);	
+		$select = mysqli_select_db($this->dbConn,$this->dbname);	
 		if(!$select){
 			
 			$response = array(
-				"error"=>mysql_errno(),
-				"message"=>mysql_error()
+				"error"=>mysqli_errno(),
+				"message"=>mysqli_error()
 			);
 			return $response;
 			
@@ -33,18 +33,18 @@ class db{
 
 	
 	function dbQuery($query){
-		$result = mysql_query($query,$this->dbConn);
+		$result = mysqli_query($this->dbConn,$query);
 		
 		if($result !== false){
 			return $result;
 		}else{
-			error_log(mysql_error()." ".$query);
+			error_log(mysqli_error()." ".$query);
 		}
 		
 	}
 
 	function dbValue($resource){
-		return mysql_result($resource,0);
+		return mysqli_result($resource,0);
 	}
 	
 	function dbAssoc($resource, $forceMulti = false){
@@ -54,9 +54,9 @@ class db{
 		
 		*/
 		
-		while($row = mysql_fetch_assoc($resource)){
+		while($row = mysqli_fetch_assoc($resource)){
 
-			if(mysql_num_rows($resource) > 1 || $forceMulti == true){ //
+			if(mysqli_num_rows($resource) > 1 || $forceMulti == true){ //
 				$assocData[] = $row;
 			}else{
 				$assocData = $row;
@@ -67,20 +67,20 @@ class db{
 	}
 	
 	function dbLastInsertId(){
-		return mysql_insert_id();
+		return mysqli_insert_id($this->dbConn);
 	}
 
 	function dbRowCount($resource){
-		return mysql_num_rows($resource);
+		return mysqli_num_rows($resource);
 	}
 
 	//The escape function is built here so we can swap DB classes.
 	function dbEscape($queryString){
-		return mysql_real_escape_string($queryString);
+		return mysqli_real_escape_string($this->dbConn, $queryString);
 	}
 
 	function dbDisconnect(){
-		mysql_connect($this->dbConn);
+		mysqli_connect($this->dbConn);
 	}
 
 	function __deconstruct(){
