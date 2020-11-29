@@ -45,7 +45,7 @@
 				if(email.length == 0){
 					alert("You must enter an email address");
 					return false;
-				}else if(email.match(/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/) == null){
+				}else if(email.match(/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/) == null){
 					alert("You must enter a valid email address");
 					return false;					
 				}
